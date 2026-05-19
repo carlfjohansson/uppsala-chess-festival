@@ -23,7 +23,7 @@ async function sendOrganizerEmail(data) {
       <tr><td style="padding:8px;color:#666;">Namn</td><td style="padding:8px;font-weight:bold;">${name}</td></tr>
       <tr><td style="padding:8px;color:#666;">E-post</td><td style="padding:8px;">${email}</td></tr>
       <tr><td style="padding:8px;color:#666;">Klubb</td><td style="padding:8px;">${club || '—'}</td></tr>
-      <tr><td style="padding:8px;color:#666;">Rating</td><td style="padding:8px;">${rating || '—'}</td></tr>
+      <tr><td style="padding:8px;color:#666;">FIDE-ID</td><td style="padding:8px;">${rating || '—'}</td></tr>
       <tr><td style="padding:8px;color:#666;">Turneringar</td><td style="padding:8px;">${tournaments.join(', ')}</td></tr>
       <tr><td style="padding:8px;color:#666;">Totalt</td><td style="padding:8px;font-weight:bold;">${total} kr</td></tr>
       <tr><td style="padding:8px;color:#666;">Betalning</td><td style="padding:8px;">Kort (Stripe) — betalning påbörjad</td></tr>
