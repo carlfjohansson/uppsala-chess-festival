@@ -251,34 +251,6 @@
   html[lang="en"] [data-en-block] { display: block; }
   [data-en-block] { display: none; }
 
-  /* FOTOBANDET */
-  .photo-strip {
-    width: 100%;
-    height: 340px;
-    overflow: hidden;
-    position: relative;
-  }
-  @media (max-width: 720px) { .photo-strip { height: 220px; } }
-  .photo-strip img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 25%;
-    display: block;
-  }
-  .photo-strip .photo-caption {
-    position: absolute;
-    bottom: 16px;
-    right: 20px;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-</style>
-</head>
-<body>
-
 <nav class="top">
   <div class="inner">
     <div class="brand">Uppsala Schackfestival</div>
@@ -493,13 +465,9 @@
 
 <!-- CHECKOUT -->
 
-<div class="photo-strip">
-  <img src="/domkyrkan.jpg" alt="Uppsala domkyrka">
-  <div class="photo-caption">Uppsala</div>
-</div>
-
-<section class="section" id="anmalan">
-  <div class="container">
+<section class="section" id="anmalan" style="background-image: url('/domkyrkan.jpg'); background-size: cover; background-position: center 30%; background-attachment: fixed; position: relative;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,17,28,0.82) 0%, rgba(10,17,28,0.75) 60%, rgba(15,23,34,0.92) 100%);pointer-events:none;z-index:0;"></div>
+  <div class="container" style="position:relative;z-index:1;">
     <div class="section-head">
       <div class="label" data-sv>Anmälan</div><div class="label" data-en>Registration</div>
       <h2><span data-sv>Din anmälan</span><span data-en>Your registration</span></h2>
