@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
         <div style="font-family:sans-serif;background:#0f1722;color:#f5ecd9;padding:40px 0;">
           <div style="max-width:560px;margin:0 auto;background:#1d2a3d;border-radius:16px;overflow:hidden;">
             <div style="background:linear-gradient(135deg,#f5cb6b,#e08a3c);padding:28px 32px;">
-              <div style="font-size:1.8rem;font-weight:bold;color:#0f1722;">♞ Uppsala Schackfestival</div>
+              <div style="font-size:1.8rem;font-weight:bold;color:#0f1722;">Uppsala Schackfestival</div>
               <div style="color:#0f1722;opacity:0.8;margin-top:6px;">7–16 augusti 2026</div>
             </div>
             <div style="padding:32px;">

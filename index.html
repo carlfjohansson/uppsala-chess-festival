@@ -239,6 +239,31 @@
   html[lang="en"] [data-en] { display: inline; }
   html[lang="en"] [data-en-block] { display: block; }
   [data-en-block] { display: none; }
+
+  /* FOTOBANDET */
+  .photo-strip {
+    width: 100%;
+    height: 340px;
+    overflow: hidden;
+    position: relative;
+  }
+  @media (max-width: 720px) { .photo-strip { height: 220px; } }
+  .photo-strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    display: block;
+  }
+  .photo-strip .photo-caption {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 </style>
 </head>
 <body>
@@ -456,6 +481,12 @@
 </div>
 
 <!-- CHECKOUT -->
+
+<div class="photo-strip">
+  <img src="/domkyrkan.jpg" alt="Uppsala domkyrka">
+  <div class="photo-caption">Uppsala</div>
+</div>
+
 <section class="section" id="anmalan">
   <div class="container">
     <div class="section-head">
