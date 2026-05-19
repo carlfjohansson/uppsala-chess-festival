@@ -180,6 +180,7 @@
   form label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute); margin-bottom: 6px; margin-top: 16px; }
   form input, form select, form textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--ink); padding: 11px 14px; border-radius: 8px; font-family: var(--sans); font-size: 0.95rem; transition: border-color 0.15s; }
   form input:focus, form select:focus, form textarea:focus { outline: none; border-color: var(--gold); }
+  form input.field-error, form textarea.field-error { border-color: #e05a3c; }
   form textarea { resize: vertical; min-height: 80px; }
   .payment-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
   .payment-box h3 { margin-bottom: 6px; }
@@ -476,9 +477,9 @@
         <h3><span data-sv>Dina uppgifter</span><span data-en>Your details</span></h3>
         <p class="form-sub"><span data-sv>Fyll i dina uppgifter nedan.</span><span data-en>Fill in your details below.</span></p>
         <label for="f-name"><span data-sv>Namn</span><span data-en>Name</span> *</label>
-        <input id="f-name" required>
+        <input id="f-name" required aria-required="true" oninput="clearFieldError('f-name')">
         <label for="f-email">E-post *</label>
-        <input id="f-email" type="email" required>
+        <input id="f-email" type="email" required aria-required="true" oninput="clearFieldError('f-email')">
         <label for="f-club"><span data-sv>Klubb</span><span data-en>Club</span></label>
         <input id="f-club" placeholder="—">
         <label for="f-rating">FIDE-ID <span style="color:var(--ink-mute);font-weight:400;">(<span data-sv>valfritt</span><span data-en>optional</span>)</span></label>
@@ -592,8 +593,8 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <span data-sv>© 2026 Uppsala Skolschacksällskap. Alla rättigheter förbehållna.</span>
-      <span data-en>© 2026 Uppsala Skolschacksällskap. All rights reserved.</span>
+      <span data-sv>© 2026 Uppsala Skolschacksällskap. Alla rättigheter förbehållna. · <a href="/privacy.html">Integritetspolicy</a></span>
+      <span data-en>© 2026 Uppsala Skolschacksällskap. All rights reserved. · <a href="/privacy.html">Privacy Policy</a></span>
     </div>
   </div>
 </footer>
@@ -699,21 +700,39 @@
   }
 
   // VALIDATION
+  function clearFieldError(id) {
+    document.getElementById(id).classList.remove('field-error');
+  }
+
   function validate() {
     const lang = document.documentElement.lang;
-    const name = document.getElementById('f-name').value.trim();
-    const email = document.getElementById('f-email').value.trim();
+    const nameEl = document.getElementById('f-name');
+    const emailEl = document.getElementById('f-email');
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
     const m = document.getElementById('form-msg');
     m.classList.remove('show','error','success');
-    if (!name || !email) {
-      m.textContent = lang === 'en' ? 'Please fill in your name and email.' : 'Fyll i namn och e-post.';
-      m.classList.add('show','error');
-      document.querySelector('.checkout-form').scrollIntoView({ behavior: 'smooth' });
-      return false;
-    }
+    nameEl.classList.remove('field-error');
+    emailEl.classList.remove('field-error');
+
     if (Object.keys(cart).length === 0) {
       m.textContent = lang === 'en' ? 'Please select at least one tournament above.' : 'Välj minst en turnering ovan.';
       m.classList.add('show','error');
+      window.scrollTo({ top: document.getElementById('anmalan').offsetTop - 80, behavior: 'smooth' });
+      return false;
+    }
+    if (!name) {
+      nameEl.classList.add('field-error');
+      m.textContent = lang === 'en' ? 'Please fill in your name.' : 'Fyll i ditt namn.';
+      m.classList.add('show','error');
+      nameEl.focus();
+      return false;
+    }
+    if (!email) {
+      emailEl.classList.add('field-error');
+      m.textContent = lang === 'en' ? 'Please fill in your email address.' : 'Fyll i din e-postadress.';
+      m.classList.add('show','error');
+      emailEl.focus();
       return false;
     }
     return true;
