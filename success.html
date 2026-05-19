@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tack för din anmälan – Uppsala Schackfestival</title>
+<style>
+  :root {
+    --bg: #0f1722;
+    --panel: #1d2a3d;
+    --ink: #f5ecd9;
+    --ink-dim: #c9bfa8;
+    --ink-mute: #8e8674;
+    --gold: #e8b552;
+    --gold-bright: #f5cb6b;
+    --orange: #e08a3c;
+    --line: rgba(232, 181, 82, 0.18);
+    --line-strong: rgba(232, 181, 82, 0.4);
+    --serif: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 70% 30%, rgba(245, 203, 107, 0.25), transparent 55%),
+      radial-gradient(ellipse at 20% 80%, rgba(184, 90, 46, 0.3), transparent 50%),
+      linear-gradient(180deg, #2a1d2a 0%, #1a1828 40%, #0f1722 100%);
+    font-family: var(--sans);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .card {
+    background: rgba(29, 42, 61, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 56px 48px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .check {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-bright), var(--orange));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    color: var(--bg);
+    box-shadow: 0 10px 40px rgba(232, 181, 82, 0.4);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  .lead {
+    color: var(--ink-dim);
+    font-size: 1.05rem;
+    margin: 0 0 32px;
+  }
+  .next {
+    text-align: left;
+    background: rgba(15, 23, 34, 0.6);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin: 28px 0;
+  }
+  .next h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--gold-bright);
+    margin: 0 0 10px;
+  }
+  .next ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--ink-dim);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+  .next ul li::marker { color: var(--gold); }
+  .btn {
+    display: inline-block;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--gold-bright), var(--orange));
+    color: var(--bg);
+    text-decoration: none;
+    box-shadow: 0 6px 24px rgba(232, 181, 82, 0.35);
+    transition: transform 0.15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .lang {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    display: flex;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    overflow: hidden;
+    font-size: 0.78rem;
+  }
+  .lang button {
+    background: transparent;
+    border: 0;
+    color: var(--ink-dim);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .lang button.active {
+    background: var(--gold);
+    color: var(--bg);
+  }
+  [data-en] { display: none; }
+  html[lang="en"] [data-sv] { display: none; }
+  html[lang="en"] [data-en] { display: inline; }
+  .session {
+    margin-top: 24px;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    word-break: break-all;
+  }
+  .session code {
+    color: var(--gold);
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="lang" role="group" aria-label="Language">
+    <button class="active" data-lang="sv">SV</button>
+    <button data-lang="en">EN</button>
+  </div>
+  <div class="card">
+    <div class="check">♔</div>
+    <h1>
+      <span data-sv>Tack för din anmälan!</span>
+      <span data-en>Thank you for registering!</span>
+    </h1>
+    <p class="lead">
+      <span data-sv>Din betalning är genomförd och vi har tagit emot din anmälan till Uppsala Schackfestival 2026.</span>
+      <span data-en>Your payment has been received and your registration for Uppsala Chess Festival 2026 is confirmed.</span>
+    </p>
+
+    <div class="next">
+      <h2><span data-sv>Vad händer nu?</span><span data-en>What happens next?</span></h2>
+      <ul>
+        <li>
+          <span data-sv>Ett kvitto skickas till din e-postadress från Stripe.</span>
+          <span data-en>A receipt will be sent to your email from Stripe.</span>
+        </li>
+        <li>
+          <span data-sv>Vi bekräftar din plats på respektive turnering inom några dagar.</span>
+          <span data-en>We will confirm your spot in each tournament within a few days.</span>
+        </li>
+        <li>
+          <span data-sv>Spellokal: Uppsala Schackcentrum, Ekeby Bruk 6L.</span>
+          <span data-en>Venue: Uppsala Schackcentrum, Ekeby Bruk 6L.</span>
+        </li>
+        <li>
+          <span data-sv>Frågor? Mejla <a href="mailto:info@uppsalachessfestival.se" style="color: var(--gold-bright);">info@uppsalachessfestival.se</a>.</span>
+          <span data-en>Questions? Email <a href="mailto:info@uppsalachessfestival.se" style="color: var(--gold-bright);">info@uppsalachessfestival.se</a>.</span>
+        </li>
+      </ul>
+    </div>
+
+    <a href="/" class="btn">
+      <span data-sv>Tillbaka till hemsidan</span>
+      <span data-en>Back to the website</span>
+    </a>
+
+    <div class="session" id="session"></div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.lang button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.documentElement.lang = btn.dataset.lang;
+        document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get('session_id');
+    if (sid) {
+      document.getElementById('session').innerHTML =
+        '<span data-sv>Referensnummer:</span><span data-en>Reference:</span> <code>' + sid.slice(0, 24) + '…</code>';
+    }
+  </script>
+</body>
+</html>

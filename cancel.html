@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Betalning avbruten – Uppsala Schackfestival</title>
+<style>
+  :root {
+    --bg: #0f1722;
+    --panel: #1d2a3d;
+    --ink: #f5ecd9;
+    --ink-dim: #c9bfa8;
+    --ink-mute: #8e8674;
+    --gold: #e8b552;
+    --gold-bright: #f5cb6b;
+    --orange: #e08a3c;
+    --line: rgba(232, 181, 82, 0.18);
+    --line-strong: rgba(232, 181, 82, 0.4);
+    --serif: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 70% 30%, rgba(245, 203, 107, 0.18), transparent 55%),
+      radial-gradient(ellipse at 20% 80%, rgba(184, 90, 46, 0.22), transparent 50%),
+      linear-gradient(180deg, #2a1d2a 0%, #1a1828 40%, #0f1722 100%);
+    font-family: var(--sans);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .card {
+    background: rgba(29, 42, 61, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 56px 48px;
+    max-width: 540px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: rgba(245, 236, 217, 0.08);
+    border: 1px solid var(--line-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--gold);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+    margin: 0 0 12px;
+  }
+  p {
+    color: var(--ink-dim);
+    margin: 0 0 24px;
+  }
+  .btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.15s;
+    font-size: 0.95rem;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-bright), var(--orange));
+    color: var(--bg);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+  }
+  .lang {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    display: flex;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    overflow: hidden;
+    font-size: 0.78rem;
+  }
+  .lang button {
+    background: transparent;
+    border: 0;
+    color: var(--ink-dim);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .lang button.active {
+    background: var(--gold);
+    color: var(--bg);
+  }
+  [data-en] { display: none; }
+  html[lang="en"] [data-sv] { display: none; }
+  html[lang="en"] [data-en] { display: inline; }
+</style>
+</head>
+<body>
+  <div class="lang">
+    <button class="active" data-lang="sv">SV</button>
+    <button data-lang="en">EN</button>
+  </div>
+  <div class="card">
+    <div class="icon">♟</div>
+    <h1>
+      <span data-sv>Betalningen avbröts</span>
+      <span data-en>Payment cancelled</span>
+    </h1>
+    <p>
+      <span data-sv>Inget har dragits från ditt kort. Du kan försöka igen, eller använda Swish/plusgiro istället.</span>
+      <span data-en>No charge was made. You can try again, or use Swish/PlusGiro instead.</span>
+    </p>
+    <div class="btns">
+      <a href="/#anmalan" class="btn btn-primary">
+        <span data-sv>Försök igen</span>
+        <span data-en>Try again</span>
+      </a>
+      <a href="/" class="btn btn-ghost">
+        <span data-sv>Till hemsidan</span>
+        <span data-en>Back to home</span>
+      </a>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.lang button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.documentElement.lang = btn.dataset.lang;
+        document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+  </script>
+</body>
+</html>

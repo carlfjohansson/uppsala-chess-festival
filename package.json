@@ -1,0 +1,12 @@
+{
+  "name": "uppsala-schackfestival",
+  "version": "1.0.0",
+  "description": "Uppsala Schackfestival 2026 — website with Stripe Checkout",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "stripe": "^17.3.0"
+  }
+}
