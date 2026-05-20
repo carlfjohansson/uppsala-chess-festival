@@ -73,7 +73,13 @@
   .lang-toggle { display: flex; border: 1px solid rgba(232, 181, 82, 0.4); border-radius: 999px; overflow: hidden; font-size: 0.8rem; }
   .lang-toggle button { background: transparent; border: 0; color: #c9bfa8; padding: 6px 12px; cursor: pointer; font-family: var(--sans); font-weight: 600; letter-spacing: 0.05em; }
   .lang-toggle button.active { background: #e8b552; color: #0f1722; }
-  @media (max-width: 720px) { nav.top ul { display: none; } }
+  @media (max-width: 720px) {
+  nav.top ul { display: none; }
+  nav.top ul.open { display: flex; flex-direction: column; gap: 0; position: absolute; top: 56px; left: 0; right: 0; background: var(--navy); padding: 8px 0; z-index: 999; }
+  nav.top ul.open li a { display: block; padding: 12px 24px; color: #c9bfa8; }
+  nav.top ul.open li a:hover { color: #f5cb6b; }
+  .nav-hamburger { display: flex !important; }
+}
 
   /* HERO — keeps dark overlay over photo, fades to page bg at bottom */
   .hero {
@@ -270,6 +276,9 @@
       <button class="active" data-lang="sv">SV</button>
       <button data-lang="en">EN</button>
     </div>
+    <button class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Meny" style="display:none;background:none;border:none;cursor:pointer;padding:6px;color:#c9bfa8;margin-left:8px;">
+      <svg id="ham-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
   </div>
 </nav>
 
@@ -530,8 +539,9 @@
           <input id="f-rating" placeholder="t.ex. 123456" oninput="clearFieldError('f-rating')">
           <!-- SSF search widget (shown for Swedish players) -->
           <div id="ssf-search-wrap" style="margin-top:10px;">
-            <button type="button" onclick="togglePlayerSearch()" style="background:none;border:none;padding:0;color:var(--navy);font-size:0.85rem;cursor:pointer;font-family:var(--sans);text-decoration:underline;text-underline-offset:3px;">
-              <span data-sv>Vet du inte ditt SSF-ID? Sök det här</span><span data-en>Don't know your SSF ID? Search here</span>
+            <button type="button" onclick="togglePlayerSearch()" style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--line-strong);border-radius:20px;padding:5px 12px;color:var(--navy);font-size:0.82rem;cursor:pointer;font-family:var(--sans);font-weight:500;transition:background 0.15s,border-color 0.15s;" onmouseover="this.style.background='rgba(13,58,110,0.05)';this.style.borderColor='var(--navy)'" onmouseout="this.style.background='none';this.style.borderColor='var(--line-strong)'">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <span data-sv>Sök SSF-ID</span><span data-en>Look up SSF ID</span>
             </button>
             <div id="player-search-box" style="display:none;margin-top:14px;padding:16px;background:var(--bg-soft);border:1px solid var(--line-strong);border-radius:10px;">
               <p style="margin:0 0 10px;font-size:0.82rem;color:var(--ink-mute);">
@@ -994,7 +1004,20 @@
   }
 
   // SSF PLAYER SEARCH
-  function togglePlayerSearch() {
+  function toggleMobileMenu() {
+  const ul = document.querySelector('nav.top ul');
+  ul.classList.toggle('open');
+}
+// Close mobile menu when a link is clicked
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('nav.top ul a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.querySelector('nav.top ul').classList.remove('open');
+    });
+  });
+});
+
+function togglePlayerSearch() {
     const box = document.getElementById('player-search-box');
     const isHidden = box.style.display === 'none';
     box.style.display = isHidden ? 'block' : 'none';
