@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resultat – Uppsala Schackfestival 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f8f6f2; --panel:#ffffff; --navy:#0d3a6e; --gold:#c07010;
+  --ink:#1a1a2e; --ink-mute:#666; --line:#e0ddd8;
+  --sans:'Lato',sans-serif; --serif:'Playfair Display',serif;
+  --win-bg:#e8f5e9; --win-tx:#2e7d32;
+  --loss-bg:#fdecea; --loss-tx:#c62828;
+  --draw-bg:#fff8e1; --draw-tx:#c07010;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+a{color:var(--navy);text-decoration:none}
+
+nav.top{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+nav.top .inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:54px}
+.back-link{color:#c9bfa8;font-size:.88rem;display:flex;align-items:center;gap:5px;transition:color .2s}
+.back-link:hover{color:#f5cb6b}
+.brand{font-family:var(--serif);font-size:1rem;color:#f5cb6b;white-space:nowrap;margin:0 auto}
+.lang-toggle{display:flex;gap:4px}
+.lang-toggle button{background:none;border:1px solid rgba(255,255,255,.3);color:#c9bfa8;border-radius:4px;padding:3px 9px;font-size:.82rem;cursor:pointer;font-family:var(--sans)}
+.lang-toggle button.active{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.5)}
+
+.hero-small{background:var(--navy);color:#fff;padding:32px 24px 28px;text-align:center}
+.hero-small h1{font-family:var(--serif);font-size:1.8rem;color:#f5cb6b}
+.hero-small p{color:#c9bfa8;font-size:.92rem;margin-top:6px}
+
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+.section{padding:32px 0}
+
+.tourn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.tourn-btn{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .2s}
+.tourn-btn:hover{border-color:var(--navy);box-shadow:0 4px 12px rgba(13,58,110,.1);transform:translateY(-2px)}
+.tourn-btn.active{border-color:var(--navy);background:var(--navy);color:#fff}
+.tourn-btn .t-name{font-weight:700;font-size:.95rem;display:block}
+.tourn-btn .t-date{font-size:.76rem;opacity:.65;margin-top:3px;display:block}
+.tourn-btn.active .t-name{color:#f5cb6b}
+.tourn-btn.active .t-date{color:#c9bfa8}
+
+.youth-tabs{display:none;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.youth-tabs.visible{display:flex}
+.ytab{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 14px;font-size:.82rem;cursor:pointer;font-family:var(--sans);color:var(--navy);transition:all .15s}
+.ytab:hover{border-color:var(--navy)}
+.ytab.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+
+#results-panel{display:none}
+.results-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.results-title{font-family:var(--serif);font-size:1.4rem;color:var(--navy);flex:1}
+.view-tabs{display:flex;gap:6px}
+.vtab{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 14px;font-size:.82rem;cursor:pointer;font-family:var(--sans);color:var(--ink-mute);transition:all .15s}
+.vtab:hover{border-color:var(--navy);color:var(--navy)}
+.vtab.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.ssf-link{font-size:.8rem;margin-bottom:10px}
+.ssf-link a{color:var(--ink-mute);text-decoration:underline;text-underline-offset:2px}
+
+.loading-msg{padding:48px;text-align:center;color:var(--ink-mute)}
+.spinner{font-size:2rem;display:block;margin-bottom:12px;animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-msg{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:36px;text-align:center;color:var(--ink-mute)}
+.empty-msg strong{display:block;font-size:1.05rem;color:var(--navy);margin-bottom:8px}
+
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+table{border-collapse:collapse;font-size:.84rem;width:1px;min-width:100%}
+thead th{background:var(--navy);color:#fff;font-weight:600;padding:8px 6px;font-size:.74rem;white-space:nowrap;position:sticky;top:0;z-index:2}
+thead th.th-name{text-align:left;background:#0a2d56;position:sticky;left:0;z-index:3}
+thead th.th-num{width:28px;min-width:28px;padding:8px 2px;text-align:center}
+thead th.th-stat{width:1px;white-space:nowrap;padding:8px 12px}
+tbody tr:nth-child(odd) td{background:var(--panel)}
+tbody tr:nth-child(even) td{background:#faf9f6}
+tbody tr:hover td{background:#f0edea!important}
+td.td-rank{text-align:center;font-weight:700;color:var(--ink-mute);padding:6px 4px;font-size:.82rem;width:28px;border-right:1px solid var(--line)}
+td.td-name{text-align:left;padding:5px 10px 5px 6px;white-space:nowrap;position:sticky;left:0;z-index:1;border-right:1px solid var(--line)}
+tbody tr:nth-child(odd) td.td-name{background:var(--panel)}
+tbody tr:nth-child(even) td.td-name{background:#faf9f6}
+.td-pname{font-weight:600;display:block;line-height:1.3}
+.td-sub{font-size:.70rem;color:var(--ink-mute);display:block;line-height:1.2}
+td.td-cell{text-align:center;padding:6px 10px;color:var(--ink-mute);font-size:.82rem;white-space:nowrap}
+td.td-w{color:var(--win-tx);font-weight:600}
+td.td-d{color:var(--draw-tx);font-weight:600}
+td.td-l{color:var(--loss-tx);font-weight:600}
+td.td-score{text-align:center;font-weight:700;color:var(--navy);padding:6px 12px;font-size:.9rem;border-left:1px solid var(--line);white-space:nowrap}
+td.td-kvp{text-align:center;padding:6px 10px;color:var(--ink-mute);font-size:.75rem}
+td.rc{width:30px;min-width:30px;max-width:30px;padding:4px 1px;text-align:center;font-weight:700;font-size:.84rem;position:relative;border:1px solid rgba(0,0,0,.07)}
+.cw{background:var(--win-bg);color:var(--win-tx)}
+.cl{background:var(--loss-bg);color:var(--loss-tx)}
+.cd{background:var(--draw-bg);color:var(--draw-tx)}
+.cs{background:repeating-linear-gradient(45deg,#f0ede8,#f0ede8 4px,#e8e5e0 4px,#e8e5e0 8px)}
+.ce{color:#bbb;font-size:.72rem}
+.opp{position:absolute;top:2px;font-size:.52rem;font-weight:500;opacity:.6;line-height:1}
+.opp-w{right:2px}.opp-b{left:2px}.opp-c{left:50%;transform:translateX(-50%)}
+.gen{margin-top:12px;color:var(--ink-mute);font-size:.74rem;text-align:right}
+.gen a{color:var(--ink-mute);text-decoration:underline;text-underline-offset:2px}
+
+footer{background:var(--navy);color:#c9bfa8;text-align:center;font-size:.82rem;padding:24px;margin-top:48px}
+footer a{color:#f5cb6b}
+
+@media(max-width:600px){
+  .tourn-grid{grid-template-columns:repeat(2,1fr)}
+  .results-header{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="inner">
+    <a href="/" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <span class="sv">Tillbaka</span><span class="en" style="display:none">Back</span>
+    </a>
+    <span class="brand">Uppsala Schackfestival 2026</span>
+    <div class="lang-toggle">
+      <button class="active" onclick="setLang('sv')">SV</button>
+      <button onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-small">
+  <h1><span class="sv">Resultat & startlistor</span><span class="en" style="display:none">Results & start lists</span></h1>
+  <p><span class="sv">Välj en turnering nedan</span><span class="en" style="display:none">Select a tournament below</span></p>
+</div>
+
+<div class="container">
+  <div class="section">
+    <div class="tourn-grid" id="tourn-grid"></div>
+
+    <div class="youth-tabs" id="youth-tabs">
+      <button class="ytab active" onclick="selectYouth(18499,this)">Klass 1</button>
+      <button class="ytab" onclick="selectYouth(18500,this)">Klass 2</button>
+      <button class="ytab" onclick="selectYouth(18501,this)">Klass 3</button>
+      <button class="ytab" onclick="selectYouth(18502,this)">Klass 4</button>
+    </div>
+
+    <div id="results-panel">
+      <div class="results-header">
+        <div class="results-title" id="results-title"></div>
+        <div class="view-tabs" id="view-tabs" style="display:none">
+          <button class="vtab active" onclick="switchView('cross',this)"><span class="sv">Korstabell</span><span class="en" style="display:none">Cross table</span></button>
+          <button class="vtab" onclick="switchView('round',this)"><span class="sv">Rond för rond</span><span class="en" style="display:none">Round by round</span></button>
+          <button class="vtab" onclick="switchView('compact',this)"><span class="sv">Ställning</span><span class="en" style="display:none">Standings</span></button>
+        </div>
+      </div>
+      <div class="ssf-link" id="ssf-link"></div>
+      <div id="tab-cross"></div>
+      <div id="tab-round" style="display:none"></div>
+      <div id="tab-compact" style="display:none"></div>
+      <div id="tab-startlist" style="display:none"></div>
+      <div class="gen" id="results-footer"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="/">Uppsala Schackfestival 2026</a> &nbsp;·&nbsp;
+  <span class="sv">Data från member.schack.se</span><span class="en" style="display:none">Data from member.schack.se</span>
+</footer>
+
+<script>
+const TOURNAMENTS = [
+  {id:18485, sv:'Weekend 1',         en:'Weekend 1',      date:'7–9 aug'},
+  {id:18494, sv:'Weekend 2',         en:'Weekend 2',      date:'14–16 aug'},
+  {id:18496, sv:'Snabbschack',       en:'Rapid',          date:'10 aug'},
+  {id:18495, sv:'Chess960',          en:'Chess960',       date:'11 aug'},
+  {id:18489, sv:'Blixt',             en:'Blitz',          date:'12 aug'},
+  {id:18491, sv:'Amatör',            en:'Amateur',        date:'13 aug'},
+  {id:18480, sv:'24-timmarsblixten', en:'24-Hour Blitz',  date:'14–15 aug'},
+  {id:'youth',sv:'Ungdom',           en:'Youth',          date:'8–16 aug', youth:true},
+];
+const YOUTH_IDS = [18499,18500,18501,18502];
+const BASE = 'https://member.schack.se/public/api/v1';
+let lang = 'sv';
+let currentId = null;
+
+// Language
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-toggle button:${l==='sv'?'first':'last'}-child`).classList.add('active');
+  document.querySelectorAll('.sv').forEach(e => e.style.display = l==='sv'?'':'none');
+  document.querySelectorAll('.en').forEach(e => e.style.display = l==='en'?'':'none');
+  buildGrid();
+}
+
+// Grid
+function buildGrid() {
+  document.getElementById('tourn-grid').innerHTML = TOURNAMENTS.map(t => {
+    const isActive = currentId === t.id || (t.youth && YOUTH_IDS.includes(currentId));
+    return `<button class="tourn-btn${isActive?' active':''}" onclick="selectTourn('${t.id}',this)" data-id="${t.id}">
+      <span class="t-name">${lang==='sv'?t.sv:t.en}</span>
+      <span class="t-date">${t.date}</span>
+    </button>`;
+  }).join('');
+}
+buildGrid();
+
+function selectTourn(id, btn) {
+  document.querySelectorAll('.tourn-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const youthTabs = document.getElementById('youth-tabs');
+  if (id==='youth') {
+    youthTabs.classList.add('visible');
+    selectYouth(YOUTH_IDS[0], document.querySelector('.ytab'));
+  } else {
+    youthTabs.classList.remove('visible');
+    load(parseInt(id));
+  }
+}
+
+function selectYouth(id, btn) {
+  document.querySelectorAll('.ytab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  load(id);
+}
+
+// Load
+async function load(id) {
+  currentId = id;
+  const t = TOURNAMENTS.find(x=>x.id===id||(x.youth&&YOUTH_IDS.includes(id)));
+  const name = t ? (lang==='sv'?t.sv:t.en) : `ID ${id}`;
+  document.getElementById('results-panel').style.display = 'block';
+  document.getElementById('results-title').textContent = name;
+  document.getElementById('view-tabs').style.display = 'none';
+  document.getElementById('ssf-link').innerHTML = '';
+  document.getElementById('results-footer').innerHTML = '';
+  showTab('cross');
+  document.getElementById('tab-cross').innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar data…':'Fetching data…'}</div>`;
+
+  try {
+    const [table, rounds] = await Promise.all([
+      api(`/tournamentresults/table/id/${id}`),
+      api(`/tournamentresults/roundresults/id/${id}`)
+    ]);
+
+    if (!Array.isArray(table)||table.length===0) {
+      await showStartList(id); return;
+    }
+
+    const players = standings(table);
+    const {roundInfo, matrix} = processRounds(players, rounds);
+    const nR = players.length ? Math.max(0,...Object.values(roundInfo).flatMap(r=>Object.keys(r).map(Number))) : 0;
+
+    document.getElementById('tab-cross').innerHTML = wrap(crossTable(players,matrix));
+    document.getElementById('tab-round').innerHTML = nR ? wrap(roundTable(players,roundInfo,nR)) : emptyMsg(lang==='sv'?'Rondinformation saknas':'No round data');
+    document.getElementById('tab-compact').innerHTML = wrap(standingsTable(players));
+    document.getElementById('tab-startlist').style.display = 'none';
+    document.getElementById('view-tabs').style.display = 'flex';
+
+    const now = new Date().toLocaleString('sv-SE',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',','');
+    document.getElementById('results-footer').innerHTML = `${lang==='sv'?'Uppdaterad':'Updated'} ${now} · <a href="https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=1" target="_blank">member.schack.se</a>`;
+    document.getElementById('ssf-link').innerHTML = ssfLink(id);
+  } catch(e) {
+    document.getElementById('tab-cross').innerHTML = emptyMsg(`${lang==='sv'?'Kunde inte hämta data':'Could not fetch data'}: ${esc(String(e))}`);
+  }
+}
+
+async function showStartList(id) {
+  showTab('startlist');
+  const el = document.getElementById('tab-startlist');
+  el.style.display = 'block';
+  el.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar anmälda…':'Fetching registrations…'}</div>`;
+
+  try {
+    const data = await api(`/tournament/group/id/${id}`);
+    const list = data.players||data.contenders||data.participants||[];
+    if (!list.length) throw new Error('empty');
+
+    const sv = lang==='sv';
+    let h = `<div class="table-wrap"><table><thead><tr>
+      <th class="th-name" style="width:32px;text-align:center">#</th>
+      <th class="th-name">${sv?'Namn':'Name'}</th>
+      <th class="th-stat">${sv?'Klubb':'Club'}</th>
+      <th class="th-stat">Rating</th>
+    </tr></thead><tbody>`;
+    list.forEach((p,i)=>{
+      const pi=p.playerInfo||p;
+      const nm=[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${i+1}`;
+      const club=pi.club||p.club||'–';
+      const rating=pi.elo?.rating||pi.rating||'–';
+      h+=`<tr><td class="td-rank">${i+1}</td><td class="td-name"><span class="td-pname">${esc(nm)}</span></td><td class="td-cell">${esc(String(club))}</td><td class="td-cell">${rating}</td></tr>`;
+    });
+    h += '</tbody></table></div>';
+    el.innerHTML = h;
+    document.getElementById('ssf-link').innerHTML = ssfLink(id);
+    document.getElementById('results-footer').innerHTML = `${lang==='sv'?'Anmälda spelare · Data från':'Registered players · Data from'} member.schack.se`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty-msg">
+      <strong>${lang==='sv'?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong>
+      <p style="margin-top:10px;font-size:.88rem">${lang==='sv'?'Resultaten visas här när tävlingen startar. Se anmälda spelare på SSF:':'Results will appear here once the tournament starts. View registered players on SSF:'}</p>
+      <a href="https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=4" target="_blank" rel="noopener"
+         style="display:inline-block;margin-top:16px;padding:10px 22px;background:var(--navy);color:#fff;border-radius:8px;font-weight:700;font-size:.88rem">
+        ${lang==='sv'?'Visa anmälda på member.schack.se ↗':'View registrations on member.schack.se ↗'}
+      </a>
+    </div>`;
+  }
+}
+
+function ssfLink(id) {
+  return `<a href="https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=1" target="_blank" rel="noopener">↗ ${lang==='sv'?'Öppna på member.schack.se':'Open on member.schack.se'}</a>`;
+}
+
+function showTab(name) {
+  ['cross','round','compact','startlist'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    el.style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('active'));
+}
+function switchView(name, btn) {
+  showTab(name);
+  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function wrap(html) { return `<div class="table-wrap">${html}</div>`; }
+function emptyMsg(msg) { return `<div class="empty-msg"><strong>${msg}</strong></div>`; }
+
+// Data
+function standings(data) {
+  return data.sort((a,b)=>(a.place||999)-(b.place||999)).map(p=>{
+    const pi=p.playerInfo||{};
+    const sp=(p.wonGames||0)+(p.drawGames||0)+(p.lostGames||0);
+    const kvpRaw=p.secPoints;
+    return {
+      id:p.contenderId,
+      name:[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${p.contenderId}`,
+      club:pi.club||'', rating:pi.elo?.rating||0,
+      rank:p.place||0, score:p.points||0,
+      kvp:kvpRaw!=null?fmt(Math.round(kvpRaw*2)/2):'',
+      wins:String(p.wonGames||0), draws:String(p.drawGames||0),
+      losses:String(p.lostGames||0), sp:String(sp),
+    };
+  });
+}
+function parseRes(v) {
+  if (v===1||v===1.0) return {w:1,b:0};
+  if (v===0||v===0.0) return {w:0,b:1};
+  if (v===0.5||v===2) return {w:.5,b:.5};
+  if (v===3) return {w:0,b:1};
+  if (typeof v==='string') {
+    const s=v.toLowerCase().replace('½','0.5');
+    if (s.includes('1-0')||s==='1') return {w:1,b:0};
+    if (s.includes('0-1')||s==='0') return {w:0,b:1};
+    return {w:.5,b:.5};
+  }
+  return null;
+}
+function processRounds(players, rrs) {
+  const byId={},roundInfo={},matrix={};
+  players.forEach(p=>{byId[p.id]=p;roundInfo[p.id]={};matrix[p.id]={};});
+  for (const rr of rrs) {
+    const rn=rr.roundNr, pairs=[];
+    if (rr.games?.length) {
+      for (const g of rr.games) {
+        if (!g.whiteId||!g.blackId||g.result==null||g.result===0) continue;
+        const res=parseRes(g.result);
+        if (res) pairs.push({wId:g.whiteId,bId:g.blackId,res});
+      }
+    }
+    if (!pairs.length&&rr.homeId&&rr.awayId) {
+      const hr=rr.homeResult??0,ar=rr.awayResult??0;
+      if (!hr&&!ar) continue;
+      pairs.push({wId:rr.homeId,bId:rr.awayId,res:{w:hr===ar?.5:hr>ar?1:0,b:hr===ar?.5:ar>hr?1:0}});
+    }
+    for (const {wId,bId,res} of pairs) {
+      const wp=byId[wId],bp=byId[bId];
+      if (!wp||!bp) continue;
+      roundInfo[wId][rn]={opp_id:bId,score:res.w,color:'w',opp_rank:bp.rank};
+      roundInfo[bId][rn]={opp_id:wId,score:res.b,color:'b',opp_rank:wp.rank};
+      matrix[wId][bId]=res.w===1?'win':res.w===0?'loss':'draw';
+      matrix[bId][wId]=res.b===1?'win':res.b===0?'loss':'draw';
+    }
+  }
+  return {roundInfo,matrix};
+}
+
+function fmt(s) { const w=Math.floor(s),h=Math.abs(s-w-.5)<.01; return (w===0&&h)?'½':String(w)+(h?'½':''); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pCells(p) {
+  const sub=[p.club,p.rating?`Rating ${p.rating}`:undefined].filter(Boolean).join(' · ');
+  return `<td class="td-rank">${p.rank}</td><td class="td-name"><span class="td-pname">${esc(p.name)}</span>${sub?`<span class="td-sub">${esc(sub)}</span>`:''}</td>`;
+}
+
+function crossTable(players, matrix) {
+  const sv=lang==='sv';
+  let h=`<table><thead><tr><th class="th-name" colspan="2">${sv?'Spelare':'Player'}</th>`;
+  players.forEach((_,j)=>h+=`<th class="th-num" title="${esc(players[j].name)}">${j+1}</th>`);
+  h+=`<th class="th-stat">${sv?'Poäng':'Points'}</th><th class="th-stat">KV.P</th></tr></thead><tbody>`;
+  players.forEach((p,i)=>{
+    h+='<tr>'+pCells(p);
+    let sc=0;
+    players.forEach((opp,j)=>{
+      if (i===j){h+='<td class="rc cs"></td>';return;}
+      const v=matrix[p.id]?.[opp.id];
+      const cls={win:'cw',loss:'cl',draw:'cd'}[v]||'ce';
+      const lbl={win:'1',loss:'0',draw:'½'}[v]||'–';
+      h+=`<td class="rc ${cls}" title="${esc(p.name)} vs ${esc(opp.name)}">${lbl}</td>`;
+      sc+=v==='win'?1:v==='draw'?.5:0;
+    });
+    h+=`<td class="td-score">${fmt(sc)}</td><td class="td-kvp">${esc(p.kvp)}</td></tr>`;
+  });
+  return h+'</tbody></table>';
+}
+
+function roundTable(players, roundInfo, nR) {
+  const sv=lang==='sv';
+  let h=`<table><thead><tr><th class="th-name" colspan="2">${sv?'Spelare':'Player'}</th>`;
+  for (let r=1;r<=nR;r++) h+=`<th class="th-num">${r}</th>`;
+  h+=`<th class="th-stat">${sv?'Poäng':'Points'}</th><th class="th-stat">KV.P</th></tr></thead><tbody>`;
+  players.forEach(p=>{
+    h+='<tr>'+pCells(p);
+    for (let rn=1;rn<=nR;rn++) {
+      const info=roundInfo[p.id]?.[rn];
+      if (!info){h+='<td class="rc ce">–</td>';continue;}
+      const cls=info.score===1?'cw':info.score===0?'cl':'cd';
+      const lbl=info.score===1?'1':info.score===0?'0':'½';
+      const cc=info.color==='w'?'opp-w':info.color==='b'?'opp-b':'opp-c';
+      h+=`<td class="rc ${cls}"><span class="opp ${cc}">${info.opp_rank}</span>${lbl}</td>`;
+    }
+    h+=`<td class="td-score">${fmt(p.score)}</td><td class="td-kvp">${esc(p.kvp)}</td></tr>`;
+  });
+  return h+'</tbody></table>';
+}
+
+function standingsTable(players) {
+  const sv=lang==='sv';
+  let h=`<table><thead><tr><th class="th-name" colspan="2">${sv?'Spelare':'Player'}</th>
+    <th class="th-stat">${sv?'Spelat':'Played'}</th><th class="th-stat">${sv?'Vinster':'Wins'}</th>
+    <th class="th-stat">${sv?'Remier':'Draws'}</th><th class="th-stat">${sv?'Förluster':'Losses'}</th>
+    <th class="th-stat">${sv?'Poäng':'Points'}</th><th class="th-stat">KV.P</th></tr></thead><tbody>`;
+  players.forEach(p=>{
+    h+='<tr>'+pCells(p);
+    h+=`<td class="td-cell">${p.sp}</td><td class="td-cell td-w">${p.wins}</td><td class="td-cell td-d">${p.draws}</td><td class="td-cell td-l">${p.losses}</td><td class="td-score">${fmt(p.score)}</td><td class="td-kvp">${p.kvp}</td></tr>`;
+  });
+  return h+'</tbody></table>';
+}
+
+async function api(path) {
+  const r = await fetch(BASE+path);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// Hash routing
+function checkHash() {
+  const h = location.hash.replace('#','');
+  if (!h) return;
+  const id = parseInt(h);
+  if (!id) return;
+  if (YOUTH_IDS.includes(id)) {
+    const btn = document.querySelector('[data-id="youth"]');
+    if (btn) selectTourn('youth', btn);
+    const idx = YOUTH_IDS.indexOf(id);
+    const ytabs = document.querySelectorAll('.ytab');
+    if (ytabs[idx]) selectYouth(id, ytabs[idx]);
+  } else {
+    const btn = document.querySelector(`[data-id="${id}"]`);
+    if (btn) selectTourn(String(id), btn);
+  }
+}
+window.addEventListener('hashchange', checkHash);
+checkHash();
+</script>
+</body>
+</html>
