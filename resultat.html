@@ -268,15 +268,18 @@ async function showStartList(id) {
   showTab('startlist');
   const el = document.getElementById('tab-startlist');
   el.style.display = 'block';
+  document.getElementById('ssf-link').innerHTML = '';
   el.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar anmälda…':'Fetching registrations…'}</div>`;
+
+  const notStarted = `<div class="empty-msg"><strong>${lang==='sv'?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong><p style="margin-top:8px;font-size:.88rem;color:var(--ink-mute)">${lang==='sv'?'Resultaten visas här när tävlingen startar.':'Results will appear here once the tournament starts.'}</p></div>`;
 
   try {
     const data = await api(`/tournament/group/id/${id}`);
     const list = data.players||data.contenders||data.participants||[];
-    if (!list.length) throw new Error('empty');
+    if (!list.length) { el.innerHTML = notStarted; return; }
 
     const sv = lang==='sv';
-    let h = `<div class="table-wrap"><table><thead><tr>
+    let h = `<div class="empty-msg" style="text-align:left;padding:16px 0 0"><strong style="display:block;margin-bottom:16px;font-size:1rem;">${sv?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong></div><div class="table-wrap"><table><thead><tr>
       <th class="th-name" style="width:32px;text-align:center">#</th>
       <th class="th-name">${sv?'Namn':'Name'}</th>
       <th class="th-stat">${sv?'Klubb':'Club'}</th>
@@ -291,17 +294,9 @@ async function showStartList(id) {
     });
     h += '</tbody></table></div>';
     el.innerHTML = h;
-    document.getElementById('ssf-link').innerHTML = ssfLink(id);
     document.getElementById('results-footer').innerHTML = `${lang==='sv'?'Anmälda spelare · Data från':'Registered players · Data from'} member.schack.se`;
   } catch(e) {
-    el.innerHTML = `<div class="empty-msg">
-      <strong>${lang==='sv'?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong>
-      <p style="margin-top:10px;font-size:.88rem">${lang==='sv'?'Resultaten visas här när tävlingen startar. Se anmälda spelare på SSF:':'Results will appear here once the tournament starts. View registered players on SSF:'}</p>
-      <a href="https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=4" target="_blank" rel="noopener"
-         style="display:inline-block;margin-top:16px;padding:10px 22px;background:var(--navy);color:#fff;border-radius:8px;font-weight:700;font-size:.88rem">
-        ${lang==='sv'?'Visa anmälda på member.schack.se ↗':'View registrations on member.schack.se ↗'}
-      </a>
-    </div>`;
+    el.innerHTML = notStarted;
   }
 }
 
