@@ -916,9 +916,9 @@
       if (!data.url) throw new Error('Missing checkout URL');
       window.location.href = data.url;
     } catch (err) {
-      m.textContent = lang === 'en'
-        ? 'Card payment unavailable right now. Please try Swish or PlusGiro.'
-        : 'Kortbetalning är inte tillgänglig just nu. Försök med Swish eller Plusgiro.';
+      m.innerHTML = lang === 'en'
+        ? 'Card payment unavailable right now. Please try Swish or PlusGiro instead — or email us at <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a> and we will help you.'
+        : 'Kortbetalning är inte tillgänglig just nu. Prova Swish eller Plusgiro istället — eller hör av dig till <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a> så hjälper vi dig.';
       m.classList.add('show','error');
       btn.disabled = false;
       btn.innerHTML = lang === 'en' ? '<span data-en>Pay by card</span>' : '<span data-sv>Betala med kort</span>';
@@ -945,9 +945,9 @@
         : `✓ Anmälan mottagen! En bekräftelse har skickats till ${data.email}. Kom ihåg att betala <strong>${currAmt(total)}</strong> till: <strong>${payInfo}</strong>`;
       m.classList.add('show','success');
     } catch (err) {
-      m.textContent = lang === 'en'
-        ? 'Something went wrong. Please email us at info@uppsalachessfestival.se.'
-        : 'Något gick fel. Mejla oss på info@uppsalachessfestival.se.';
+      m.innerHTML = lang === 'en'
+        ? 'Something went wrong with your registration. Please email <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a> and we will sort it out as soon as possible.'
+        : 'Något gick fel med din anmälan. Hör av dig till <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a> så löser vi det så snabbt vi kan.';
       m.classList.add('show','error');
     }
   }
@@ -1060,7 +1060,7 @@
       }).join('') + hint;
 
     } catch (err) {
-      resultsEl.innerHTML = `<p style="color:#c03020;font-size:0.85rem;margin:0;">${lang === 'en' ? 'Search failed. Please try again.' : 'Sökning misslyckades. Försök igen.'}</p>`;
+      resultsEl.innerHTML = `<p style="color:#c03020;font-size:0.85rem;margin:0;">${lang === 'en' ? 'Search failed. Please try again, or contact us at <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a> for help.' : 'Sökning misslyckades. Försök igen, eller hör av dig till <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a> om problemet kvarstår.'}</p>`;
     }
   }
 
