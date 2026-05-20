@@ -4,11 +4,14 @@ export default async function handler(req, res) {
 
   const { fornamn, efternamn } = req.query;
 
-  if (!fornamn || !efternamn) {
-    return res.status(400).json({ error: 'fornamn and efternamn are required' });
+  if (!efternamn) {
+    return res.status(400).json({ error: 'efternamn is required' });
   }
 
-  const url = `https://member.schack.se/public/api/v1/player/fornamn/${encodeURIComponent(fornamn)}/efternamn/${encodeURIComponent(efternamn)}`;
+  // If no fornamn given, try with a single space — the SSF API may return
+  // all players with that last name regardless of first name.
+  const fn = fornamn && fornamn.trim() ? fornamn.trim() : ' ';
+  const url = `https://member.schack.se/public/api/v1/player/fornamn/${encodeURIComponent(fn)}/efternamn/${encodeURIComponent(efternamn.trim())}`;
 
   try {
     const response = await fetch(url, {
