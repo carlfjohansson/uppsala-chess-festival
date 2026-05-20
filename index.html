@@ -723,6 +723,7 @@
   // CART
   let cart = {};
   let titledPlayer = false; // GM/IM/WGM/WIM har gratis inträde
+  let usssPlayer = false;   // USSS-medlemmar spelar Ungdom gratis
 
   function toggleCart(btn) {
     const name = btn.dataset.tournament;
@@ -745,7 +746,7 @@
 
   function updateCartUI() {
     const items = Object.entries(cart);
-    const total = titledPlayer ? 0 : items.reduce((s, [, p]) => s + p, 0);
+    const total = titledPlayer ? 0 : items.reduce((s, [name, p]) => s + (usssPlayer && name === 'Ungdom' ? 0 : p), 0);
     const count = items.length;
     // Cart bar
     document.getElementById('cart-bar').classList.toggle('visible', count > 0);
@@ -760,7 +761,11 @@
       totalRow.style.display = 'none';
     } else {
       container.innerHTML = items.map(([name, price]) =>
-        `<div class="cart-item"><div class="item-name">${name}</div><div style="display:flex;align-items:center;gap:4px;"><div class="item-price">${titledPlayer ? '<span style="text-decoration:line-through;color:var(--ink-mute);font-size:0.85rem;">' + currAmt(price) + '</span> 0 kr' : currAmt(price)}</div><button class="btn-remove" onclick="removeFromCart('${name}')" title="Ta bort">×</button></div></div>`
+        `<div class="cart-item"><div class="item-name">${name}</div><div style="display:flex;align-items:center;gap:4px;"><div class="item-price">${
+          titledPlayer ? '<span style="text-decoration:line-through;color:var(--ink-mute);font-size:0.85rem;">' + currAmt(price) + '</span> 0 kr' :
+          (usssPlayer && name === 'Ungdom') ? '<span style="text-decoration:line-through;color:var(--ink-mute);font-size:0.85rem;">' + currAmt(price) + '</span> 0 kr' :
+          currAmt(price)
+        }</div><button class="btn-remove" onclick="removeFromCart('${name}')" title="Ta bort">×</button></div></div>`
       ).join('');
       totalRow.style.display = 'flex';
       document.getElementById('checkout-total-val').textContent = curr(total);
@@ -779,6 +784,21 @@
       titleNotice.textContent = lang === 'en' ? '🏆 Free entry for titled player (GM/IM/WGM/WIM) — total: 0 SEK' : '🏆 Gratis inträde för titulerad spelare (GM/IM/WGM/WIM) — totalt: 0 kronor';
     } else {
       titleNotice.style.display = 'none';
+    }
+    // USSS-meddelande
+    let usssNotice = document.getElementById('usss-member-notice');
+    if (!usssNotice) {
+      usssNotice = document.createElement('div');
+      usssNotice.id = 'usss-member-notice';
+      usssNotice.style.cssText = 'background:#e3f0fb;border:1px solid #1976d2;border-radius:10px;padding:12px 16px;margin-top:12px;color:#0d47a1;font-size:0.9rem;font-weight:600;';
+      titleNotice.parentNode.insertBefore(usssNotice, titleNotice.nextSibling);
+    }
+    const hasUngdom = items.some(([name]) => name === 'Ungdom');
+    if (usssPlayer && hasUngdom && !titledPlayer) {
+      usssNotice.style.display = 'block';
+      usssNotice.textContent = lang === 'en' ? '🎓 USSS member — free entry for Youth tournament' : '🎓 USSS-medlem — gratis inträde i Ungdomstävlingen';
+    } else {
+      usssNotice.style.display = 'none';
     }
     document.getElementById('swish-amount').textContent = curr(total);
     document.getElementById('pg-amount').textContent = curr(total);
@@ -1046,14 +1066,17 @@
 
   const TITLED = new Set(['GM','IM','WGM','WIM']);
 
-  function useSSFPlayer(id, fullName, title) {
+  function useSSFPlayer(id, fullName, title, club) {
     document.getElementById('f-rating').value = id;
     const nameField = document.getElementById('f-name');
     if (!nameField.value.trim()) nameField.value = fullName;
     document.getElementById('player-search-box').style.display = 'none';
     document.getElementById('f-rating').dispatchEvent(new Event('input'));
-    // Kolla om titulerad spelare
-    titledPlayer = title && TITLED.has(title.toUpperCase());
+    // Kolla om titulerad spelare (GM/IM/WGM/WIM)
+    titledPlayer = title && TITLED.has(title.trim().toUpperCase());
+    // Kolla om USSS-medlem (gratis Ungdom)
+    const clubLower = (club || '').toLowerCase();
+    usssPlayer = clubLower.includes('usss') || (clubLower.includes('uppsala') && clubLower.includes('skol'));
     updateCartUI();
   }
 
