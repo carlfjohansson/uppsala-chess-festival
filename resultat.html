@@ -115,7 +115,10 @@ footer a{color:#f5cb6b}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       <span class="sv">Tillbaka</span><span class="en" style="display:none">Back</span>
     </a>
-    <span class="brand">Uppsala Schackfestival 2026</span>
+    <a href="/" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <img src="/logo.png" alt="Uppsala Chess Festival" style="height:34px;width:auto;">
+      <span class="sv">Uppsala Schackfestival</span><span class="en" style="display:none">Uppsala Chess Festival</span>
+    </a>
     <div class="lang-toggle">
       <button class="active" onclick="setLang('sv')">SV</button>
       <button onclick="setLang('en')">EN</button>
@@ -133,10 +136,10 @@ footer a{color:#f5cb6b}
     <div class="tourn-grid" id="tourn-grid"></div>
 
     <div class="youth-tabs" id="youth-tabs">
-      <button class="ytab active" onclick="selectYouth(18499,this)">Klass 1</button>
-      <button class="ytab" onclick="selectYouth(18500,this)">Klass 2</button>
-      <button class="ytab" onclick="selectYouth(18501,this)">Klass 3</button>
-      <button class="ytab" onclick="selectYouth(18502,this)">Klass 4</button>
+      <button class="ytab active" onclick="selectYouth(18499,this)">2006–2008</button>
+      <button class="ytab" onclick="selectYouth(18500,this)">2009–2011</button>
+      <button class="ytab" onclick="selectYouth(18501,this)">2012–2014</button>
+      <button class="ytab" onclick="selectYouth(18502,this)">2015–</button>
     </div>
 
     <div id="results-panel">
