@@ -511,8 +511,31 @@
           <input id="f-club">
         </div>
         <div class="form-field">
-          <label for="f-rating">FIDE-ID <span style="color:var(--ink-mute);font-size:0.85em;">(<span data-sv>valfritt</span><span data-en>optional</span>)</span></label>
-          <input id="f-rating">
+          <label for="f-rating">SSF-ID <span style="color:var(--ink-mute);font-size:0.85em;">(<span data-sv>valfritt</span><span data-en>optional</span>)</span></label>
+          <input id="f-rating" placeholder="t.ex. 123456">
+          <div style="margin-top:10px;">
+            <button type="button" onclick="togglePlayerSearch()" style="background:none;border:none;padding:0;color:var(--navy);font-size:0.85rem;cursor:pointer;font-family:var(--sans);text-decoration:underline;text-underline-offset:3px;">
+              <span data-sv>Vet du inte ditt SSF-ID? Sök det här</span><span data-en>Don't know your SSF ID? Search here</span>
+            </button>
+          </div>
+          <div id="player-search-box" style="display:none;margin-top:14px;padding:16px;background:var(--bg-soft);border:1px solid var(--line-strong);border-radius:10px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-sv>Förnamn</label>
+                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-en>First name</label>
+                <input id="ps-fornamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+              </div>
+              <div>
+                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-sv>Efternamn</label>
+                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-en>Last name</label>
+                <input id="ps-efternamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+              </div>
+            </div>
+            <button type="button" onclick="searchSSFPlayer()" style="width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:0.9rem;cursor:pointer;">
+              <span data-sv>Sök i SSF:s spelardatabas</span><span data-en>Search SSF player database</span>
+            </button>
+            <div id="ps-results" style="margin-top:12px;"></div>
+          </div>
         </div>
         <div class="form-field">
           <label for="f-msg"><span data-sv>Övrigt</span><span data-en>Other</span> <span style="color:var(--ink-mute);font-size:0.85em;">(<span data-sv>valfritt</span><span data-en>optional</span>)</span></label>
@@ -846,6 +869,76 @@
       m.classList.add('show','error');
     }
   }
+
+  // SSF PLAYER SEARCH
+  function togglePlayerSearch() {
+    const box = document.getElementById('player-search-box');
+    const isHidden = box.style.display === 'none';
+    box.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+      // Pre-fill from name field if possible
+      const name = document.getElementById('f-name').value.trim().split(' ');
+      if (name.length >= 2) {
+        document.getElementById('ps-fornamn').value = name[0];
+        document.getElementById('ps-efternamn').value = name.slice(1).join(' ');
+      }
+      document.getElementById('ps-fornamn').focus();
+    }
+  }
+
+  async function searchSSFPlayer() {
+    const fornamn = document.getElementById('ps-fornamn').value.trim();
+    const efternamn = document.getElementById('ps-efternamn').value.trim();
+    const resultsEl = document.getElementById('ps-results');
+    const lang = document.documentElement.lang;
+
+    if (!fornamn || !efternamn) {
+      resultsEl.innerHTML = `<p style="color:var(--ink-mute);font-size:0.85rem;margin:0;">${lang === 'en' ? 'Please enter both first and last name.' : 'Ange både förnamn och efternamn.'}</p>`;
+      return;
+    }
+
+    resultsEl.innerHTML = `<p style="color:var(--ink-mute);font-size:0.85rem;margin:0;">${lang === 'en' ? 'Searching…' : 'Söker…'}</p>`;
+
+    try {
+      const res = await fetch('/api/search-player?fornamn=' + encodeURIComponent(fornamn) + '&efternamn=' + encodeURIComponent(efternamn));
+      if (!res.ok) throw new Error('API error ' + res.status);
+      const players = await res.json();
+
+      if (!Array.isArray(players) || players.length === 0) {
+        resultsEl.innerHTML = `<p style="color:var(--ink-mute);font-size:0.85rem;margin:0;">${lang === 'en' ? 'No player found. Check the spelling.' : 'Ingen spelare hittades. Kontrollera stavningen.'}</p>`;
+        return;
+      }
+
+      resultsEl.innerHTML = players.slice(0, 8).map(p => {
+        const rating = p.elo && p.elo.rating ? p.elo.rating : null;
+        const fideId = p.fideid && p.fideid !== 0 ? ' · FIDE-ID: ' + p.fideid : '';
+        const ratingStr = rating ? (lang === 'en' ? ' · Rating: ' : ' · Rating: ') + rating : '';
+        return `<div onclick="useSSFPlayer(${p.id}, '${(p.firstName + ' ' + p.lastName).replace(/'/g,"\'")}')"
+          style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-top:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:all 0.15s;"
+          onmouseover="this.style.borderColor='var(--navy)';this.style.background='rgba(13,58,110,0.04)'"
+          onmouseout="this.style.borderColor='var(--line)';this.style.background='var(--panel)'">
+          <div>
+            <div style="font-weight:600;color:var(--ink);font-size:0.92rem;">${p.firstName} ${p.lastName}</div>
+            <div style="font-size:0.78rem;color:var(--ink-mute);margin-top:2px;">${p.club || ''}${ratingStr}${fideId}</div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--navy);font-weight:700;white-space:nowrap;margin-left:12px;">ID: ${p.id}</div>
+        </div>`;
+      }).join('');
+
+    } catch (err) {
+      resultsEl.innerHTML = `<p style="color:#c03020;font-size:0.85rem;margin:0;">${lang === 'en' ? 'Search failed. Please try again.' : 'Sökning misslyckades. Försök igen.'}</p>`;
+    }
+  }
+
+  function useSSFPlayer(id, fullName) {
+    document.getElementById('f-rating').value = id;
+    // Also pre-fill name if empty
+    const nameField = document.getElementById('f-name');
+    if (!nameField.value.trim()) nameField.value = fullName;
+    document.getElementById('player-search-box').style.display = 'none';
+    document.getElementById('f-rating').dispatchEvent(new Event('input'));
+  }
+
 </script>
 </body>
 </html>
