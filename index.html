@@ -993,6 +993,12 @@
         return;
       }
 
+      const shown = Math.min(players.length, 8);
+      const hint = players.length > 0
+        ? `<p style="margin:10px 0 0;font-size:0.8rem;color:var(--ink-mute);font-style:italic;">${lang === 'en'
+            ? `Showing ${shown} result${shown !== 1 ? 's' : ''}. Not finding yourself? Add your first name and search again.`
+            : `Visar ${shown} träff${shown !== 1 ? 'ar' : ''}. Hittar du inte dig själv? Lägg till förnamnet och sök igen.`}</p>`
+        : '';
       resultsEl.innerHTML = players.slice(0, 8).map(p => {
         const rating = p.elo && p.elo.rating ? p.elo.rating : null;
         const fideId = p.fideid && p.fideid !== 0 ? ' · FIDE-ID: ' + p.fideid : '';
@@ -1007,7 +1013,7 @@
           </div>
           <div style="font-size:0.8rem;color:var(--navy);font-weight:700;white-space:nowrap;margin-left:12px;">ID: ${p.id}</div>
         </div>`;
-      }).join('');
+      }).join('') + hint;
 
     } catch (err) {
       resultsEl.innerHTML = `<p style="color:#c03020;font-size:0.85rem;margin:0;">${lang === 'en' ? 'Search failed. Please try again.' : 'Sökning misslyckades. Försök igen.'}</p>`;
