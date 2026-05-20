@@ -1070,6 +1070,8 @@
     document.getElementById('f-rating').value = id;
     const nameField = document.getElementById('f-name');
     if (!nameField.value.trim()) nameField.value = fullName;
+    const clubField = document.getElementById('f-club');
+    if (club && club.trim()) clubField.value = club.trim();
     document.getElementById('player-search-box').style.display = 'none';
     document.getElementById('f-rating').dispatchEvent(new Event('input'));
     // Kolla om titulerad spelare (GM/IM/WGM/WIM)
