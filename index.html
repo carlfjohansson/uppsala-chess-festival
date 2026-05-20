@@ -510,32 +510,48 @@
           <label for="f-club"><span data-sv>Klubb</span><span data-en>Club</span></label>
           <input id="f-club">
         </div>
-        <div class="form-field">
-          <label for="f-rating">SSF-ID <span style="color:var(--ink-mute);font-size:0.85em;">(<span data-sv>valfritt</span><span data-en>optional</span>)</span></label>
-          <input id="f-rating" placeholder="t.ex. 123456">
-          <div style="margin-top:10px;">
+        <div class="form-field" id="field-player-id">
+          <!-- Label + foreign player toggle on same row -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+            <label for="f-rating" style="margin-bottom:0;">
+              <span id="id-label-type" data-sv>SSF-ID</span><span id="id-label-type-en" data-en>SSF-ID</span>
+              <span id="id-label-req" style="color:var(--ink-mute);font-size:0.85em;"> (<span data-sv>valfritt</span><span data-en>optional</span>)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--ink-dim);cursor:pointer;user-select:none;font-weight:400;">
+              <input type="checkbox" id="cb-foreign" onchange="toggleForeignPlayer()" style="cursor:pointer;width:14px;height:14px;">
+              <span data-sv>Utländsk spelare (ange FIDE-ID)</span><span data-en>Foreign player (enter FIDE ID)</span>
+            </label>
+          </div>
+          <input id="f-rating" placeholder="t.ex. 123456" oninput="clearFieldError('f-rating')">
+          <!-- SSF search widget (shown for Swedish players) -->
+          <div id="ssf-search-wrap" style="margin-top:10px;">
             <button type="button" onclick="togglePlayerSearch()" style="background:none;border:none;padding:0;color:var(--navy);font-size:0.85rem;cursor:pointer;font-family:var(--sans);text-decoration:underline;text-underline-offset:3px;">
               <span data-sv>Vet du inte ditt SSF-ID? Sök det här</span><span data-en>Don't know your SSF ID? Search here</span>
             </button>
-          </div>
-          <div id="player-search-box" style="display:none;margin-top:14px;padding:16px;background:var(--bg-soft);border:1px solid var(--line-strong);border-radius:10px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-              <div>
-                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-sv>Förnamn</label>
-                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-en>First name</label>
-                <input id="ps-fornamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+            <div id="player-search-box" style="display:none;margin-top:14px;padding:16px;background:var(--bg-soft);border:1px solid var(--line-strong);border-radius:10px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div>
+                  <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-sv>Förnamn</label>
+                  <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-en>First name</label>
+                  <input id="ps-fornamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-sv>Efternamn</label>
+                  <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-en>Last name</label>
+                  <input id="ps-efternamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+                </div>
               </div>
-              <div>
-                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-sv>Efternamn</label>
-                <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;" data-en>Last name</label>
-                <input id="ps-efternamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
-              </div>
+              <button type="button" onclick="searchSSFPlayer()" style="width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:0.9rem;cursor:pointer;">
+                <span data-sv>Sök i SSF:s spelardatabas</span><span data-en>Search SSF player database</span>
+              </button>
+              <div id="ps-results" style="margin-top:12px;"></div>
             </div>
-            <button type="button" onclick="searchSSFPlayer()" style="width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:0.9rem;cursor:pointer;">
-              <span data-sv>Sök i SSF:s spelardatabas</span><span data-en>Search SSF player database</span>
-            </button>
-            <div id="ps-results" style="margin-top:12px;"></div>
           </div>
+          <!-- Note shown for foreign players -->
+          <p id="foreign-note" style="display:none;margin:8px 0 0;font-size:0.85rem;color:var(--ink-mute);font-style:italic;">
+            <span data-sv>Ange ditt internationella FIDE-ID (7 siffror).</span>
+            <span data-en>Enter your international FIDE ID (7 digits).</span>
+          </p>
         </div>
         <div class="form-field">
           <label for="f-msg"><span data-sv>Övrigt</span><span data-en>Other</span> <span style="color:var(--ink-mute);font-size:0.85em;">(<span data-sv>valfritt</span><span data-en>optional</span>)</span></label>
@@ -720,6 +736,7 @@
     const count = items.length;
     // Cart bar
     document.getElementById('cart-bar').classList.toggle('visible', count > 0);
+    updateIdFieldLabel();
     document.getElementById('cart-count').textContent = count;
     document.getElementById('cart-total-bar').textContent = curr(total);
     // Checkout cart
@@ -801,6 +818,22 @@
       emailEl.focus();
       return false;
     }
+    // Check player ID if required (ELO-rated tournaments in cart)
+    if (needsPlayerId()) {
+      const idEl = document.getElementById('f-rating');
+      const idVal = idEl.value.trim();
+      if (!idVal) {
+        idEl.classList.add('field-error');
+        const isForeign = document.getElementById('cb-foreign').checked;
+        const idType = isForeign ? 'FIDE-ID' : 'SSF-ID';
+        m.textContent = lang === 'en'
+          ? `Please enter your ${idType} — required for ELO-rated tournaments.`
+          : `Ange ditt ${idType} — obligatoriskt för ELO-rankade tävlingar.`;
+        m.classList.add('show','error');
+        idEl.focus();
+        return false;
+      }
+    }
     return true;
   }
 
@@ -810,6 +843,7 @@
       email: document.getElementById('f-email').value.trim(),
       club: document.getElementById('f-club').value.trim(),
       rating: document.getElementById('f-rating').value.trim(),
+      idType: document.getElementById('cb-foreign').checked ? 'fide' : 'ssf',
       message: document.getElementById('f-msg').value.trim(),
       tournaments: Object.keys(cart),
       lang: document.documentElement.lang
@@ -868,6 +902,47 @@
         : 'Något gick fel. Mejla oss på info@uppsalachessfestival.se.';
       m.classList.add('show','error');
     }
+  }
+
+
+  // ELO TOURNAMENTS — require a player ID
+  const ELO_TOURNAMENTS = new Set(['Weekend 1', 'Weekend 2', 'Snabbschack', 'Blixt']);
+
+  function needsPlayerId() {
+    return Object.keys(cart).some(t => ELO_TOURNAMENTS.has(t));
+  }
+
+  function updateIdFieldLabel() {
+    const reqEl = document.getElementById('id-label-req');
+    if (!reqEl) return;
+    const lang = document.documentElement.lang;
+    const required = needsPlayerId();
+    const isForeign = document.getElementById('cb-foreign').checked;
+    const idType = isForeign ? 'FIDE-ID' : 'SSF-ID';
+    // Update the type label
+    document.getElementById('id-label-type').textContent = idType;
+    document.getElementById('id-label-type-en').textContent = idType;
+    // Update required/optional note
+    if (required) {
+      reqEl.innerHTML = lang === 'en'
+        ? ' <span style="color:#c03020;font-weight:600;">* obligatorisk för ELO-tävlingar</span>'
+        : ' <span style="color:#c03020;font-weight:600;">* obligatorisk för ELO-tävlingar</span>';
+    } else {
+      reqEl.innerHTML = lang === 'en'
+        ? ' (<span data-en>optional</span>)'
+        : ' (<span data-sv>valfritt</span>)';
+    }
+    // Update input placeholder
+    document.getElementById('f-rating').placeholder = isForeign ? 't.ex. 1503014' : 't.ex. 123456';
+  }
+
+  function toggleForeignPlayer() {
+    const isForeign = document.getElementById('cb-foreign').checked;
+    document.getElementById('ssf-search-wrap').style.display = isForeign ? 'none' : 'block';
+    document.getElementById('foreign-note').style.display = isForeign ? 'block' : 'none';
+    document.getElementById('player-search-box').style.display = 'none';
+    document.getElementById('f-rating').value = '';
+    updateIdFieldLabel();
   }
 
   // SSF PLAYER SEARCH
