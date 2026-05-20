@@ -10,23 +10,24 @@
 <meta name="description" content="Uppsala Schackfestival 7–16 augusti 2026 – åtta turneringar för alla nivåer på Uppsala Schackcentrum.">
 <style>
   :root {
-    --bg: #0f1722;
-    --bg-soft: #182434;
-    --panel: #1d2a3d;
-    --panel-2: #243349;
-    --ink: #f5ecd9;
-    --ink-dim: #c9bfa8;
-    --ink-mute: #8e8674;
-    --gold: #e8b552;
-    --gold-bright: #f5cb6b;
-    --orange: #e08a3c;
+    --bg: #f8f6f2;
+    --bg-soft: #edeae4;
+    --panel: #ffffff;
+    --panel-2: #f4f1eb;
+    --navy: #0d3a6e;
+    --ink: #12203a;
+    --ink-dim: #3d4a5f;
+    --ink-mute: #7a8898;
+    --gold: #c07010;
+    --gold-bright: #e8a820;
+    --orange: #d96b2a;
     --rust: #b85a2e;
     --green: #4caf7d;
-    --line: rgba(232, 181, 82, 0.18);
-    --line-strong: rgba(232, 181, 82, 0.4);
+    --line: rgba(18, 32, 58, 0.10);
+    --line-strong: rgba(18, 32, 58, 0.22);
     --serif: "Lato", system-ui, sans-serif;
     --sans: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    --shadow: 0 4px 24px rgba(0,0,0,0.09);
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -39,8 +40,8 @@
     -webkit-font-smoothing: antialiased;
     padding-bottom: 80px;
   }
-  a { color: var(--gold-bright); text-decoration: none; }
-  a:hover { color: var(--ink); }
+  a { color: var(--navy); text-decoration: none; }
+  a:hover { color: var(--gold); }
   h1, h2, h3, h4 {
     font-family: var(--serif);
     font-weight: 700;
@@ -50,31 +51,31 @@
     color: var(--ink);
   }
   h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
-  h3 { font-size: 1.4rem; color: var(--gold-bright); }
+  h3 { font-size: 1.4rem; color: var(--navy); }
   .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-  /* NAV */
+  /* NAV — stays dark to sit cleanly over the hero photo */
   nav.top {
     position: sticky; top: 0; z-index: 100;
     backdrop-filter: blur(12px);
-    background: rgba(15, 23, 34, 0.85);
-    border-bottom: 1px solid var(--line);
+    background: rgba(13, 30, 50, 0.93);
+    border-bottom: 1px solid rgba(232, 181, 82, 0.18);
   }
   nav.top .inner {
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 24px; max-width: 1200px; margin: 0 auto; gap: 16px;
   }
-  nav.top .brand { font-family: var(--serif); font-size: 1.1rem; color: var(--gold-bright); letter-spacing: 0.04em; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+  nav.top .brand { font-family: var(--serif); font-size: 1.1rem; color: #f5cb6b; letter-spacing: 0.04em; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
   .nav-logo { height: 36px; width: auto; }
   nav.top ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; font-size: 0.95rem; }
-  nav.top ul a { color: var(--ink-dim); transition: color 0.2s; }
-  nav.top ul a:hover { color: var(--gold-bright); }
-  .lang-toggle { display: flex; border: 1px solid var(--line-strong); border-radius: 999px; overflow: hidden; font-size: 0.8rem; }
-  .lang-toggle button { background: transparent; border: 0; color: var(--ink-dim); padding: 6px 12px; cursor: pointer; font-family: var(--sans); font-weight: 600; letter-spacing: 0.05em; }
-  .lang-toggle button.active { background: var(--gold); color: var(--bg); }
+  nav.top ul a { color: #c9bfa8; transition: color 0.2s; }
+  nav.top ul a:hover { color: #f5cb6b; }
+  .lang-toggle { display: flex; border: 1px solid rgba(232, 181, 82, 0.4); border-radius: 999px; overflow: hidden; font-size: 0.8rem; }
+  .lang-toggle button { background: transparent; border: 0; color: #c9bfa8; padding: 6px 12px; cursor: pointer; font-family: var(--sans); font-weight: 600; letter-spacing: 0.05em; }
+  .lang-toggle button.active { background: #e8b552; color: #0f1722; }
   @media (max-width: 720px) { nav.top ul { display: none; } }
 
-  /* HERO */
+  /* HERO — keeps dark overlay over photo, fades to page bg at bottom */
   .hero {
     position: relative; min-height: 88vh; display: flex; align-items: center; overflow: hidden;
     background-image: url('/nattsol.jpg');
@@ -89,32 +90,31 @@
     content: ""; position: absolute; inset: 0;
     background: linear-gradient(
       to bottom,
-      rgba(10, 15, 25, 0.1) 0%,
-      rgba(10, 15, 25, 0.2) 40%,
-      rgba(10, 15, 25, 0.5) 65%,
-      rgba(15, 23, 34, 0.88) 82%,
-      rgba(15, 23, 34, 1.0) 100%
+      rgba(10, 15, 25, 0.08) 0%,
+      rgba(10, 15, 25, 0.22) 36%,
+      rgba(10, 15, 25, 0.56) 60%,
+      rgba(248, 246, 242, 0.55) 85%,
+      rgba(248, 246, 242, 1.00) 100%
     );
     pointer-events: none;
   }
   .hero-content { position: relative; z-index: 2; width: 100%; padding: 80px 0 120px; }
-  .hero .eyebrow { font-family: var(--serif); font-style: italic; font-weight: 300; color: var(--gold-bright); font-size: 1.1rem; letter-spacing: 0.04em; margin-bottom: 12px; }
-  .hero h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); margin: 0 0 16px; color: var(--ink); font-weight: 900; letter-spacing: -0.01em; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
-  .hero h1 .accent { display: block; color: var(--gold-bright); font-size: 0.55em; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 8px; font-weight: 400; }
-  .hero p.tagline { font-size: clamp(1.05rem, 1.5vw, 1.25rem); max-width: 580px; color: var(--ink-dim); margin: 24px 0 36px; }
+  /* Hero text: explicitly light since body is now light */
+  .hero .eyebrow { font-family: var(--serif); font-style: italic; font-weight: 300; color: #f5cb6b; font-size: 1.1rem; letter-spacing: 0.04em; margin-bottom: 12px; }
+  .hero h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); margin: 0 0 16px; color: #f5ecd9; font-weight: 900; letter-spacing: -0.01em; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+  .hero h1 .accent { display: block; color: #f5cb6b; font-size: 0.55em; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 8px; font-weight: 400; }
+  .hero p.tagline { font-size: clamp(1.05rem, 1.5vw, 1.25rem); max-width: 580px; color: #c9bfa8; margin: 24px 0 36px; }
   .hero .ctas { display: flex; gap: 14px; flex-wrap: wrap; }
   .btn { display: inline-block; padding: 14px 28px; border-radius: 999px; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.04em; transition: all 0.2s; cursor: pointer; border: 0; font-family: var(--sans); }
-  .btn-primary { background: linear-gradient(135deg, var(--gold-bright), var(--orange)); color: var(--bg); box-shadow: 0 6px 24px rgba(232, 181, 82, 0.35); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232, 181, 82, 0.5); color: var(--bg); }
-  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
-  .btn-ghost:hover { background: rgba(245, 203, 107, 0.1); color: var(--gold-bright); }
+  .btn-primary { background: linear-gradient(135deg, #f5cb6b, var(--orange)); color: #0f1722; box-shadow: 0 6px 24px rgba(232, 181, 82, 0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232, 181, 82, 0.5); color: #0f1722; }
+  .btn-ghost { background: transparent; color: #f5ecd9; border: 1px solid rgba(232, 181, 82, 0.4); }
+  .btn-ghost:hover { background: rgba(245, 203, 107, 0.1); color: #f5cb6b; }
   .btn[disabled] { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-@media (max-width: 720px) {
-}
   .countdown { margin-top: 48px; display: flex; gap: 18px; flex-wrap: wrap; }
-  .countdown .unit { background: rgba(245, 236, 217, 0.06); border: 1px solid var(--line); border-radius: 12px; padding: 14px 20px; min-width: 78px; text-align: center; backdrop-filter: blur(8px); }
-  .countdown .num { font-family: var(--serif); font-size: 2rem; color: var(--gold-bright); line-height: 1; }
-  .countdown .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-mute); margin-top: 6px; }
+  .countdown .unit { background: rgba(245, 236, 217, 0.07); border: 1px solid rgba(232, 181, 82, 0.18); border-radius: 12px; padding: 14px 20px; min-width: 78px; text-align: center; backdrop-filter: blur(8px); }
+  .countdown .num { font-family: var(--serif); font-size: 2rem; color: #f5cb6b; line-height: 1; }
+  .countdown .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #8e8674; margin-top: 6px; }
 
   /* SECTIONS */
   section.section { padding: 90px 0; position: relative; }
@@ -125,46 +125,45 @@
 
   /* TIMELINE */
   .timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
-  .day:hover { transform: translateY(-3px); border-color: var(--gold); background: var(--panel-2); }
-  .day .date { font-family: var(--serif); font-size: 1.35rem; color: var(--gold-bright); margin-bottom: 4px; }
+  .day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .day:hover { transform: translateY(-3px); border-color: var(--navy); box-shadow: 0 4px 16px rgba(13,58,110,0.10); }
+  .day .date { font-family: var(--serif); font-size: 1.35rem; color: var(--navy); margin-bottom: 4px; font-weight: 700; }
   .day .weekday { font-size: 0.72rem; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
   .day .events { font-size: 0.82rem; color: var(--ink-dim); line-height: 1.4; }
   .day .events span { display: block; padding: 2px 0; }
 
   /* TOURNAMENT GRID */
   .tournaments { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px 26px; transition: all 0.25s; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-  .card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), var(--orange)); opacity: 0.7; }
-  .card:hover { transform: translateY(-4px); border-color: var(--line-strong); box-shadow: var(--shadow); }
-  .card.in-cart { border-color: var(--green); }
-  .card.in-cart::before { background: var(--green); opacity: 1; }
-  .card .cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--orange); margin-bottom: 10px; }
-  .card h3 { font-size: 1.55rem; margin-bottom: 4px; color: var(--ink); }
-  .card .when { font-family: var(--serif); color: var(--gold-bright); font-size: 1.1rem; margin-bottom: 18px; }
-  .card dl { margin: 0 0 18px; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 0.92rem; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--navy); border-radius: 0 0 12px 12px; padding: 22px 24px 24px; transition: all 0.25s; display: flex; flex-direction: column; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .card::before { display: none; }
+  .card:hover { transform: translateY(-4px); border-top-color: var(--gold); box-shadow: var(--shadow); }
+  .card.in-cart { border-top-color: var(--green); box-shadow: 0 0 0 2px rgba(76,175,125,0.2); }
+  .card .cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--navy); opacity: 0.6; margin-bottom: 8px; }
+  .card h3 { font-size: 1.35rem; margin-bottom: 4px; color: var(--navy); font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; }
+  .card .when { font-family: var(--serif); color: var(--gold); font-size: 1rem; margin-bottom: 16px; font-weight: 600; }
+  .card dl { margin: 0 0 16px; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 0.92rem; }
   .card dt { color: var(--ink-mute); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.08em; padding-top: 3px; }
   .card dd { margin: 0; color: var(--ink-dim); }
-  .card .note { padding-top: 14px; border-top: 1px dashed var(--line); font-size: 0.85rem; color: var(--ink-mute); font-style: italic; margin-bottom: 18px; }
-  .card .prizes { color: var(--gold-bright); font-weight: 500; }
-  .btn-add { margin-top: auto; width: 100%; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; border: 1px solid var(--line-strong); background: transparent; color: var(--ink-dim); cursor: pointer; font-family: var(--sans); transition: all 0.2s; }
-  .btn-add:hover { border-color: var(--gold); color: var(--gold-bright); background: rgba(232, 181, 82, 0.06); }
+  .card .note { padding-top: 14px; border-top: 1px dashed var(--line-strong); font-size: 0.85rem; color: var(--ink-mute); font-style: italic; margin-bottom: 18px; }
+  .card .prizes { color: var(--navy); font-weight: 600; }
+  .btn-add { margin-top: auto; width: 100%; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; border: 1px solid var(--line-strong); background: transparent; color: var(--ink-mute); cursor: pointer; font-family: var(--sans); transition: all 0.2s; }
+  .btn-add:hover { border-color: var(--navy); color: var(--navy); background: rgba(13, 58, 110, 0.04); }
   .btn-add.added { background: var(--green); border-color: var(--green); color: #fff; }
   .btn-add.added:hover { background: #3a9566; border-color: #3a9566; }
 
   /* CART BAR */
   .cart-bar {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-    background: var(--panel-2); border-top: 1px solid var(--line-strong);
+    background: var(--navy); border-top: 1px solid rgba(255,255,255,0.12);
     padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; transform: translateY(100%); transition: transform 0.3s ease; backdrop-filter: blur(12px);
+    gap: 16px; transform: translateY(100%); transition: transform 0.3s ease;
   }
   .cart-bar.visible { transform: translateY(0); }
   .cart-bar .cart-summary { display: flex; align-items: center; gap: 14px; }
-  .cart-bar .cart-count { background: var(--gold); color: var(--bg); border-radius: 999px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
-  .cart-bar .cart-label { color: var(--ink-dim); font-size: 0.95rem; }
-  .cart-bar .cart-total { font-family: var(--serif); color: var(--gold-bright); font-size: 1.3rem; }
-  .cart-bar .btn-checkout { background: linear-gradient(135deg, var(--gold-bright), var(--orange)); color: var(--bg); border: 0; border-radius: 999px; padding: 12px 28px; font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: var(--sans); white-space: nowrap; transition: all 0.2s; }
+  .cart-bar .cart-count { background: #e8b552; color: #0f1722; border-radius: 999px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+  .cart-bar .cart-label { color: rgba(255,255,255,0.72); font-size: 0.95rem; }
+  .cart-bar .cart-total { font-family: var(--serif); color: #f5cb6b; font-size: 1.3rem; }
+  .cart-bar .btn-checkout { background: linear-gradient(135deg, #f5cb6b, var(--orange)); color: #0f1722; border: 0; border-radius: 999px; padding: 12px 28px; font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: var(--sans); white-space: nowrap; transition: all 0.2s; }
   .cart-bar .btn-checkout:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,181,82,0.4); }
 
   /* CHECKOUT */
@@ -175,88 +174,92 @@
   .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
   .cart-item:last-of-type { border-bottom: 0; }
   .cart-item .item-name { color: var(--ink-dim); font-size: 0.95rem; }
-  .cart-item .item-price { font-family: var(--serif); color: var(--gold-bright); }
+  .cart-item .item-price { font-family: var(--serif); color: var(--navy); }
   .btn-remove { background: none; border: none; color: var(--ink-mute); cursor: pointer; font-size: 1.2rem; padding: 0 0 0 10px; line-height: 1; transition: color 0.15s; }
-  .btn-remove:hover { color: #f1a085; }
+  .btn-remove:hover { color: #c03020; }
   .cart-total-row { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line-strong); }
   .cart-total-row .lbl { font-size: 0.78rem; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; align-self: center; }
-  .cart-total-row .val { font-family: var(--serif); font-size: 1.6rem; color: var(--gold-bright); }
+  .cart-total-row .val { font-family: var(--serif); font-size: 1.6rem; color: var(--navy); }
   .checkout-form { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
   .checkout-form h3 { margin-bottom: 6px; }
   .checkout-form .form-sub { color: var(--ink-mute); font-size: 0.9rem; margin-bottom: 20px; }
   .form-field { margin-top: 22px; }
   .checkout-form label { display: block; font-size: 0.85rem; color: var(--ink-dim); margin-bottom: 8px; font-weight: 400; }
   .checkout-form input, .checkout-form textarea {
-    display: block; width: 100%; background: var(--bg-soft);
-    border: 1px solid var(--line); color: var(--ink);
+    display: block; width: 100%; background: var(--bg);
+    border: 1px solid var(--line-strong); color: var(--ink);
     padding: 13px 16px; border-radius: 10px;
     font-family: var(--sans); font-size: 1rem;
     transition: border-color 0.15s, box-shadow 0.15s;
     -webkit-appearance: none;
   }
   .checkout-form input:focus, .checkout-form textarea:focus {
-    outline: none; border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(232,181,82,0.13);
+    outline: none; border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(13, 58, 110, 0.10);
   }
-  .checkout-form input.field-error { border-color: #e05a3c; }
+  .checkout-form input.field-error { border-color: #c03020; }
   .checkout-form textarea { resize: vertical; min-height: 90px; }
-  .checkout-form .form-sub { color: var(--ink-mute); font-size: 0.9rem; margin-bottom: 24px; }
   .payment-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
   .payment-box h3 { margin-bottom: 6px; }
   .payment-box .form-sub { color: var(--ink-mute); font-size: 0.9rem; margin-bottom: 24px; }
   .payment-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
   @media (max-width: 560px) { .payment-options { grid-template-columns: 1fr; } }
-  .pay-option { border: 1px solid var(--line); border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; background: var(--bg); transition: all 0.2s; color: var(--ink-dim); }
-  .pay-option:hover { border-color: var(--gold); color: var(--gold-bright); }
-  .pay-option.selected { border-color: var(--gold-bright); background: rgba(245,203,107,0.08); color: var(--gold-bright); }
+  .pay-option { border: 1px solid var(--line-strong); border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; background: var(--bg); transition: all 0.2s; color: var(--ink-dim); }
+  .pay-option:hover { border-color: var(--navy); color: var(--navy); }
+  .pay-option.selected { border-color: var(--navy); background: rgba(13, 58, 110, 0.06); color: var(--navy); }
   .pay-option .pay-icon { font-size: 1.6rem; margin-bottom: 6px; }
   .pay-option .pay-name { font-weight: 600; font-size: 0.9rem; }
   .pay-option .pay-desc { font-size: 0.75rem; color: var(--ink-mute); margin-top: 3px; }
   .pay-panel { display: none; }
   .pay-panel.active { display: block; }
-  .pay-detail-box { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .pay-detail-box { background: var(--bg); border: 1px solid var(--line-strong); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
   .pay-detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: center; }
   .pay-detail-row:last-child { border-bottom: 0; }
   .pay-detail-row .lbl { color: var(--ink-mute); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; }
-  .pay-detail-row .val { font-family: var(--serif); color: var(--gold-bright); font-size: 1.05rem; }
+  .pay-detail-row .val { font-family: var(--serif); color: var(--navy); font-size: 1.05rem; }
   .pay-note { color: var(--ink-mute); font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px; font-style: italic; }
   .btn-full { width: 100%; margin-top: 8px; }
   .pay-badges { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 0.78rem; color: var(--ink-mute); flex-wrap: wrap; }
-  .pay-badges .chip { padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); }
-  .form-msg { margin-top: 16px; padding: 14px 18px; border-radius: 10px; background: rgba(232, 181, 82, 0.1); border: 1px solid var(--line-strong); font-size: 0.92rem; color: var(--gold-bright); display: none; line-height: 1.5; }
+  .pay-badges .chip { padding: 3px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--bg); }
+  .form-msg { margin-top: 16px; padding: 14px 18px; border-radius: 10px; background: rgba(192, 112, 16, 0.08); border: 1px solid rgba(192, 112, 16, 0.28); font-size: 0.92rem; color: var(--gold); display: none; line-height: 1.5; }
   .form-msg.show { display: block; }
-  .form-msg.error { background: rgba(220, 90, 60, 0.12); border-color: rgba(220, 90, 60, 0.4); color: #f1a085; }
-  .form-msg.success { background: rgba(76, 175, 125, 0.12); border-color: rgba(76, 175, 125, 0.4); color: #7dd4a8; }
+  .form-msg.error { background: rgba(192, 48, 32, 0.08); border-color: rgba(192, 48, 32, 0.3); color: #c03020; }
+  .form-msg.success { background: rgba(76, 175, 125, 0.10); border-color: rgba(76, 175, 125, 0.35); color: #2a7a55; }
 
   /* PRACTICAL / INFO */
   .practical { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-  .info-box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px; }
-  .info-box h4 { font-size: 1.15rem; color: var(--gold-bright); margin-bottom: 8px; }
+  .info-box { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--navy); border-radius: 0 0 10px 10px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .info-box h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--navy); margin-bottom: 8px; font-weight: 700; }
   .info-box p { color: var(--ink-dim); font-size: 0.95rem; margin: 0; }
 
+  /* ANMALAN-section overrides (keeps dark photo overlay) */
+  #anmalan .section-head .label { color: #e8b552; }
+  #anmalan .section-head h2 { color: #f5ecd9; }
+  #anmalan .section-head p { color: #c9bfa8; }
+
   /* FOOTER */
-  footer { background: #0a1119; padding: 60px 0 30px; border-top: 1px solid var(--line); }
+  footer { background: #0a1119; padding: 60px 0 30px; border-top: 4px solid #e8b552; }
   .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
   @media (max-width: 720px) { .foot-grid { grid-template-columns: 1fr; gap: 28px; } }
-  footer h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); margin-bottom: 14px; }
-  footer p, footer a { color: var(--ink-dim); font-size: 0.92rem; margin: 4px 0; }
-  .foot-bottom { border-top: 1px solid var(--line); padding-top: 24px; text-align: center; color: var(--ink-mute); font-size: 0.85rem; }
-  .foot-brand { font-family: var(--serif); color: var(--gold-bright); font-size: 1.4rem; margin-bottom: 10px; }
+  footer h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.14em; color: #e8b552; margin-bottom: 14px; }
+  footer p, footer a { color: #c9bfa8; font-size: 0.92rem; margin: 4px 0; }
+  footer a:hover { color: #f5cb6b; }
+  .foot-bottom { border-top: 1px solid rgba(232, 181, 82, 0.18); padding-top: 24px; text-align: center; color: #8e8674; font-size: 0.85rem; }
+  .foot-brand { font-family: var(--serif); color: #f5cb6b; font-size: 1.4rem; margin-bottom: 10px; }
 
   /* LANGUAGE UTILITY */
   [data-en] { display: none; }
   html[lang="en"] [data-sv] { display: none; }
-  html[lang="en"] [data-en] { display: inline; }
+  html[lang="en"] [data-en] { display: revert; }
   html[lang="en"] [data-en-block] { display: block; }
   [data-en-block] { display: none; }
-
 </style>
 </head>
 <body>
 
 <nav class="top">
   <div class="inner">
-    <div class="brand">Uppsala Schackfestival</div>
+    <div class="brand"><img src="/logo.png" alt="" class="nav-logo">Uppsala Schackfestival</div>
     <ul>
       <li><a href="#turneringar"><span data-sv>Turneringar</span><span data-en>Tournaments</span></a></li>
       <li><a href="#anmalan"><span data-sv>Anmälan</span><span data-en>Registration</span></a></li>
@@ -326,9 +329,8 @@
   </div>
 </section>
 
-<section class="section alt" id="turneringar" style="background-image:url('/bg-turneringar.jpg');background-size:cover;background-position:center 40%;background-attachment:fixed;position:relative;">
-  <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,17,28,0.78) 0%, rgba(10,17,28,0.68) 50%, rgba(10,17,28,0.82) 100%);pointer-events:none;z-index:0;"></div>
-  <div class="container" style="position:relative;z-index:1;">
+<section class="section" id="turneringar">
+  <div class="container">
     <div class="section-head">
       <div class="label" data-sv>Programmet</div><div class="label" data-en>The programme</div>
       <h2><span data-sv>Åtta turneringar</span><span data-en>Eight tournaments</span></h2>
@@ -344,8 +346,8 @@
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>5</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>90 min + 30 sek/<span data-sv>drag</span><span data-en>move</span></dd>
           <dt data-sv>Tider</dt><dt data-en>Schedule</dt><dd>7/8: 16–20 · 8–9/8: 10–14, 16–20</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>400 kr</dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 kr · 2) 500 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>400 <span data-sv>kronor</span><span data-en>SEK</span></dd>
+          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 <span data-sv>kronor</span><span data-en>SEK</span> · 2) 500 <span data-sv>kronor</span><span data-en>SEK</span></dd>
         </dl>
         <div class="note"><span data-sv>Bergergrupper indelade efter rating. Priser i varje grupp.</span><span data-en>Berger groups divided by rating. Prizes in each group.</span></div>
         <button class="btn-add" data-tournament="Weekend 1" data-price="400" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
@@ -359,8 +361,8 @@
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>5</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>90 min + 30 sek/<span data-sv>drag</span><span data-en>move</span></dd>
           <dt data-sv>Tider</dt><dt data-en>Schedule</dt><dd>14/8: 16–20 · 15–16/8: 10–14, 16–20</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>400 kr</dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 kr · 2) 500 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>400 <span data-sv>kronor</span><span data-en>SEK</span></dd>
+          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 <span data-sv>kronor</span><span data-en>SEK</span> · 2) 500 <span data-sv>kronor</span><span data-en>SEK</span></dd>
         </dl>
         <div class="note"><span data-sv>Bergergrupper indelade efter rating. Priser i varje grupp.</span><span data-en>Berger groups divided by rating. Prizes in each group.</span></div>
         <button class="btn-add" data-tournament="Weekend 2" data-price="400" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
@@ -373,8 +375,8 @@
         <dl>
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>6</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>15 min + 5 sek</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 kr</dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 2 000 kr · 2) 1 500 kr · 3) 1 000 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 <span data-sv>kronor</span><span data-en>SEK</span></dd>
+          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 2 000 <span data-sv>kronor</span><span data-en>SEK</span> · 2) 1 500 <span data-sv>kronor</span><span data-en>SEK</span> · 3) 1 000 <span data-sv>kronor</span><span data-en>SEK</span></dd>
         </dl>
         <div class="note"><span data-sv>Ratingpriser till ungefär var tionde spelare.</span><span data-en>Rating prizes for approximately every tenth player.</span></div>
         <button class="btn-add" data-tournament="Snabbschack" data-price="200" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
@@ -387,8 +389,8 @@
         <dl>
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>6</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>15 min + 5 sek</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 kr</dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 kr · 2) 750 kr · 3) 500 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 <span data-sv>kronor</span><span data-en>SEK</span></dd>
+          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 <span data-sv>kronor</span><span data-en>SEK</span> · 2) 750 <span data-sv>kronor</span><span data-en>SEK</span> · 3) 500 <span data-sv>kronor</span><span data-en>SEK</span></dd>
         </dl>
         <div class="note"><span data-sv>Olika startpositioner i varje rond. Öppen för alla.</span><span data-en>Different starting positions each round. Open to all.</span></div>
         <button class="btn-add" data-tournament="Chess960" data-price="200" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
@@ -401,8 +403,8 @@
         <dl>
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>11</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>3 min + 2 sek/<span data-sv>drag</span><span data-en>move</span></dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 kr</dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 2 000 kr · 2) 1 500 kr · 3) 1 000 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 <span data-sv>kronor</span><span data-en>SEK</span></dd>
+          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 2 000 <span data-sv>kronor</span><span data-en>SEK</span> · 2) 1 500 <span data-sv>kronor</span><span data-en>SEK</span> · 3) 1 000 <span data-sv>kronor</span><span data-en>SEK</span></dd>
         </dl>
         <div class="note"><span data-sv>Ratingpriser till ungefär var tionde spelare.</span><span data-en>Rating prizes for approximately every tenth player.</span></div>
         <button class="btn-add" data-tournament="Blixt" data-price="200" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
@@ -415,8 +417,8 @@
         <dl>
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>5</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>15 min + 5 sek/<span data-sv>drag</span><span data-en>move</span></dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 kr</dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 kr · 2) 750 kr · 3) 500 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>200 <span data-sv>kronor</span><span data-en>SEK</span></dd>
+          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes">1) 1 000 <span data-sv>kronor</span><span data-en>SEK</span> · 2) 750 <span data-sv>kronor</span><span data-en>SEK</span> · 3) 500 <span data-sv>kronor</span><span data-en>SEK</span></dd>
         </dl>
         <div class="note"><span data-sv>Enbart för spelare utan FIDE-rating.</span><span data-en>Only for players without FIDE rating.</span></div>
         <button class="btn-add" data-tournament="Amatör" data-price="200" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
@@ -429,7 +431,7 @@
         <dl>
           <dt data-sv>Format</dt><dt data-en>Format</dt><dd><span data-sv>Blixt i 24 timmar</span><span data-en>24-hour blitz</span></dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>3 min + 2 sek</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>100 kr</dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>100 <span data-sv>kronor</span><span data-en>SEK</span></dd>
           <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes" data-sv>Sakpriser</dd><dd class="prizes" data-en>Item prizes</dd>
         </dl>
         <div class="note"><span data-sv>Se regler på hemsidan.</span><span data-en>See website for full rules.</span></div>
@@ -443,7 +445,7 @@
         <dl>
           <dt data-sv>Ronder</dt><dt data-en>Rounds</dt><dd>6</dd>
           <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>10 min + 5 sek</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd><span data-sv>100 kr — gratis för USSS-medlemmar</span><span data-en>100 kr — free for USSS members</span></dd>
+          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd><span data-sv>100 kronor — gratis för USSS-medlemmar</span><span data-en>100 SEK — free for USSS members</span></dd>
           <dt data-sv>Klasser</dt><dt data-en>Classes</dt><dd><span data-sv>Födda 2007–, 2010–, 2013–, 2016–</span><span data-en>Born 2007–, 2010–, 2013–, 2016–</span></dd>
           <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes" data-sv>Sakpriser</dd><dd class="prizes" data-en>Item prizes</dd>
         </dl>
@@ -460,7 +462,7 @@
   <div class="cart-summary">
     <div class="cart-count" id="cart-count">0</div>
     <div class="cart-label"><span data-sv>turnering(ar) vald(a)</span><span data-en>tournament(s) selected</span></div>
-    <div class="cart-total" id="cart-total-bar">0 kr</div>
+    <div class="cart-total" id="cart-total-bar">0 <span data-sv>kronor</span><span data-en>SEK</span></div>
   </div>
   <button class="btn-checkout" onclick="goToCheckout()">
     <span data-sv>Gå till kassan →</span><span data-en>Proceed to checkout →</span>
@@ -489,7 +491,7 @@
         </div>
         <div class="cart-total-row" id="checkout-total-row" style="display:none;">
           <div class="lbl"><span data-sv>Totalt att betala</span><span data-en>Total to pay</span></div>
-          <div class="val" id="checkout-total-val">0 kr</div>
+          <div class="val" id="checkout-total-val">0 <span data-sv>kronor</span><span data-en>SEK</span></div>
         </div>
       </div>
 
@@ -552,7 +554,7 @@
         <div class="pay-panel" id="panel-swish">
           <div class="pay-detail-box">
             <div class="pay-detail-row"><div class="lbl">Swish</div><div class="val">123 138 89 09</div></div>
-            <div class="pay-detail-row"><div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div><div class="val" id="swish-amount">0 kr</div></div>
+            <div class="pay-detail-row"><div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div><div class="val" id="swish-amount">0 <span data-sv>kronor</span><span data-en>SEK</span></div></div>
           </div>
           <p class="pay-note"><span data-sv>Ange ditt namn och turneringarna som meddelande i Swish. Klicka sedan "Bekräfta anmälan" nedan.</span><span data-en>Enter your name and tournaments as the Swish message. Then click "Confirm registration" below.</span></p>
           <button class="btn btn-primary btn-full" onclick="submitManualPayment('swish')"><span data-sv>Bekräfta anmälan</span><span data-en>Confirm registration</span></button>
@@ -561,7 +563,7 @@
         <div class="pay-panel" id="panel-pg">
           <div class="pay-detail-box">
             <div class="pay-detail-row"><div class="lbl">Plusgiro</div><div class="val">16 13 539-4</div></div>
-            <div class="pay-detail-row"><div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div><div class="val" id="pg-amount">0 kr</div></div>
+            <div class="pay-detail-row"><div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div><div class="val" id="pg-amount">0 <span data-sv>kronor</span><span data-en>SEK</span></div></div>
           </div>
           <p class="pay-note"><span data-sv>Ange ditt namn och turneringarna som referens vid betalningen. Klicka sedan "Bekräfta anmälan" nedan.</span><span data-en>Enter your name and tournaments as the payment reference. Then click "Confirm registration" below.</span></p>
           <button class="btn btn-primary btn-full" onclick="submitManualPayment('pg')"><span data-sv>Bekräfta anmälan</span><span data-en>Confirm registration</span></button>
@@ -573,9 +575,8 @@
   </div>
 </section>
 
-<section class="section alt" id="info" style="background-image:url('/bg-info.jpg');background-size:cover;background-position:center 50%;background-attachment:fixed;position:relative;">
-  <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,17,28,0.78) 0%, rgba(10,17,28,0.68) 50%, rgba(10,17,28,0.82) 100%);pointer-events:none;z-index:0;"></div>
-  <div class="container" style="position:relative;z-index:1;">
+<section class="section alt" id="info">
+  <div class="container">
     <div class="section-head">
       <div class="label" data-sv>Praktisk information</div><div class="label" data-en>Practical information</div>
       <h2><span data-sv>Bra att veta</span><span data-en>Good to know</span></h2>
@@ -589,9 +590,8 @@
   </div>
 </section>
 
-<section class="section" id="regler" style="background-image:url('/bg-regler.jpg');background-size:cover;background-position:center 35%;background-attachment:fixed;position:relative;">
-  <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,17,28,0.82) 0%, rgba(10,17,28,0.72) 50%, rgba(10,17,28,0.88) 100%);pointer-events:none;z-index:0;"></div>
-  <div class="container" style="position:relative;z-index:1;">
+<section class="section" id="regler">
+  <div class="container">
     <div class="section-head">
       <div class="label" data-sv>Spelregler</div><div class="label" data-en>Rules</div>
       <h2><span data-sv>Kvalifikationer & priser</span><span data-en>Qualifications & prizes</span></h2>
@@ -658,6 +658,17 @@
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
+
+  // CURRENCY HELPER
+  function curr(amount) {
+    const lang = document.documentElement.lang;
+    return amount.toLocaleString('sv-SE') + (lang === 'en' ? ' SEK' : ' kronor');
+  }
+  function currAmt(amount) {
+    const lang = document.documentElement.lang;
+    return amount + (lang === 'en' ? ' SEK' : ' kronor');
+  }
+
   // CART
   let cart = {};
 
@@ -687,7 +698,7 @@
     // Cart bar
     document.getElementById('cart-bar').classList.toggle('visible', count > 0);
     document.getElementById('cart-count').textContent = count;
-    document.getElementById('cart-total-bar').textContent = total.toLocaleString('sv-SE') + ' kr';
+    document.getElementById('cart-total-bar').textContent = curr(total);
     // Checkout cart
     const container = document.getElementById('checkout-cart-items');
     const totalRow = document.getElementById('checkout-total-row');
@@ -696,13 +707,13 @@
       totalRow.style.display = 'none';
     } else {
       container.innerHTML = items.map(([name, price]) =>
-        `<div class="cart-item"><div class="item-name">${name}</div><div style="display:flex;align-items:center;gap:4px;"><div class="item-price">${price} kr</div><button class="btn-remove" onclick="removeFromCart('${name}')" title="Ta bort">×</button></div></div>`
+        `<div class="cart-item"><div class="item-name">${name}</div><div style="display:flex;align-items:center;gap:4px;"><div class="item-price">${currAmt(price)}</div><button class="btn-remove" onclick="removeFromCart('${name}')" title="Ta bort">×</button></div></div>`
       ).join('');
       totalRow.style.display = 'flex';
-      document.getElementById('checkout-total-val').textContent = total.toLocaleString('sv-SE') + ' kr';
+      document.getElementById('checkout-total-val').textContent = curr(total);
     }
-    document.getElementById('swish-amount').textContent = total.toLocaleString('sv-SE') + ' kr';
-    document.getElementById('pg-amount').textContent = total.toLocaleString('sv-SE') + ' kr';
+    document.getElementById('swish-amount').textContent = curr(total);
+    document.getElementById('pg-amount').textContent = curr(total);
   }
 
   function removeFromCart(name) {
@@ -825,8 +836,8 @@
       const total = Object.values(cart).reduce((s, p) => s + p, 0);
       const payInfo = method === 'swish' ? 'Swish: 123 138 89 09' : 'Plusgiro: 16 13 539-4';
       m.innerHTML = lang === 'en'
-        ? `✓ Registration received! A confirmation has been sent to ${data.email}. Please complete your payment of <strong>${total} kr</strong> to: <strong>${payInfo}</strong>`
-        : `✓ Anmälan mottagen! En bekräftelse har skickats till ${data.email}. Kom ihåg att betala <strong>${total} kr</strong> till: <strong>${payInfo}</strong>`;
+        ? `✓ Registration received! A confirmation has been sent to ${data.email}. Please complete your payment of <strong>${currAmt(total)}</strong> to: <strong>${payInfo}</strong>`
+        : `✓ Anmälan mottagen! En bekräftelse har skickats till ${data.email}. Kom ihåg att betala <strong>${currAmt(total)}</strong> till: <strong>${payInfo}</strong>`;
       m.classList.add('show','success');
     } catch (err) {
       m.textContent = lang === 'en'
