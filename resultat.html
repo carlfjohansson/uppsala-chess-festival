@@ -2,6 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="/logo.png" type="image/png">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Resultat – Uppsala Schackfestival 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,7 +118,7 @@ footer a{color:#f5cb6b}
     </a>
     <a href="/" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
       <img src="/logo.png" alt="Uppsala Chess Festival" style="height:34px;width:auto;">
-      <span class="sv">Uppsala Schackfestival</span><span class="en" style="display:none">Uppsala Chess Festival</span>
+      <span class="sv">Uppsala Schackfestival</span><span class="en" style="display:none">6th Uppsala Chess Festival</span>
     </a>
     <div class="lang-toggle">
       <button class="active" onclick="setLang('sv')">SV</button>
@@ -136,10 +137,10 @@ footer a{color:#f5cb6b}
     <div class="tourn-grid" id="tourn-grid"></div>
 
     <div class="youth-tabs" id="youth-tabs">
-      <button class="ytab active" onclick="selectYouth(18499,this)">2006–2008</button>
-      <button class="ytab" onclick="selectYouth(18500,this)">2009–2011</button>
-      <button class="ytab" onclick="selectYouth(18501,this)">2012–2014</button>
-      <button class="ytab" onclick="selectYouth(18502,this)">2015–</button>
+      <button class="ytab active" onclick="selectYouth(18502,this)">2006–2008</button>
+      <button class="ytab" onclick="selectYouth(18501,this)">2009–2011</button>
+      <button class="ytab" onclick="selectYouth(18500,this)">2012–2014</button>
+      <button class="ytab" onclick="selectYouth(18499,this)">2015–</button>
     </div>
 
     <div id="results-panel">
@@ -177,7 +178,7 @@ const TOURNAMENTS = [
   {id:18480, sv:'24-timmarsblixten', en:'24-Hour Blitz',  date:'14–15 aug'},
   {id:'youth',sv:'Ungdom',           en:'Youth',          date:'8–16 aug', youth:true},
 ];
-const YOUTH_IDS = [18499,18500,18501,18502];
+const YOUTH_IDS = [18502,18501,18500,18499];
 const BASE = 'https://member.schack.se/public/api/v1';
 let lang = 'sv';
 let currentId = null;
