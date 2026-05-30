@@ -335,25 +335,24 @@ function emptyMsg(msg) { return `<div class="empty-msg"><strong>${msg}</strong><
 
 // Data
 function standings(data) {
-  return data.sort((a,b)=>{
-    const pa=a.place||999, pb=b.place||999;
-    if (pa!==pb) return pa-pb;
-    // Tiebreak: higher rating first
-    const ra=a.playerInfo?.elo?.rating||0, rb=b.playerInfo?.elo?.rating||0;
-    return rb-ra;
-  }).map(p=>{
+  return data.map(p=>{
     const pi=p.playerInfo||{};
     const sp=(p.wonGames||0)+(p.drawGames||0)+(p.lostGames||0);
     const kvpRaw=p.secPoints;
     return {
       id:p.contenderId,
       name:[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${p.contenderId}`,
-      club:pi.club||'', rating:pi.elo?.rating||0,
+      club:pi.club||'', rating:pi.elo?.rating||pi.rating||0,
       rank:p.place||0, score:p.points||0,
       kvp:kvpRaw!=null?fmt(Math.round(kvpRaw*2)/2):'',
       wins:String(p.wonGames||0), draws:String(p.drawGames||0),
       losses:String(p.lostGames||0), sp:String(sp),
     };
+  }).sort((a,b)=>{
+    const pa=a.rank||999, pb=b.rank||999;
+    if (pa!==pb) return pa-pb;
+    // Lika placering: sortera efter rating fallande
+    return b.rating-a.rating;
   });
 }
 function parseRes(v) {
