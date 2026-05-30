@@ -335,7 +335,13 @@ function emptyMsg(msg) { return `<div class="empty-msg"><strong>${msg}</strong><
 
 // Data
 function standings(data) {
-  return data.sort((a,b)=>(a.place||999)-(b.place||999)).map(p=>{
+  return data.sort((a,b)=>{
+    const pa=a.place||999, pb=b.place||999;
+    if (pa!==pb) return pa-pb;
+    // Tiebreak: higher rating first
+    const ra=a.playerInfo?.elo?.rating||0, rb=b.playerInfo?.elo?.rating||0;
+    return rb-ra;
+  }).map(p=>{
     const pi=p.playerInfo||{};
     const sp=(p.wonGames||0)+(p.drawGames||0)+(p.lostGames||0);
     const kvpRaw=p.secPoints;
