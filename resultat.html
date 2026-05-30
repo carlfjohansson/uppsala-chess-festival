@@ -276,8 +276,21 @@ async function showStartList(id) {
 
   try {
     const data = await api(`/tournament/group/id/${id}`);
-    const list = data.players||data.contenders||data.participants||[];
-    if (!list.length) { el.innerHTML = notStarted; return; }
+    const rawList = data.players||data.contenders||data.participants||[];
+    if (!rawList.length) { el.innerHTML = notStarted; return; }
+
+    // Sort by rating desc, unrated alphabetically by last name at bottom
+    const list = rawList.map(p => {
+      const pi = p.playerInfo||p;
+      const rating = pi.elo?.rating||pi.rating||0;
+      const lastName = pi.lastName||'';
+      return {p, pi, rating, lastName};
+    }).sort((a,b) => {
+      if (a.rating && b.rating) return b.rating - a.rating;
+      if (a.rating) return -1;
+      if (b.rating) return 1;
+      return a.lastName.localeCompare(b.lastName, 'sv');
+    }).map(x => x.p);
 
     const sv = lang==='sv';
     let h = `<div class="empty-msg" style="text-align:left;padding:16px 0 0"><strong style="display:block;margin-bottom:16px;font-size:1rem;">${sv?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong></div><div class="table-wrap"><table><thead><tr>
