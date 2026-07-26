@@ -296,8 +296,8 @@
         <span class="accent">7–16 augusti 2026</span>
       </h1>
       <p class="tagline">
-        <span data-sv>Tio dagar med åtta turneringar — från långpartier och blixt till Chess960 och 24-timmars schack. För klubbspelare, amatörer och ungdomar.</span>
-        <span data-en>Ten days with eight tournaments — from classical and blitz to Chess960 and 24-hour chess. For club players, amateurs and youth.</span>
+        <span data-sv>Tio dagar med sju turneringar — från långpartier och blixt till Chess960. För klubbspelare, amatörer och ungdomar.</span>
+        <span data-en>Ten days with seven tournaments — from classical and blitz to Chess960. For club players, amateurs and youth.</span>
       </p>
       <div class="ctas">
         <a href="#turneringar" class="btn btn-primary">
@@ -338,7 +338,7 @@
       <div class="day" onclick="location.hash='#chess960'"><div class="date">11 aug</div><div class="weekday" data-sv>Tisdag</div><div class="weekday" data-en>Tuesday</div><div class="events"><span>Chess960</span></div></div>
       <div class="day" onclick="location.hash='#blixt'"><div class="date">12 aug</div><div class="weekday" data-sv>Onsdag</div><div class="weekday" data-en>Wednesday</div><div class="events"><span data-sv>Blixt</span><span data-en>Blitz</span></div></div>
       <div class="day" onclick="location.hash='#amator'"><div class="date">13 aug</div><div class="weekday" data-sv>Torsdag</div><div class="weekday" data-en>Thursday</div><div class="events"><span data-sv>Amatör</span><span data-en>Amateur</span></div></div>
-      <div class="day" onclick="location.hash='#dygnet'"><div class="date">14 aug</div><div class="weekday" data-sv>Fredag</div><div class="weekday" data-en>Friday</div><div class="events"><span>Weekend 2</span><span data-sv>24-timmarsblixten</span><span data-en>24h Blitz</span></div></div>
+      <div class="day" onclick="location.hash='#weekend2'"><div class="date">14 aug</div><div class="weekday" data-sv>Fredag</div><div class="weekday" data-en>Friday</div><div class="events"><span>Weekend 2</span></div></div>
       <div class="day" onclick="location.hash='#weekend2'"><div class="date">15 aug</div><div class="weekday" data-sv>Lördag</div><div class="weekday" data-en>Saturday</div><div class="events"><span>Weekend 2</span></div></div>
       <div class="day" onclick="location.hash='#ungdom'"><div class="date">16 aug</div><div class="weekday" data-sv>Söndag</div><div class="weekday" data-en>Sunday</div><div class="events"><span>Weekend 2</span><span data-sv>Ungdom</span><span data-en>Youth</span></div></div>
     </div>
@@ -349,7 +349,7 @@
   <div class="container">
     <div class="section-head">
       <div class="label" data-sv>Programmet</div><div class="label" data-en>The programme</div>
-      <h2><span data-sv>Åtta turneringar</span><span data-en>Eight tournaments</span></h2>
+      <h2><span data-sv>Sju turneringar</span><span data-en>Seven tournaments</span></h2>
       <p><span data-sv>Välj de turneringar du vill delta i och klicka "Lägg till". En varukorg dyker upp längst ned — gå sedan till kassan när du är klar.</span><span data-en>Choose the tournaments you want to enter and click "Add to cart". A cart will appear at the bottom — proceed to checkout when ready.</span></p>
       <p style="margin-top:8px;font-size:0.88rem;color:var(--ink-mute);"><span data-sv>GM, IM, WGM och WIM spelar gratis — ange ditt SSF-ID så räknas det ut automatiskt.</span><span data-en>GMs, IMs, WGMs and WIMs play free of charge — enter your SSF ID and the discount is applied automatically.</span></p>
     </div>
@@ -445,20 +445,6 @@
         <div class="note"><span data-sv>Enbart för spelare utan FIDE-rating.</span><span data-en>Only for players without FIDE rating.</span></div>
         <button class="btn-add" data-tournament="Amatör" data-price="200" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
       <a href="/resultat.html#18491" class="btn-results" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:7px 14px;border:1px solid var(--line);border-radius:8px;font-size:0.82rem;font-weight:600;color:var(--navy);transition:all 0.2s;" onmouseover="this.style.background='rgba(13,58,110,0.06)';this.style.borderColor='var(--navy)'" onmouseout="this.style.background='';this.style.borderColor='var(--line)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-sv>Resultat & startlista</span><span data-en>Results & start list</span></a>
-      </article>
-
-      <article class="card" id="dygnet">
-        <div class="cat" data-sv>Special · 24 timmar</div><div class="cat" data-en>Special · 24 hours</div>
-        <h3><span data-sv>24-timmarsblixten</span><span data-en>24-Hour Blitz</span></h3>
-        <div class="when"><span data-sv>14 aug 12.00 → 15 aug 12.00</span><span data-en>14 Aug 12 PM → 15 Aug 12 PM</span></div>
-        <dl>
-          <dt data-sv>Format</dt><dt data-en>Format</dt><dd><span data-sv>Blixt i 24 timmar</span><span data-en>24-hour blitz</span></dd>
-          <dt data-sv>Betänketid</dt><dt data-en>Time</dt><dd>3 min + 2 sek</dd>
-          <dt data-sv>Startavgift</dt><dt data-en>Entry fee</dt><dd>325 <span data-sv>kronor</span><span data-en>SEK</span></dd>
-          <dt data-sv>Priser</dt><dt data-en>Prizes</dt><dd class="prizes" data-sv>Alla startavgifter delas ut som priser</dd><dd class="prizes" data-en>All entry fees paid out as prizes</dd>
-        </dl>
-        <button class="btn-add" data-tournament="24-timmarsblixten" data-price="325" onclick="toggleCart(this)"><span data-sv>+ Lägg till i varukorg</span><span data-en>+ Add to cart</span></button>
-      <a href="/resultat.html#18480" class="btn-results" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:7px 14px;border:1px solid var(--line);border-radius:8px;font-size:0.82rem;font-weight:600;color:var(--navy);transition:all 0.2s;" onmouseover="this.style.background='rgba(13,58,110,0.06)';this.style.borderColor='var(--navy)'" onmouseout="this.style.background='';this.style.borderColor='var(--line)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-sv>Resultat & startlista</span><span data-en>Results & start list</span></a>
       </article>
 
       <article class="card" id="ungdom">
