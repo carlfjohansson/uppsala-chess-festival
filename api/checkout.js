@@ -2,47 +2,14 @@ const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const TOURNAMENTS = {
-  'Weekend 1':          { name: 'Weekend 1 — 7–9 augusti',        amount: 40000 },
-  'Weekend 2':          { name: 'Weekend 2 — 14–16 augusti',      amount: 40000 },
-  'Snabbschack':        { name: 'Snabbschack — 10 augusti',       amount: 20000 },
-  'Chess960':           { name: 'Chess960 — 11 augusti',          amount: 20000 },
-  'Blixt':              { name: 'Blixt — 12 augusti',             amount: 20000 },
-  'Amatör':             { name: 'Amatör — 13 augusti',            amount: 20000 },
-  'Schack dygnet runt': { name: 'Schack dygnet runt — 14–15 aug', amount: 10000 },
-  'Ungdom':             { name: 'Ungdom — 16 augusti',            amount: 10000 }
+  'Weekend 1':   { name: 'Weekend 1 — 7–9 augusti',   amount: 40000 },
+  'Weekend 2':   { name: 'Weekend 2 — 14–16 augusti', amount: 40000 },
+  'Snabbschack': { name: 'Snabbschack — 10 augusti',  amount: 20000 },
+  'Chess960':    { name: 'Chess960 — 11 augusti',     amount: 20000 },
+  'Blixt':       { name: 'Blixt — 12 augusti',        amount: 20000 },
+  'Amatör':      { name: 'Amatör — 13 augusti',       amount: 20000 },
+  'Ungdom':      { name: 'Ungdom — 16 augusti',       amount: 10000 }
 };
-
-async function sendOrganizerEmail(data) {
-  if (!process.env.RESEND_API_KEY) return;
-  const { name, email, club, rating, message, tournaments, lang } = data;
-  const total = tournaments.reduce((s, t) => s + (TOURNAMENTS[t] ? TOURNAMENTS[t].amount / 100 : 0), 0);
-
-  const html = `
-    <h2>Ny kortbetalning – Uppsala Schackfestival 2026</h2>
-    <table style="border-collapse:collapse;width:100%;max-width:500px;">
-      <tr><td style="padding:8px;color:#666;">Namn</td><td style="padding:8px;font-weight:bold;">${name}</td></tr>
-      <tr><td style="padding:8px;color:#666;">E-post</td><td style="padding:8px;">${email}</td></tr>
-      <tr><td style="padding:8px;color:#666;">Klubb</td><td style="padding:8px;">${club || '—'}</td></tr>
-      <tr><td style="padding:8px;color:#666;">FIDE-ID</td><td style="padding:8px;">${rating || '—'}</td></tr>
-      <tr><td style="padding:8px;color:#666;">Turneringar</td><td style="padding:8px;">${tournaments.join(', ')}</td></tr>
-      <tr><td style="padding:8px;color:#666;">Totalt</td><td style="padding:8px;font-weight:bold;">${total} kr</td></tr>
-      <tr><td style="padding:8px;color:#666;">Betalning</td><td style="padding:8px;">Kort (Stripe) — betalning påbörjad</td></tr>
-      ${message ? `<tr><td style="padding:8px;color:#666;">Övrigt</td><td style="padding:8px;">${message}</td></tr>` : ''}
-    </table>
-    <p style="color:#888;font-size:12px;margin-top:16px;">Kontrollera Stripe-dashboarden för att bekräfta att betalningen genomfördes.</p>
-  `;
-
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: 'Uppsala Schackfestival <onboarding@resend.dev>',
-      to: ['info@uppsalachessfestival.se'],
-      subject: `Ny anmälan (kort): ${name} — ${tournaments.join(', ')}`,
-      html
-    })
-  });
-}
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -74,19 +41,18 @@ module.exports = async (req, res) => {
       line_items: lineItems,
       customer_email: email,
       locale: lang === 'en' ? 'en' : 'sv',
-      success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}&lang=${lang || 'sv'}`,
       cancel_url: `${origin}/cancel.html`,
       metadata: {
         name: name.slice(0, 480),
+        email: email.slice(0, 480),
         club: (club || '').slice(0, 480),
         rating: (rating || '').slice(0, 100),
         tournaments: tournaments.join(', ').slice(0, 480),
-        message: (message || '').slice(0, 480)
+        message: (message || '').slice(0, 480),
+        lang: lang || 'sv'
       }
     });
-
-    // Send organizer email (non-blocking)
-    sendOrganizerEmail({ name, email, club, rating, message, tournaments, lang }).catch(console.error);
 
     return res.status(200).json({ url: session.url });
   } catch (err) {

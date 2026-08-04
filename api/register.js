@@ -1,7 +1,7 @@
 const PRICES = {
   'Weekend 1': 400, 'Weekend 2': 400, 'Snabbschack': 200,
   'Chess960': 200, 'Blixt': 200, 'Amatör': 200,
-  'Schack dygnet runt': 100, 'Ungdom': 100
+  'Ungdom': 100
 };
 
 const DATES = {
@@ -11,7 +11,6 @@ const DATES = {
   'Chess960': '11 augusti 2026, kl. 17.00',
   'Blixt': '12 augusti 2026, kl. 17.00',
   'Amatör': '13 augusti 2026, kl. 17.00',
-  'Schack dygnet runt': '14 aug kl. 12.00 – 15 aug kl. 12.00',
   'Ungdom': '16 augusti 2026, kl. 11.00'
 };
 

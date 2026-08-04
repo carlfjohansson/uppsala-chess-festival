@@ -164,12 +164,8 @@
       <h2><span data-sv>Vad händer nu?</span><span data-en>What happens next?</span></h2>
       <ul>
         <li>
-          <span data-sv>Ett kvitto skickas till din e-postadress från Stripe.</span>
-          <span data-en>A receipt will be sent to your email from Stripe.</span>
-        </li>
-        <li>
-          <span data-sv>Vi bekräftar din plats på respektive turnering inom några dagar.</span>
-          <span data-en>We will confirm your spot in each tournament within a few days.</span>
+          <span data-sv>En bekräftelse skickas till din e-postadress.</span>
+          <span data-en>A confirmation will be sent to your email address.</span>
         </li>
         <li>
           <span data-sv>Spellokal: Uppsala Schackcentrum, Ekeby Bruk 6L.</span>
@@ -191,17 +187,39 @@
   </div>
 
   <script>
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get('session_id');
+    const lang = params.get('lang') || 'sv';
+
+    // Sätt språk från URL-param
+    if (lang === 'en') {
+      document.documentElement.lang = 'en';
+      document.querySelectorAll('.lang button').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === 'en');
+      });
+    }
+
     document.querySelectorAll('.lang button').forEach(btn => {
       btn.addEventListener('click', () => {
         document.documentElement.lang = btn.dataset.lang;
         document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('active', b === btn));
       });
     });
-    const params = new URLSearchParams(window.location.search);
-    const sid = params.get('session_id');
+
     if (sid) {
       document.getElementById('session').innerHTML =
         '<span data-sv>Referensnummer:</span><span data-en>Reference:</span> <code>' + sid.slice(0, 24) + '…</code>';
+
+      // Skicka bekräftelsemejl — bara en gång per session (skyddar mot refresh)
+      const storageKey = 'ucf_confirmed_' + sid;
+      if (!sessionStorage.getItem(storageKey)) {
+        sessionStorage.setItem(storageKey, '1');
+        fetch('/api/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sid })
+        }).catch(console.error);
+      }
     }
   </script>
 </body>
