@@ -200,54 +200,66 @@
 
     /* ── Enkelbräde-läge ────────────────────────────── */
     .single-wrap {
-      max-width: 1000px; margin: 0 auto;
-      padding: 16px 20px 40px;
-      display: flex; flex-direction: column; gap: 12px;
+      height: calc(100vh - 4.2vh);
+      display: flex; flex-direction: column;
+      padding: 1.2vh 1.5vw 1vh;
+      overflow: hidden;
     }
-    .single-group-label {
+    .single-hdr {
+      flex-shrink: 0;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(0.9rem, 2.2vh, 1.3rem);
-      color: var(--gold); letter-spacing: 0.08em;
+      font-size: clamp(0.8rem, 1.6vh, 1.1rem);
+      color: var(--navy); letter-spacing: 0.07em;
+      margin-bottom: 0.8vh;
     }
-    .single-board-row {
-      display: flex; align-items: flex-start; gap: 20px;
+    .single-bw {
+      flex: 1; min-height: 0;
+      display: flex; align-items: center; gap: 2vw;
+      overflow: hidden;
     }
-    .single-board-col { display: flex; flex-direction: column; gap: 8px; }
+    .single-board-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      width: min(calc(72vw - 4vw), calc(100vh - 4.2vh - 5vh));
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.22);
+      flex-shrink: 0;
+    }
+    .single-board-grid .sq { aspect-ratio: 1; }
+    .single-ml-col {
+      flex: 1; min-width: 0; min-height: 0; height: 100%;
+      display: flex; flex-direction: column; gap: 1vh;
+      overflow: hidden;
+    }
+    .single-players { flex-shrink: 0; }
     .single-p-row {
-      display: flex; align-items: center; gap: 8px;
-      font-size: clamp(0.85rem, 1.8vh, 1.1rem); font-weight: 700;
+      display: flex; align-items: center; gap: 0.5em;
+      font-size: clamp(0.85rem, 1.8vh, 1.15rem); font-weight: 700;
+      line-height: 1.65;
     }
     .single-p-dot {
-      width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
     }
     .single-p-dot.w { background: #f0f0f0; border: 1px solid #999; }
     .single-p-dot.b { background: #1a1a1a; border: 1px solid #666; }
     .single-p-title {
-      font-size: 0.75em; font-weight: 700; color: var(--accent);
-      background: rgba(192,112,16,.15); padding: 1px 5px; border-radius: 3px;
+      font-size: 0.72em; font-weight: 700; color: var(--accent);
+      background: rgba(192,112,16,.15); padding: 1px 6px; border-radius: 3px;
     }
     .single-p-rating { color: var(--muted); font-size: 0.78em; }
-    .single-board-grid {
-      display: grid; grid-template-columns: repeat(8, 1fr);
-      width: min(min(72vh, 72vw), 580px);
-      border-radius: 4px; overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,.22);
-    }
-    .single-board-grid .sq { aspect-ratio: 1; }
     .single-ml {
-      flex: 1; min-width: 120px;
-      height: min(min(72vh, 72vw), 580px);
+      flex: 1; min-height: 0;
       overflow-y: auto; scrollbar-width: thin;
       display: flex; flex-direction: column; justify-content: flex-end;
     }
     .single-ml .ml-row {
-      font-size: clamp(0.75rem, 1.6vh, 1rem);
-      line-height: 1.7;
-      grid-template-columns: 2em 1fr 1fr;
+      font-size: clamp(0.85rem, 1.8vh, 1.1rem);
+      line-height: 1.85;
+      grid-template-columns: 2.2em 1fr 1fr;
     }
     .single-result {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.4rem; color: var(--accent); letter-spacing: .06em;
+      font-size: 1.1rem; color: var(--accent); letter-spacing: .06em;
+      margin-left: auto;
     }
   </style>
 </head>
@@ -263,10 +275,10 @@
 <script>
 const BASE = 'https://1.pool.livechesscloud.com/get';
 const GROUPS = [
-  { id:'g1', label:'Weekend 1 – grupp 1', tid:'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52' },
-  { id:'g2', label:'Weekend 1 – grupp 2', tid:'8d579e31-c216-43c4-817e-597ba58db845' },
-  { id:'g3', label:'Weekend 1 – grupp 3', tid:'3e1dead3-0b84-4d70-8dfe-34b099bd019b' },
-  { id:'g4', label:'Weekend 1 – grupp 4', tid:'b0741cd4-79ba-4ad3-990b-4e766946ca16' },
+  { id:'grupp-1', label:'Weekend 1 – grupp 1', tid:'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52' },
+  { id:'grupp-2', label:'Weekend 1 – grupp 2', tid:'8d579e31-c216-43c4-817e-597ba58db845' },
+  { id:'grupp-3', label:'Weekend 1 – grupp 3', tid:'3e1dead3-0b84-4d70-8dfe-34b099bd019b' },
+  { id:'grupp-4', label:'Weekend 1 – grupp 4', tid:'b0741cd4-79ba-4ad3-990b-4e766946ca16' },
 ];
 const BOARDS = 3;
 
@@ -376,18 +388,15 @@ function boardHTML(data) {
 
 function initGrid() {
   if (SINGLE_MODE) {
-    // Dölj grid, visa enkelbräde-wrapper
     document.getElementById('grid').style.display = 'none';
     const grp = GROUPS.find(g => g.id === SINGLE_GID);
     const label = grp ? grp.label : SINGLE_GID;
-    document.getElementById('top').querySelector('h1').textContent =
-      `${label} — Bord ${SINGLE_BOARD}`;
-    document.title = `Bord ${SINGLE_BOARD} | Uppsala Schackfestival 2026`;
     const wrap = document.createElement('div');
     wrap.className = 'single-wrap';
     wrap.id = 'single-wrap';
-    wrap.innerHTML = `<div class="single-group-label">${esc(label)}</div>` +
-      `<div id="single-content"></div>`;
+    wrap.innerHTML =
+      `<div class="single-hdr">${esc(label)} — Bord ${SINGLE_BOARD}</div>` +
+      `<div id="single-content" class="single-bw"></div>`;
     document.body.appendChild(wrap);
   } else {
     let html='';
@@ -446,8 +455,6 @@ function renderSingle() {
   const boardSrc = boardHTML(data);
   const bigBoard = boardSrc.replace('class="board-grid"', 'class="single-board-grid"');
 
-  const ml = `<div class="single-ml" id="single-ml">${moveListHTML(data)}</div>`;
-
   // Klockor för enkelbräde
   const done = !!(data && data.result && data.result !== '*');
   const clks = extractClocks(data);
@@ -455,13 +462,13 @@ function renderSingle() {
   clockState[SINGLE_GID][SINGLE_BOARD] = clks ? { ...clks, fetchedAt: Date.now(), done } : { done };
 
   document.getElementById('single-content').innerHTML =
-    `<div class="single-board-row">
-      <div class="single-board-col">
-        <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span>${wR}${res}<span class="p-clock" style="font-size:1em;margin-left:auto" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span></div>
-        ${bigBoard}
-        <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span>${bR}<span class="p-clock" style="font-size:1em;margin-left:auto" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
+    bigBoard +
+    `<div class="single-ml-col">
+      <div class="single-players">
+        <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span><span class="single-p-rating">${w.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span>${res}</div>
+        <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span><span class="single-p-rating">${bl.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
       </div>
-      ${ml}
+      <div class="single-ml" id="single-ml">${moveListHTML(data)}</div>
     </div>`;
 
   const mlEl = document.getElementById('single-ml');
