@@ -249,7 +249,7 @@
     .single-ml {
       flex: 1; min-height: 0;
       overflow-y: auto; scrollbar-width: thin;
-      display: flex; flex-direction: column; justify-content: flex-end;
+      display: flex; flex-direction: column; justify-content: flex-start;
     }
     .single-ml .ml-row {
       font-size: clamp(0.85rem, 1.8vh, 1.1rem);
@@ -261,6 +261,35 @@
       font-size: 1.1rem; color: var(--accent); letter-spacing: .06em;
       margin-left: auto;
     }
+    /* Analys */
+    .sf-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border);
+      background: #f0ede7; color: var(--navy); cursor: pointer;
+      font-size: clamp(0.65rem, 1.3vh, 0.85rem); font-weight: 700;
+      font-family: 'Inter', sans-serif; letter-spacing: .04em;
+      transition: background .15s;
+    }
+    .sf-btn:hover { background: #e4e0d8; }
+    .sf-btn.on { background: var(--navy); color: var(--gold); border-color: var(--navy); }
+    .sf-bar-wrap {
+      height: 10px; border-radius: 3px; overflow: hidden;
+      background: #1a1a1a; display: none; margin-top: 5px;
+    }
+    .sf-bar-wrap.vis { display: block; }
+    .sf-bar-w { height: 100%; background: #f0f0f0; transition: width .4s; }
+    .sf-eval {
+      font-size: clamp(0.7rem, 1.4vh, 0.9rem); font-weight: 700;
+      font-variant-numeric: tabular-nums; color: var(--navy);
+      display: none;
+    }
+    .sf-eval.vis { display: inline; }
+    .sf-pv {
+      font-size: clamp(0.6rem, 1.2vh, 0.78rem); color: var(--muted);
+      display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sf-pv.vis { display: block; }
+    .sf-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -333,6 +362,102 @@ const SINGLE_BOARD = _p.get('board') ? parseInt(_p.get('board')) : null;
 const SINGLE_MODE  = !!(SINGLE_GID && SINGLE_BOARD);
 
 const SWE = { K:'K', Q:'D', R:'T', B:'L', N:'S' };
+
+// ── Stockfish (enkelbräde-läge) ──────────────────────────────────────
+let sfWorker = null, sfReady = false, sfOn = false, sfPending = null;
+
+function sfInit() {
+  if (sfWorker) return;
+  try {
+    const blob = new Blob(
+      [`importScripts('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js')`],
+      { type: 'application/javascript' }
+    );
+    sfWorker = new Worker(URL.createObjectURL(blob));
+    sfWorker.onmessage = sfMsg;
+    sfWorker.postMessage('uci');
+  } catch(e) { console.warn('Stockfish misslyckades:', e); }
+}
+
+function sfMsg(e) {
+  const line = e.data;
+  if (line === 'uciok') { sfReady = true; sfWorker.postMessage('isready'); }
+  if (line === 'readyok' && sfPending) { sfWorker.postMessage(sfPending); sfPending = null; }
+
+  if (line.startsWith('info') && line.includes(' score ')) {
+    const cpM = line.match(/score cp (-?\d+)/);
+    const mateM = line.match(/score mate (-?\d+)/);
+    const pvM = line.match(/ pv (.+)/);
+    let score = null, isMate = false;
+    if (mateM) { score = parseInt(mateM[1]); isMate = true; }
+    else if (cpM) score = parseInt(cpM[1]) / 100;
+
+    if (score !== null) {
+      const evalEl = document.getElementById('sf-eval');
+      const barEl  = document.getElementById('sf-bar-w');
+      const pvEl   = document.getElementById('sf-pv');
+      if (!evalEl) return;
+
+      // Vit positivt = vit bättre
+      let label = isMate ? (score > 0 ? `#${score}` : `#${score}`) : (score > 0 ? `+${score.toFixed(1)}` : score.toFixed(1));
+      evalEl.textContent = label;
+
+      // Stapel
+      let pct = isMate ? (score > 0 ? 90 : 10) : 50 + Math.min(Math.max(score * 5, -40), 40);
+      if (barEl) barEl.style.width = pct + '%';
+
+      // Bästa drag i svensk notation
+      if (pvEl && pvM) {
+        const moves = pvM[1].trim().split(' ').slice(0, 3);
+        pvEl.textContent = 'Bästa: ' + moves.join(' ');
+      }
+    }
+  }
+}
+
+function sfAnalyze(fen) {
+  if (!sfOn || !sfWorker) return;
+  const cmd = `position fen ${fen}
+go movetime 2000`;
+  if (!sfReady) { sfPending = cmd; return; }
+  sfWorker.postMessage('stop');
+  sfWorker.postMessage(cmd);
+}
+
+function sfToggle() {
+  sfOn = !sfOn;
+  const btn = document.getElementById('sf-btn');
+  const barWrap = document.getElementById('sf-bar-wrap');
+  const evalEl  = document.getElementById('sf-eval');
+  const pvEl    = document.getElementById('sf-pv');
+  if (sfOn) {
+    sfInit();
+    btn.textContent = '⬛ Analys av';
+    btn.classList.add('on');
+    barWrap && barWrap.classList.add('vis');
+    evalEl  && evalEl.classList.add('vis');
+    pvEl    && pvEl.classList.add('vis');
+    sfRunNow();
+  } else {
+    if (sfWorker) sfWorker.postMessage('stop');
+    btn.textContent = '▶ Analys på';
+    btn.classList.remove('on');
+    barWrap && barWrap.classList.remove('vis');
+    evalEl  && evalEl.classList.remove('vis');
+    pvEl    && pvEl.classList.remove('vis');
+  }
+}
+
+function sfRunNow() {
+  if (!sfOn) return;
+  const data = (gameData[SINGLE_GID] || {})[SINGLE_BOARD];
+  const c = new Chess();
+  for (const mv of (data && data.moves ? data.moves : [])) {
+    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
+    if (!san) break; try { c.move(san); } catch(e) { break; }
+  }
+  sfAnalyze(c.fen());
+}
 function sweSAN(san) {
   if (!san) return '';
   return san
@@ -468,11 +593,18 @@ function renderSingle() {
         <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span><span class="single-p-rating">${w.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span>${res}</div>
         <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span><span class="single-p-rating">${bl.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
       </div>
+      <div class="sf-row">
+        <button class="sf-btn" id="sf-btn" onclick="sfToggle()">▶ Analys på</button>
+        <span class="sf-eval" id="sf-eval"></span>
+      </div>
+      <div class="sf-bar-wrap" id="sf-bar-wrap"><div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div></div>
+      <div class="sf-pv" id="sf-pv"></div>
       <div class="single-ml" id="single-ml">${moveListHTML(data)}</div>
     </div>`;
 
   const mlEl = document.getElementById('single-ml');
-  if (mlEl) mlEl.scrollTop = mlEl.scrollHeight;
+  if (mlEl) mlEl.scrollTop = 0;
+  if (sfOn) sfRunNow();
 }
 
 async function fetchGroup(g) {
