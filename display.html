@@ -196,7 +196,10 @@
     .sq img {
       width: 80%; height: 80%; pointer-events: none;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+      -webkit-user-drag: none;
     }
+    .sq[draggable="true"] { cursor: grab; }
+    .sq[draggable="true"]:active { cursor: grabbing; }
 
     /* ── Enkelbräde-läge ────────────────────────────── */
     .single-wrap {
@@ -575,7 +578,10 @@ function ibBoard() {
     if (p) { const k = p.color + p.type.toUpperCase(); if (PIECE_SVG[k]) inner = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[k])}" alt="${k}">`; }
     const dot  = (leg && !p) ? '<div class="ib-dot"></div>' : '';
     const cap  = (leg &&  p) ? ' ib-cap' : '';
-    h += `<div class="sq ${cls}${cap}" onclick="ibClick('${sq}')">${inner}${dot}</div>`;
+    const canDrag = (p && p.color === c.turn())
+      ? ` draggable="true" ondragstart="ibDragStart(event,'${sq}')" ondragend="ibDragEnd(event)"`
+      : '';
+    h += `<div class="sq ${cls}${cap}"${canDrag} onclick="ibClick('${sq}')" ondragover="event.preventDefault()" ondrop="ibDrop(event,'${sq}')">${inner}${dot}</div>`;
   }
   el.innerHTML = h;
 }
@@ -617,6 +623,23 @@ function ibMoves() {
   }
   el.innerHTML = html;
   el.querySelector('.ib-cur')?.scrollIntoView({ block: 'nearest' });
+}
+
+function ibDragStart(e, sq) {
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', sq);
+  IB.selSq = sq;
+  requestAnimationFrame(ibBoard); // markera efter drag-snapshot
+}
+
+function ibDrop(e, sq) {
+  e.preventDefault();
+  if (sq !== IB.selSq) ibClick(sq);
+  else { IB.selSq = null; ibBoard(); }
+}
+
+function ibDragEnd(e) {
+  if (e.dataTransfer.dropEffect === 'none') { IB.selSq = null; ibBoard(); }
 }
 
 function ibClick(sq) {
