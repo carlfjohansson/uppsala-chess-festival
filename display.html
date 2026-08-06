@@ -329,7 +329,7 @@ function moveListHTML(data) {
     typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
   ).filter(Boolean);
 
-  if (!sans.length) return '<div class="ml-row" style="color:var(--muted);font-size:0.75em;padding:0.5em 0">Inga drag ännu</div>';
+  if (!sans.length) return '<div class="ml-row"><span class="ml-num">1.</span><span class="ml-w" style="color:var(--muted)">…</span><span class="ml-b"></span></div>';
 
   let rows = '';
   const totalPairs = Math.ceil(sans.length / 2);
