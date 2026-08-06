@@ -1235,7 +1235,7 @@
       <li><a href="/">Hem</a></li>
       <li><a href="/resultat.html">Resultat</a></li>
       <li><a href="/live.html" class="active">⚡ Live</a></li>
-      <li><a href="/display.html" style="font-size:0.75rem;opacity:0.5;letter-spacing:.04em" title="Visningsläge för spellokal">📺</a></li>
+      <li><a href="/display.html" target="_blank" style="font-size:0.75rem;opacity:0.5;letter-spacing:.04em" title="Visningsläge för spellokal">📺</a></li>
     </ul>
     <button class="nav-menu-btn" onclick="this.nextElementSibling;document.getElementById('nav-ul').classList.toggle('open')" aria-label="Meny">
       <span></span><span></span><span></span>
@@ -4013,7 +4013,7 @@ function initStadium() {
       <div class="sg-boards">`;
 
     for (let b = 1; b <= grp.boards; b++) {
-      html += `<div class="sg-board" onclick="focusGame('${grp.id}', ${b})" title="Klicka för fullständig spelvy">
+      html += `<div class="sg-board" onclick="window.open('/display.html?gid=${grp.id}&board=${b}','_blank')" title="Klicka för fullständig spelvy">
         <div class="sg-board-top">
           <span class="sg-board-num">Bord ${b}</span>
           <span class="sg-board-result" id="sgr-${grp.id}-${b}"></span>

@@ -125,18 +125,52 @@
       font-size: clamp(0.48rem, 0.95vh, 0.65rem);
       color: var(--muted); flex-shrink: 0;
     }
+    .p-clock {
+      margin-left: auto; flex-shrink: 0;
+      font-size: clamp(0.52rem, 1.05vh, 0.7rem);
+      font-variant-numeric: tabular-nums;
+      font-weight: 700; letter-spacing: 0.02em;
+      color: var(--muted);
+      background: rgba(18,32,58,0.06);
+      border-radius: 3px; padding: 0 3px;
+    }
+    .p-clock.active { color: var(--accent); background: rgba(192,112,16,0.12); }
+    .p-clock.low { color: #c0392b; background: rgba(192,57,43,0.1); }
     .p-title {
       font-size: clamp(0.48rem, 0.85vh, 0.62rem);
       font-weight: 700; color: var(--accent);
       flex-shrink: 0;
     }
 
-    /* Bräde — varje ruta får aspect-ratio:1, brädet blir automatiskt kvadratiskt */
+    /* Bräde + draglista sida vid sida */
     .bw {
       flex: 1; min-height: 0;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center;
+      gap: 0.5vw;
       overflow: hidden;
     }
+    /* Draglista */
+    .ml {
+      flex: 1; min-width: 0; min-height: 0;
+      height: 100%;
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .ml::-webkit-scrollbar { display: none; }
+    .ml-row {
+      display: grid;
+      grid-template-columns: 1.8em 1fr 1fr;
+      gap: 0.1em;
+      line-height: 1.55;
+      font-size: clamp(0.5rem, 1.05vh, 0.7rem);
+      color: var(--text);
+    }
+    .ml-num { color: var(--muted); font-size: 0.85em; text-align: right; padding-right: 0.2em; }
+    .ml-w   { font-weight: 700; }
+    .ml-b   { color: rgba(18,32,58,0.7); }
+    .ml-row.ml-last .ml-w,
+    .ml-row.ml-last .ml-b { color: var(--navy); font-weight: 800; }
     .board-grid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
@@ -157,6 +191,58 @@
     .sq img {
       width: 80%; height: 80%; pointer-events: none;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+    }
+
+    /* ── Enkelbräde-läge ────────────────────────────── */
+    .single-wrap {
+      max-width: 1000px; margin: 0 auto;
+      padding: 16px 20px 40px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .single-group-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(0.9rem, 2.2vh, 1.3rem);
+      color: var(--gold); letter-spacing: 0.08em;
+    }
+    .single-board-row {
+      display: flex; align-items: flex-start; gap: 20px;
+    }
+    .single-board-col { display: flex; flex-direction: column; gap: 8px; }
+    .single-p-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: clamp(0.85rem, 1.8vh, 1.1rem); font-weight: 700;
+    }
+    .single-p-dot {
+      width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+    }
+    .single-p-dot.w { background: #f0f0f0; border: 1px solid #999; }
+    .single-p-dot.b { background: #1a1a1a; border: 1px solid #666; }
+    .single-p-title {
+      font-size: 0.75em; font-weight: 700; color: var(--accent);
+      background: rgba(192,112,16,.15); padding: 1px 5px; border-radius: 3px;
+    }
+    .single-p-rating { color: var(--muted); font-size: 0.78em; }
+    .single-board-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      width: min(min(72vh, 72vw), 580px);
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.22);
+    }
+    .single-board-grid .sq { aspect-ratio: 1; }
+    .single-ml {
+      flex: 1; min-width: 120px;
+      height: min(min(72vh, 72vw), 580px);
+      overflow-y: auto; scrollbar-width: thin;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .single-ml .ml-row {
+      font-size: clamp(0.75rem, 1.6vh, 1rem);
+      line-height: 1.7;
+      grid-template-columns: 2em 1fr 1fr;
+    }
+    .single-result {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; color: var(--accent); letter-spacing: .06em;
     }
   </style>
 </head>
@@ -195,6 +281,70 @@ const PIECE_SVG = {
 };
 
 let gameData = {}, pairData = {};
+// {gid: {board: {wSecs, bSecs, whoseTurn, fetchedAt, done}}}
+const clockState = {};
+
+function extractClocks(data) {
+  if (!data || !data.moves || !data.moves.length) return null;
+  const moves = data.moves;
+  let wSecs = null, bSecs = null;
+  moves.forEach((mv, i) => {
+    const str = typeof mv === 'string' ? mv : (mv.m || mv.san || '');
+    const parts = str.split(' ');
+    const t = parseInt(parts[1], 10);
+    if (!isNaN(t) && t >= 0) {
+      if (i % 2 === 0) wSecs = t;
+      else bSecs = t;
+    }
+  });
+  if (wSecs === null && bSecs === null) return null;
+  const whoseTurn = moves.length % 2 === 0 ? 'w' : 'b';
+  return { wSecs, bSecs, whoseTurn };
+}
+
+function fmtClock(secs) {
+  if (secs === null || secs === undefined || secs < 0) secs = 0;
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+// URL-param-läge: ?gid=grupp-1&board=2
+const _p = new URLSearchParams(location.search);
+const SINGLE_GID   = _p.get('gid');
+const SINGLE_BOARD = _p.get('board') ? parseInt(_p.get('board')) : null;
+const SINGLE_MODE  = !!(SINGLE_GID && SINGLE_BOARD);
+
+const SWE = { K:'K', Q:'D', R:'T', B:'L', N:'S' };
+function sweSAN(san) {
+  if (!san) return '';
+  return san
+    .replace(/^([KQRBN])/, m => SWE[m] || m)
+    .replace(/=([KQRBN])/, (_, p) => '=' + (SWE[p] || p));
+}
+
+function moveListHTML(data) {
+  const rawMoves = data && data.moves ? data.moves : [];
+  const sans = rawMoves.map(mv =>
+    typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
+  ).filter(Boolean);
+
+  if (!sans.length) return '<div class="ml-row" style="color:var(--muted);font-size:0.75em;padding:0.5em 0">Inga drag ännu</div>';
+
+  let rows = '';
+  const totalPairs = Math.ceil(sans.length / 2);
+  for (let i = 0; i < sans.length; i += 2) {
+    const n   = Math.floor(i / 2) + 1;
+    const w   = sweSAN(sans[i]);
+    const b   = sweSAN(sans[i + 1] || '');
+    const isLast = (i + 2 >= sans.length);
+    rows += `<div class="ml-row${isLast ? ' ml-last' : ''}">` +
+            `<span class="ml-num">${n}.</span>` +
+            `<span class="ml-w">${w}</span>` +
+            `<span class="ml-b">${b}</span></div>`;
+  }
+  return rows;
+}
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pLabel(p){ return p?([p.fname,p.lname].filter(Boolean).join(' ')||p.name||null):null; }
@@ -220,10 +370,26 @@ function boardHTML(data) {
 }
 
 function initGrid() {
-  let html='';
-  GROUPS.forEach(g=>{ html+=`<div class="g-hdr">${esc(g.label)}</div>`; });
-  for(let b=1;b<=BOARDS;b++) GROUPS.forEach(g=>{ html+=`<div class="bc" id="bc-${g.id}-${b}"></div>`; });
-  document.getElementById('grid').innerHTML=html;
+  if (SINGLE_MODE) {
+    // Dölj grid, visa enkelbräde-wrapper
+    document.getElementById('grid').style.display = 'none';
+    const grp = GROUPS.find(g => g.id === SINGLE_GID);
+    const label = grp ? grp.label : SINGLE_GID;
+    document.getElementById('top').querySelector('h1').textContent =
+      `${label} — Bord ${SINGLE_BOARD}`;
+    document.title = `Bord ${SINGLE_BOARD} | Uppsala Schackfestival 2026`;
+    const wrap = document.createElement('div');
+    wrap.className = 'single-wrap';
+    wrap.id = 'single-wrap';
+    wrap.innerHTML = `<div class="single-group-label">${esc(label)}</div>` +
+      `<div id="single-content"></div>`;
+    document.body.appendChild(wrap);
+  } else {
+    let html='';
+    GROUPS.forEach(g=>{ html+=`<div class="g-hdr">${esc(g.label)}</div>`; });
+    for(let b=1;b<=BOARDS;b++) GROUPS.forEach(g=>{ html+=`<div class="bc" id="bc-${g.id}-${b}"></div>`; });
+    document.getElementById('grid').innerHTML=html;
+  }
 }
 
 function updateBoard(g,b) {
@@ -237,11 +403,60 @@ function updateBoard(g,b) {
   const wR=w.rating?`<span class="p-rating">${w.rating}</span>`:'';
   const bR=bl.rating?`<span class="p-rating">${bl.rating}</span>`:'';
   const res=data&&data.result&&data.result!=='*'?`<span class="bc-result">${esc(data.result)}</span>`:'';
+
+  // Spara klockstatus
+  const done = !!(data && data.result && data.result !== '*');
+  const clks = extractClocks(data);
+  if (!clockState[g.id]) clockState[g.id] = {};
+  clockState[g.id][b] = clks ? { ...clks, fetchedAt: Date.now(), done } : { done };
+
   el.innerHTML=
     `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span>${res}</div>`+
-    `<div class="p-row"><span class="p-dot w"></span>${wT}<span class="p-name">${esc(wN)}</span>${wR}</div>`+
-    `<div class="p-row"><span class="p-dot b"></span>${bT}<span class="p-name">${esc(bN)}</span>${bR}</div>`+
-    `<div class="bw">${boardHTML(data)}</div>`;
+    `<div class="p-row"><span class="p-dot w"></span>${wT}<span class="p-name">${esc(wN)}</span>${wR}<span class="p-clock" id="clk-${g.id}-${b}-w"></span></div>`+
+    `<div class="p-row"><span class="p-dot b"></span>${bT}<span class="p-name">${esc(bN)}</span>${bR}<span class="p-clock" id="clk-${g.id}-${b}-b"></span></div>`+
+    `<div class="bw">${boardHTML(data)}<div class="ml" id="ml-${g.id}-${b}">${moveListHTML(data)}</div></div>`;
+  const mlEl=document.getElementById(`ml-${g.id}-${b}`);
+  if(mlEl) mlEl.scrollTop=mlEl.scrollHeight;
+}
+
+function renderSingle() {
+  const grp = GROUPS.find(g => g.id === SINGLE_GID);
+  if (!grp) return;
+  const data = (gameData[SINGLE_GID] || {})[SINGLE_BOARD];
+  const pair = (pairData[SINGLE_GID] || {})[SINGLE_BOARD] || {};
+  const w = pair.white || {}, bl = pair.black || {};
+  const wN = pLabel(w) || 'Vit', bN = pLabel(bl) || 'Svart';
+  const wT = w.title  ? `<span class="single-p-title">${esc(w.title)}</span>`  : '';
+  const bT = bl.title ? `<span class="single-p-title">${esc(bl.title)}</span>` : '';
+  const wR = w.rating  ? `<span class="single-p-rating">${w.rating}</span>`  : '';
+  const bR = bl.rating ? `<span class="single-p-rating">${bl.rating}</span>` : '';
+  const res = data && data.result && data.result !== '*'
+    ? `<span class="single-result">${esc(data.result)}</span>` : '';
+
+  // Brädet (återanvänd boardHTML men med annan klass)
+  const boardSrc = boardHTML(data);
+  const bigBoard = boardSrc.replace('class="board-grid"', 'class="single-board-grid"');
+
+  const ml = `<div class="single-ml" id="single-ml">${moveListHTML(data)}</div>`;
+
+  // Klockor för enkelbräde
+  const done = !!(data && data.result && data.result !== '*');
+  const clks = extractClocks(data);
+  if (!clockState[SINGLE_GID]) clockState[SINGLE_GID] = {};
+  clockState[SINGLE_GID][SINGLE_BOARD] = clks ? { ...clks, fetchedAt: Date.now(), done } : { done };
+
+  document.getElementById('single-content').innerHTML =
+    `<div class="single-board-row">
+      <div class="single-board-col">
+        <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span>${wR}${res}<span class="p-clock" style="font-size:1em;margin-left:auto" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span></div>
+        ${bigBoard}
+        <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span>${bR}<span class="p-clock" style="font-size:1em;margin-left:auto" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
+      </div>
+      ${ml}
+    </div>`;
+
+  const mlEl = document.getElementById('single-ml');
+  if (mlEl) mlEl.scrollTop = mlEl.scrollHeight;
 }
 
 async function fetchGroup(g) {
@@ -256,13 +471,56 @@ async function fetchGroup(g) {
 }
 
 async function poll(){
-  await Promise.all(GROUPS.map(fetchGroup));
-  GROUPS.forEach(g=>{for(let b=1;b<=BOARDS;b++)updateBoard(g,b);});
-  setTimeout(poll,3000);
+  if (SINGLE_MODE) {
+    const grp = GROUPS.find(g => g.id === SINGLE_GID);
+    if (grp) await fetchGroup(grp);
+    renderSingle();
+  } else {
+    await Promise.all(GROUPS.map(fetchGroup));
+    GROUPS.forEach(g=>{for(let b=1;b<=BOARDS;b++)updateBoard(g,b);});
+  }
+  setTimeout(poll, SINGLE_MODE ? 3000 : 3000);
 }
 
-function tick(){const n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
-initGrid(); tick(); setInterval(tick,10000); poll();
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+
+function tickClocks() {
+  const now = Date.now();
+  for (const gid of Object.keys(clockState)) {
+    for (const b of Object.keys(clockState[gid])) {
+      const cs = clockState[gid][b];
+      if (!cs || !cs.fetchedAt) continue;
+      const elapsed = (now - cs.fetchedAt) / 1000;
+      const wEl = document.getElementById(`clk-${gid}-${b}-w`);
+      const bEl = document.getElementById(`clk-${gid}-${b}-b`);
+      if (!wEl && !bEl) continue;
+
+      if (cs.done) {
+        if (wEl) { wEl.textContent = cs.wSecs !== null && cs.wSecs !== undefined ? fmtClock(cs.wSecs) : ''; wEl.className='p-clock'; }
+        if (bEl) { bEl.textContent = cs.bSecs !== null && cs.bSecs !== undefined ? fmtClock(cs.bSecs) : ''; bEl.className='p-clock'; }
+        continue;
+      }
+
+      let wSecs = cs.wSecs, bSecs = cs.bSecs;
+      if (cs.whoseTurn === 'w' && wSecs !== null) wSecs = Math.max(0, wSecs - elapsed);
+      if (cs.whoseTurn === 'b' && bSecs !== null) bSecs = Math.max(0, bSecs - elapsed);
+
+      if (wEl) {
+        wEl.textContent = wSecs !== null ? fmtClock(wSecs) : '';
+        wEl.className = 'p-clock' + (cs.whoseTurn==='w' && wSecs !== null ? (wSecs<30?' low':' active') : '');
+      }
+      if (bEl) {
+        bEl.textContent = bSecs !== null ? fmtClock(bSecs) : '';
+        bEl.className = 'p-clock' + (cs.whoseTurn==='b' && bSecs !== null ? (bSecs<30?' low':' active') : '');
+      }
+    }
+  }
+}
+
+initGrid(); tick(); setInterval(tick,10000); setInterval(tickClocks,1000); poll();
 </script>
 </body>
 </html>
