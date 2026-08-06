@@ -903,7 +903,7 @@
     }
     .btn-overview { padding: 7px 14px; flex-shrink: 0; }
 
-    /* ── Brädesväljare ─────────────────────────────── */
+    /* ── Bordsväljare ─────────────────────────────── */
     .board-selector {
       width: 100%; max-width: 1080px;
       display: none;
@@ -1219,7 +1219,7 @@
   <div id="channel-tabs" style="display:contents"></div>
 </nav>
 
-<!-- ── Brädesväljare ──────────────────────────────────────── -->
+<!-- ── Bordsväljare ──────────────────────────────────────── -->
 <div id="board-selector" class="board-selector">
   <span class="bs-label">BRÄDE</span>
   <div id="board-chips" style="display:contents"></div>
@@ -1247,10 +1247,10 @@
       <option>Rond 13</option>
     </select>
     <select class="config-select" id="cfg-game">
-      <option>Bräde 1</option><option>Bräde 2</option><option>Bräde 3</option>
-      <option>Bräde 4</option><option>Bräde 5</option><option>Bräde 6</option>
-      <option>Bräde 7</option><option>Bräde 8</option><option>Bräde 9</option>
-      <option>Bräde 10</option>
+      <option>Bord 1</option><option>Bord 2</option><option>Bord 3</option>
+      <option>Bord 4</option><option>Bord 5</option><option>Bord 6</option>
+      <option>Bord 7</option><option>Bord 8</option><option>Bord 9</option>
+      <option>Bord 10</option>
     </select>
     <button class="btn btn-primary" onclick="loadGame()">▶ Ladda</button>
   </div>
@@ -1322,7 +1322,7 @@ let team1Board1Color  = 'black'; // 'white'|'black' — vilken färg lag 1 spela
 let teamCheckedBoards = new Set(); // bocade bräden i lagmatch-panelen
 let teamPollTimer     = null;    // bakgrundspoll för lagmatch-panel
 
-// ── Brädesväljare ─────────────────────────────────────────────
+// ── Bordsväljare ─────────────────────────────────────────────
 let selectedBoards  = new Set([1]); // vilka bräden som visas (1-baserade)
 
 let clockSnap      = null;
@@ -3669,7 +3669,7 @@ async function downloadTeamBoardsPGN() {
   renderScheduleWidget();
 }
 
-// ── Brädesväljare ─────────────────────────────────────────────
+// ── Bordsväljare ─────────────────────────────────────────────
 
 // Bygg HTML för ett bräde i multi-vyn (skalat, inga koordinater)
 function mbBoardHTML(data) {
@@ -3954,7 +3954,7 @@ function initStadium() {
     for (let b = 1; b <= grp.boards; b++) {
       html += `<div class="sg-board">
         <div class="sg-board-top">
-          <span class="sg-board-num">Bräde ${b}</span>
+          <span class="sg-board-num">Bord ${b}</span>
           <span class="sg-board-result" id="sgr-${grp.id}-${b}"></span>
         </div>
         <div class="sg-players" id="sgp-${grp.id}-${b}">
@@ -4109,7 +4109,7 @@ function focusGame(gid, board) {
   if (cfgRound) cfgRound.selectedIndex = 0;
   if (cfgGame && board <= cfgGame.options.length) cfgGame.selectedIndex = board - 1;
 
-  document.getElementById('match-title').textContent = `${grp.label} — Bräde ${board}`;
+  document.getElementById('match-title').textContent = `${grp.label} — Bord ${board}`;
   document.getElementById('main').innerHTML =
     '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
 
