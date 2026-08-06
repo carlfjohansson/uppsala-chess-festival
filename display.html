@@ -408,15 +408,49 @@ function sfMsg(e) {
 
       // Bästa drag i svensk notation
       if (pvEl && pvM) {
-        const moves = pvM[1].trim().split(' ').slice(0, 3);
-        pvEl.textContent = 'Bästa: ' + moves.join(' ');
+        const uciMoves = pvM[1].trim().split(' ');
+        pvEl.textContent = 'Bästa: ' + uciToSwe(sfCurrentFen, uciMoves);
       }
     }
   }
 }
 
+let sfCurrentFen = null;
+
+function uciToSwe(fen, uciMoves) {
+  if (!fen) return uciMoves.join(' ');
+  try {
+    const c = new Chess(fen);
+    return uciMoves.slice(0, 5).map(uci => {
+      const from = uci.slice(0, 2), to = uci.slice(2, 4), promo = uci[4];
+      try { const m = c.move({ from, to, promotion: promo }); return m ? sweSAN(m.san) : uci; }
+      catch(e) { return uci; }
+    }).join(' ');
+  } catch(e) { return uciMoves.join(' '); }
+}
+
+function sfApplyUI() {
+  const btn     = document.getElementById('sf-btn');
+  const barWrap = document.getElementById('sf-bar-wrap');
+  const evalEl  = document.getElementById('sf-eval');
+  const pvEl    = document.getElementById('sf-pv');
+  if (!btn) return;
+  if (sfOn) {
+    btn.textContent = '⬛ Analys av'; btn.classList.add('on');
+    barWrap && barWrap.classList.add('vis');
+    evalEl  && evalEl.classList.add('vis');
+    pvEl    && pvEl.classList.add('vis');
+  } else {
+    btn.textContent = '▶ Analys på'; btn.classList.remove('on');
+    barWrap && barWrap.classList.remove('vis');
+    evalEl  && evalEl.classList.remove('vis');
+    pvEl    && pvEl.classList.remove('vis');
+  }
+}
+
 function sfAnalyze(fen) {
   if (!sfOn || !sfWorker) return;
+  sfCurrentFen = fen;
   const cmd = `position fen ${fen}
 go movetime 2000`;
   if (!sfReady) { sfPending = cmd; return; }
@@ -426,26 +460,9 @@ go movetime 2000`;
 
 function sfToggle() {
   sfOn = !sfOn;
-  const btn = document.getElementById('sf-btn');
-  const barWrap = document.getElementById('sf-bar-wrap');
-  const evalEl  = document.getElementById('sf-eval');
-  const pvEl    = document.getElementById('sf-pv');
-  if (sfOn) {
-    sfInit();
-    btn.textContent = '⬛ Analys av';
-    btn.classList.add('on');
-    barWrap && barWrap.classList.add('vis');
-    evalEl  && evalEl.classList.add('vis');
-    pvEl    && pvEl.classList.add('vis');
-    sfRunNow();
-  } else {
-    if (sfWorker) sfWorker.postMessage('stop');
-    btn.textContent = '▶ Analys på';
-    btn.classList.remove('on');
-    barWrap && barWrap.classList.remove('vis');
-    evalEl  && evalEl.classList.remove('vis');
-    pvEl    && pvEl.classList.remove('vis');
-  }
+  sfApplyUI();
+  if (sfOn) { sfInit(); sfRunNow(); }
+  else if (sfWorker) sfWorker.postMessage('stop');
 }
 
 function sfRunNow() {
@@ -604,6 +621,7 @@ function renderSingle() {
 
   const mlEl = document.getElementById('single-ml');
   if (mlEl) mlEl.scrollTop = 0;
+  sfApplyUI();
   if (sfOn) sfRunNow();
 }
 
