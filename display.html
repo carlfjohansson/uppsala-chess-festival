@@ -382,7 +382,12 @@ function sfInit() {
 function sfMsg(e) {
   const line = e.data;
   if (line === 'uciok') { sfReady = true; sfWorker.postMessage('isready'); }
-  if (line === 'readyok' && sfPending) { sfWorker.postMessage(sfPending); sfPending = null; }
+  if (line === 'readyok' && sfPending) {
+    const fen = sfPending; sfPending = null;
+    sfCurrentFen = fen;
+    sfWorker.postMessage(`position fen ${fen}`);
+    sfWorker.postMessage('go movetime 3000');
+  }
 
   if (line.startsWith('info') && line.includes(' score ')) {
     const cpM = line.match(/score cp (-?\d+)/);
@@ -451,11 +456,10 @@ function sfApplyUI() {
 function sfAnalyze(fen) {
   if (!sfOn || !sfWorker) return;
   sfCurrentFen = fen;
-  const cmd = `position fen ${fen}
-go movetime 2000`;
-  if (!sfReady) { sfPending = cmd; return; }
+  if (!sfReady) { sfPending = fen; return; }
   sfWorker.postMessage('stop');
-  sfWorker.postMessage(cmd);
+  sfWorker.postMessage(`position fen ${fen}`);
+  sfWorker.postMessage('go movetime 3000');
 }
 
 function sfToggle() {
@@ -588,22 +592,38 @@ function renderSingle() {
   const wN = pLabel(w) || 'Vit', bN = pLabel(bl) || 'Svart';
   const wT = w.title  ? `<span class="single-p-title">${esc(w.title)}</span>`  : '';
   const bT = bl.title ? `<span class="single-p-title">${esc(bl.title)}</span>` : '';
-  const wR = w.rating  ? `<span class="single-p-rating">${w.rating}</span>`  : '';
-  const bR = bl.rating ? `<span class="single-p-rating">${bl.rating}</span>` : '';
   const res = data && data.result && data.result !== '*'
     ? `<span class="single-result">${esc(data.result)}</span>` : '';
 
-  // Brädet (återanvänd boardHTML men med annan klass)
-  const boardSrc = boardHTML(data);
-  const bigBoard = boardSrc.replace('class="board-grid"', 'class="single-board-grid"');
-
-  // Klockor för enkelbräde
+  // Klockstatus
   const done = !!(data && data.result && data.result !== '*');
   const clks = extractClocks(data);
   if (!clockState[SINGLE_GID]) clockState[SINGLE_GID] = {};
   clockState[SINGLE_GID][SINGLE_BOARD] = clks ? { ...clks, fetchedAt: Date.now(), done } : { done };
 
-  document.getElementById('single-content').innerHTML =
+  const content = document.getElementById('single-content');
+  if (!content) return;
+
+  const boardSrc = boardHTML(data);
+  const bigBoard = boardSrc.replace('class="board-grid"', 'class="single-board-grid"');
+  const mlHTML   = moveListHTML(data);
+
+  // ── Redan initierad: uppdatera bara bräde + draglista (inget blinkande) ──
+  const existing = content.querySelector('.single-board-grid');
+  if (existing) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = bigBoard;
+    const newGrid = tmp.firstElementChild;
+    existing.replaceWith(newGrid);
+    const mlEl = document.getElementById('single-ml');
+    if (mlEl) mlEl.innerHTML = mlHTML;
+    sfApplyUI();
+    if (sfOn) sfRunNow();
+    return;
+  }
+
+  // ── Första render: bygg hela strukturen ──────────────────────────────────
+  content.innerHTML =
     bigBoard +
     `<div class="single-ml-col">
       <div class="single-players">
@@ -616,14 +636,10 @@ function renderSingle() {
       </div>
       <div class="sf-bar-wrap" id="sf-bar-wrap"><div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div></div>
       <div class="sf-pv" id="sf-pv"></div>
-      <div class="single-ml" id="single-ml">${moveListHTML(data)}</div>
+      <div class="single-ml" id="single-ml">${mlHTML}</div>
     </div>`;
-
-  const mlEl = document.getElementById('single-ml');
-  if (mlEl) mlEl.scrollTop = 0;
-  sfApplyUI();
-  if (sfOn) sfRunNow();
 }
+
 
 async function fetchGroup(g) {
   if(!gameData[g.id])gameData[g.id]={};
