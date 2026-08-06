@@ -20,14 +20,18 @@
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
 a{color:var(--navy);text-decoration:none}
 
-nav.top{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-nav.top .inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:54px}
-.back-link{color:#c9bfa8;font-size:.88rem;display:flex;align-items:center;gap:5px;transition:color .2s}
-.back-link:hover{color:#f5cb6b}
-.brand{font-family:var(--serif);font-size:1rem;color:#f5cb6b;white-space:nowrap;margin:0 auto}
-.lang-toggle{display:flex;gap:4px}
-.lang-toggle button{background:none;border:1px solid rgba(255,255,255,.3);color:#c9bfa8;border-radius:4px;padding:3px 9px;font-size:.82rem;cursor:pointer;font-family:var(--sans)}
-.lang-toggle button.active{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.5)}
+nav.top{position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(13,30,50,0.93);border-bottom:1px solid rgba(232,181,82,0.18)}
+nav.top .inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:var(--sans);font-size:1.1rem;color:#f5cb6b;white-space:nowrap;display:flex;align-items:center;gap:10px;text-decoration:none;letter-spacing:.04em}
+.nav-logo{height:36px;width:auto}
+nav.top ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:.95rem}
+nav.top ul a{color:#c9bfa8;transition:color .2s;text-decoration:none}
+nav.top ul a:hover{color:#f5cb6b}
+nav.top ul a.active{color:#f5cb6b;font-weight:700}
+.lang-toggle{display:flex;border:1px solid rgba(232,181,82,0.4);border-radius:999px;overflow:hidden;font-size:.8rem}
+.lang-toggle button{background:transparent;border:0;color:#c9bfa8;padding:6px 12px;cursor:pointer;font-family:var(--sans);font-weight:600;letter-spacing:.05em}
+.lang-toggle button.active{background:#e8b552;color:#0f1722}
+@media(max-width:720px){nav.top ul{display:none}}
 
 .hero-small{background:var(--navy);color:#fff;padding:32px 24px 28px;text-align:center}
 .hero-small h1{font-family:var(--serif);font-size:1.8rem;color:#f5cb6b}
@@ -123,15 +127,12 @@ footer a{color:#f5cb6b}
 
 <nav class="top">
   <div class="inner">
-    <a href="/" class="back-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      <span class="sv">Tillbaka</span><span class="en" style="display:none">Back</span>
-    </a>
-    <a href="/" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-      <img src="/logo.png" alt="Uppsala Chess Festival" style="height:34px;width:auto;">
-      <span class="sv">Uppsala Schackfestival</span><span class="en" style="display:none">6th Uppsala Chess Festival</span>
-    </a>
-    <a href="/live.html" style="color:#f5cb6b;font-weight:700;text-decoration:none;font-size:.88rem;white-space:nowrap;">⚡ Live</a>
+    <a href="/" class="brand"><img src="/logo.png" alt="UCF" class="nav-logo"><span class="sv">Uppsala Schackfestival</span><span class="en" style="display:none">6th Uppsala Chess Festival</span></a>
+    <ul>
+      <li><a href="/"><span class="sv">Hem</span><span class="en" style="display:none">Home</span></a></li>
+      <li><a href="/resultat.html" class="active"><span class="sv">Resultat</span><span class="en" style="display:none">Results</span></a></li>
+      <li><a href="/live.html">⚡ Live</a></li>
+    </ul>
     <div class="lang-toggle">
       <button class="active" onclick="setLang('sv')">SV</button>
       <button onclick="setLang('en')">EN</button>
