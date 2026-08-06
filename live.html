@@ -1,0 +1,3818 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uppsala Schackfestival 2026 – Live</title>
+  <link rel="icon" href="/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --light-sq:   #f0d9b5;
+      --dark-sq:    #b58863;
+      --lm-light:   #cdd16e;
+      --lm-dark:    #82a050;
+      --bg:         #1a1a1a;
+      --panel:      #242424;
+      --border:     #333;
+      --text:       #e8e8e8;
+      --muted:      #888;
+      --accent:     #e8b552;
+      --live-red:   #e74c3c;
+      --board-size: min(480px, 90vw);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 16px 40px;
+    }
+
+    /* ── Config bar ────────────────────────────────── */
+    .config-bar {
+      width: 100%;
+      max-width: 1080px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 0;
+    }
+    .config-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .config-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .config-input {
+      flex: 1;
+      min-width: 180px;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: 'Lato', monospace;
+      outline: none;
+    }
+    .config-input:focus { border-color: var(--accent); }
+    .config-select {
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: 'Lato', sans-serif;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn {
+      background: #2e2e2e;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      transition: background .12s, color .12s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #3a3a3a; color: var(--text); }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border-color: transparent;
+    }
+    .btn-primary:hover { background: #c8e020; color: #000; }
+
+    /* ── Header ────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 1080px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      flex: 1;
+      min-width: 0;
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--live-red);
+      color: #fff;
+      padding: 5px 11px;
+      border-radius: 5px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      background: #fff;
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .ended-badge {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 11px;
+      border-radius: 5px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+    .pgn-badge {
+      background: var(--panel);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 5px 11px;
+      border-radius: 5px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+    .config-sep {
+      width: 1px; background: var(--border);
+      align-self: stretch; margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── Main layout ───────────────────────────────── */
+    .main {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1080px;
+    }
+    .side-panel {
+      flex: 0 0 320px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Loading ───────────────────────────────────── */
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 60px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Board section ─────────────────────────────── */
+    .board-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Player card ───────────────────────────────── */
+    .player-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: var(--board-size);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      gap: 8px;
+    }
+    .player-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      overflow: hidden;
+    }
+    .color-dot {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .color-dot.white { background: #f5e6c8; border: 1.5px solid #888; }
+    .color-dot.black { background: #222; border: 1.5px solid #666; }
+    .player-title-badge {
+      background: var(--accent);
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .player-name-wrap { overflow: hidden; }
+    .player-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .player-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .player-clock {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: 0.05em;
+      min-width: 80px;
+      text-align: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #2e2e2e;
+      color: var(--text);
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .player-clock.running {
+      background: var(--accent);
+      color: #000;
+    }
+    .player-clock.low-time {
+      background: var(--live-red);
+      color: #fff;
+      animation: clockpulse 1s ease-in-out infinite;
+    }
+    @keyframes clockpulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+
+    /* ── Board wrapper ─────────────────────────────── */
+    .board-outer {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 0;
+    }
+    .coords-rank {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      padding: 2px 4px 2px 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      width: 16px;
+      user-select: none;
+    }
+    .coords-rank span { text-align: right; line-height: 1; }
+    .board-col {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    /* ── Resultatöverlägg på brädet ─────────────────── */
+    .board-result-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: var(--board-size);
+      height: var(--board-size);
+      background: rgba(0,0,0,0.52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+      border-radius: 2px;
+    }
+    .board-result-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 10vw, 5.5rem);
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 20px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8);
+    }
+    /* Resultatöverlägg i mini-bräden (multivy) */
+    .mb-board-wrap { position: relative; }
+    .mb-result-overlay {
+      position: absolute;
+      inset: 5px; /* matchar padding i .mb-board-wrap */
+      background: rgba(0,0,0,0.52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+      border-radius: 1px;
+    }
+    .mb-result-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 10px rgba(0,0,0,0.9);
+    }
+    #board {
+      width: var(--board-size);
+      height: var(--board-size);
+      display: grid;
+      grid-template-columns: repeat(8, 12.5%);
+      grid-template-rows: repeat(8, 12.5%);
+      border: 2px solid #555;
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .coords-file {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      padding: 3px 0 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      user-select: none;
+      width: var(--board-size);
+    }
+    .coords-file span { flex: 1; text-align: center; line-height: 1; }
+
+    /* ── Squares ───────────────────────────────────── */
+    .sq {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+    }
+    .sq.light { background: var(--light-sq); }
+    .sq.dark  { background: var(--dark-sq); }
+    .sq.lm-from, .sq.lm-to {
+      outline: 3px solid rgba(255,255,255,0.55);
+      outline-offset: -3px;
+    }
+    /* ── Analysläge: rutor ─────────────────────────── */
+    .sq.sel {
+      outline: 3px solid var(--accent);
+      outline-offset: -3px;
+    }
+    /* Lagligt drag — liten prick i mitten */
+    .sq.legal::after {
+      content: '';
+      position: absolute;
+      width: 32%;
+      height: 32%;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.22);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .sq.light.legal::after { background: rgba(0,0,0,0.15); }
+    /* Lagligt drag med pjäs på — ring i stället */
+    .sq.legal-cap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 0;
+      border: 4px solid rgba(0,0,0,0.22);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .sq.light.legal-cap::after { border-color: rgba(0,0,0,0.15); }
+    /* Analysläge — inline notation */
+    .analysis-wrap {
+      padding: 5px 6px 4px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 1px 3px;
+      line-height: 1.8;
+      border-top: 1px solid #222;
+    }
+    .mv-a-num  { color: var(--muted); font-size: 0.72rem; padding: 0 1px; user-select: none; }
+    .mv-a-move { color: #7dd3fc; cursor: pointer; padding: 1px 3px; border-radius: 3px; font-size: 0.82rem; }
+    .mv-a-move:hover { background: rgba(59,130,246,.18); }
+    .mv-a-move.cur { background: #3b82f6 !important; color: #fff !important; }
+    .mv-a-alt  { color: #64748b; font-size: 0.72rem; padding: 0 1px; }
+    /* Analysläge — exit-knapp */
+    .btn-exit-analysis {
+      background: #1e3a5f;
+      border: 1px solid #3b82f6;
+      color: #7dd3fc;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: .08em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-exit-analysis:hover { background: #2563eb; color: #fff; }
+    .sq img {
+      width: 88%;
+      height: 88%;
+      pointer-events: none;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
+    }
+
+    /* ── Board controls ────────────────────────────── */
+    .board-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ── Right panel ───────────────────────────────── */
+    .right-panel {
+      flex: 1;
+      min-width: 170px;
+      max-width: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .panel-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 9px 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      border-bottom: 1px solid var(--border);
+      background: #1f1f1f;
+    }
+    .moves-scroll {
+      padding: 6px;
+      max-height: calc(var(--board-size) + 20px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .move-pair {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      border-radius: 4px;
+      padding: 1px 2px;
+    }
+    .move-pair:hover { background: #2e2e2e; }
+    .mv-num {
+      font-size: 0.73rem;
+      color: var(--muted);
+      min-width: 26px;
+      padding-right: 2px;
+    }
+    .mv-w, .mv-b {
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex: 1;
+      padding: 2px 5px;
+      border-radius: 3px;
+      cursor: pointer;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    .mv-w:hover, .mv-b:hover { background: #3a3a3a; }
+    .mv-w.cur, .mv-b.cur {
+      background: var(--accent);
+      color: #000;
+    }
+    .result-box {
+      padding: 18px;
+      text-align: center;
+    }
+    .result-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--accent);
+      letter-spacing: .08em;
+    }
+    .result-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    /* ── Nav buttons ───────────────────────────────── */
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .nav-btns { display: flex; gap: 3px; }
+    .nav-btn {
+      background: #2e2e2e;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 32px;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .1s;
+      flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { background: #3a3a3a; }
+    .nav-btn:disabled { opacity: 0.28; cursor: default; }
+    .ply-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      min-width: 48px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .review-badge {
+      background: #2e2e2e;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: .08em;
+    }
+
+    /* ── Eval bar (horisontell med glidande chip) ──── */
+    .eval-bar-h {
+      position: relative;
+      width: var(--board-size);
+      height: 22px;
+      margin: 2px 0;
+    }
+    .eval-h-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .eval-h-dark {
+      background: #0e0e0e;
+      transition: flex-grow 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .eval-h-light {
+      background: #d6d6d6;
+      transition: flex-grow 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .eval-h-chip {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--accent);
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.78rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+      z-index: 3;
+      pointer-events: none;
+      letter-spacing: .05em;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.5);
+      transition: left 0.55s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Engine panel ──────────────────────────────── */
+    .engine-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+    .engine-depth {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .engine-pv {
+      font-size: 0.75rem;
+      color: var(--text);
+      margin-top: 6px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .btn-engine-on {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border-color: transparent;
+    }
+    .btn-engine-on:hover { background: #c8e020; color: #000; }
+
+    /* ── Match schedule ────────────────────────────── */
+    .schedule-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .1s;
+    }
+    .schedule-row:last-child { border-bottom: none; }
+    .schedule-row:hover { background: #2e2e2e; }
+    .schedule-row.active { background: #2a2a1a; }
+    .sch-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      min-width: 16px;
+    }
+    .sch-date { color: var(--muted); min-width: 78px; font-size: 0.72rem; }
+    .sch-players { flex: 1; color: var(--text); font-weight: 700; word-break: break-word; }
+    .sch-result {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: .05em;
+      min-width: 32px;
+      text-align: right;
+    }
+    .sch-result.live { color: var(--live-red); }
+    .sch-result.done { color: var(--accent); }
+    .sch-result.upcoming { color: var(--muted); }
+    .sch-pgn {
+      font-size: 0.75rem; color: var(--muted); cursor: pointer;
+      padding: 1px 3px; border-radius: 3px; margin-left: 2px;
+      transition: color .12s, background .12s;
+    }
+    .sch-pgn:hover { color: var(--text); background: #333; }
+    .sch-check {
+      width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+    /* ── Vecklingsbara ronder i PGN-lista ─────────── */
+    .pgn-round-group { border-top: 1px solid var(--border); }
+    .pgn-round-group summary {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.8rem; letter-spacing: .1em; color: var(--muted);
+      cursor: pointer; list-style: none;
+      user-select: none;
+    }
+    .pgn-round-group summary::-webkit-details-marker { display: none; }
+    .pgn-round-group summary:hover { color: var(--text); background: #1f1f1f; }
+    .pgn-round-toggle {
+      font-size: 0.55rem; flex-shrink: 0;
+      transition: transform .15s;
+    }
+    details.pgn-round-group[open] .pgn-round-toggle { transform: rotate(90deg); }
+    .pgn-round-score { margin-left: auto; color: var(--accent); font-size: 0.75rem; }
+
+    /* ── PGN-vyväljare (Partier / Tabell) ── */
+    .pgn-view-toggle {
+      display: flex; border-bottom: 1px solid var(--border);
+    }
+    .pgn-view-btn {
+      flex: 1; padding: 7px 4px; background: none; border: none;
+      border-bottom: 2px solid transparent;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem;
+      letter-spacing: .1em; color: var(--muted); cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+    .pgn-view-btn.pgv-active { color: var(--text); border-bottom-color: var(--accent); }
+    .pgn-view-btn:hover:not(.pgv-active) { color: #ccc; }
+
+    /* ── Ställningstabell ── */
+    .pgn-st-header {
+      display: flex; align-items: center; padding: 5px 10px 4px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.68rem;
+      letter-spacing: .1em; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .pgn-standing-row {
+      display: flex; align-items: center; padding: 6px 10px;
+      border-bottom: 1px solid var(--border); font-size: 0.76rem;
+      transition: background .1s; cursor: default;
+    }
+    .pgn-standing-row:hover { background: #1c1c1c; }
+    .pgn-standing-row.pgn-st-active { background: #1a2410; }
+    .pgn-st-rank  { width: 20px; flex-shrink: 0; font-family: 'Bebas Neue', sans-serif; font-size: 0.8rem; color: var(--muted); }
+    .pgn-st-name  { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 6px; }
+    .pgn-st-wdl   { width: 52px; flex-shrink: 0; font-size: 0.68rem; color: var(--muted); text-align: center; letter-spacing: .01em; }
+    .pgn-st-pts   { width: 28px; flex-shrink: 0; font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; color: var(--accent); text-align: right; }
+
+    .sch-dl-bar {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sch-dl-btn {
+      background: var(--accent); color: #000; font-weight: 700;
+      font-family: 'Lato', sans-serif; font-size: 0.78rem;
+      border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;
+      flex: 1;
+    }
+    .sch-dl-btn:hover { background: #c8e020; }
+
+    /* ── Lagmatch: kryssrutor + åtgärdsrad ────────── */
+    .sch-cb {
+      width: 15px; height: 15px; cursor: pointer;
+      accent-color: var(--accent); flex-shrink: 0; margin-left: 8px;
+    }
+    .team-action-bar {
+      padding: 8px 10px;
+      border-top: 1px solid var(--border);
+      background: #1a1a00;
+      display: flex; gap: 6px;
+    }
+    .team-act-btn {
+      flex: 1; padding: 5px 6px; border-radius: 5px;
+      font-family: 'Lato', sans-serif; font-size: 0.75rem;
+      font-weight: 700; cursor: pointer; border: none; white-space: nowrap;
+    }
+    .team-act-btn.pgn { background: #2e2e2e; border: 1px solid var(--border); color: var(--muted); }
+    .team-act-btn.pgn:hover { color: var(--text); background: #3a3a3a; }
+    .team-act-btn.multi { background: var(--accent); color: #000; }
+    .team-act-btn.multi:hover { background: #c8e020; }
+
+    /* ── Config bar ─ bottom ───────────────────────── */
+    .config-bar {
+      margin-top: 28px;
+      margin-bottom: 0;
+    }
+
+    /* ── Miniöversikt ──────────────────────────────── */
+    .overview-grid {
+      width: 100%;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .mini-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .mini-card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .mini-card.mini-active { border-color: var(--accent); }
+    .mini-card-head {
+      padding: 5px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      gap: 4px;
+      background: #1f1f1f;
+      min-height: 30px;
+    }
+    .mini-board-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      min-width: 14px;
+      flex-shrink: 0;
+    }
+    .mini-players {
+      font-size: 0.65rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+    .mini-result {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.78rem;
+      flex-shrink: 0;
+      letter-spacing: .03em;
+    }
+    .mini-result.live { color: var(--live-red); }
+    .mini-result.done { color: var(--accent); }
+    .mini-result.upcoming { color: var(--muted); }
+    .mini-board-wrap { padding: 5px; }
+    .mini-board {
+      display: grid;
+      grid-template-columns: repeat(8, 12.5%);
+      grid-template-rows: repeat(8, 12.5%);
+      border: 1px solid #444;
+      border-radius: 1px;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 1;
+    }
+    .mini-sq {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      user-select: none;
+    }
+    .mini-sq.light { background: var(--light-sq); }
+    .mini-sq.dark  { background: var(--dark-sq); }
+    .mini-sq img {
+      width: 84%;
+      height: 84%;
+      pointer-events: none;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
+    }
+    .mini-loading {
+      display: flex; align-items: center; justify-content: center;
+      aspect-ratio: 1; color: var(--muted); font-size: 0.7rem;
+    }
+    /* Mini eval-bar längst ner på varje kort */
+    .mini-eval-bar {
+      height: 6px;
+      display: flex;
+      border-radius: 0 0 7px 7px;
+      overflow: hidden;
+    }
+    .mini-eval-white {
+      background: #d8d8d8;
+      transition: flex-grow 0.55s cubic-bezier(.4,0,.2,1);
+      flex-grow: 50;
+    }
+    .mini-eval-black {
+      background: #0e0e0e;
+      transition: flex-grow 0.55s cubic-bezier(.4,0,.2,1);
+      flex-grow: 50;
+    }
+    .mini-eval-bar.no-eval .mini-eval-white,
+    .mini-eval-bar.no-eval .mini-eval-black { opacity: 0.25; }
+    /* Dölj eval-barer när analys är avstängd */
+    .overview-eval-off .mini-eval-bar { display: none; }
+    /* Kontrollrad ovanför grid */
+    .overview-toolbar {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .ov-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      font-family: 'Bebas Neue', sans-serif;
+    }
+    .btn-overview { padding: 7px 14px; flex-shrink: 0; }
+
+    /* ── Brädesväljare ─────────────────────────────── */
+    .board-selector {
+      width: 100%; max-width: 1080px;
+      display: none;
+      gap: 6px; flex-wrap: wrap; align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px; margin-bottom: 16px;
+    }
+    .bs-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.78rem; color: var(--muted);
+      letter-spacing: .12em; margin-right: 2px; flex-shrink: 0;
+    }
+    .bs-spacer { flex: 1; min-width: 8px; }
+    .board-chip {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--panel); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      font-size: 0.78rem; font-family: 'Lato', sans-serif;
+      padding: 5px 10px; cursor: pointer;
+      transition: background .1s, border-color .1s, color .1s;
+      white-space: nowrap;
+    }
+    .board-chip:hover  { background: #2e2e2e; color: var(--text); }
+    .board-chip.bc-sel {
+      background: #1a1a00; border-color: var(--accent); color: var(--accent);
+    }
+    .bc-num   { font-family: 'Bebas Neue', sans-serif; font-size: 0.82rem; min-width: 18px; }
+    .bc-names { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+    .bc-dot   { font-size: 0.58rem; }
+    .bc-dot.live { color: var(--live-red); }
+    .bc-dot.done { color: var(--accent); }
+
+    /* ── Multi-brädesvy ────────────────────────────── */
+    .mb-grid { width: 100%; display: grid; gap: 14px; }
+    .mb-grid.mb-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .mb-grid.mb-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .mb-grid.mb-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .mb-panel {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; cursor: pointer;
+      transition: border-color .12s, box-shadow .12s;
+    }
+    .mb-panel:hover { border-color: #666; }
+    .mb-panel.mb-cur { border-color: var(--accent); }
+    .mb-top {
+      display: flex; flex-direction: column; gap: 2px;
+      padding: 5px 8px; border-bottom: 1px solid var(--border);
+      background: #1f1f1f;
+    }
+    .mb-top-row1 { display: flex; align-items: center; gap: 4px; }
+    .mb-board-num { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
+    .mb-res       { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; flex-shrink: 0; letter-spacing: .04em; margin-left: auto; }
+    .mb-player-w  { font-size: 0.68rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e8e8e8; }
+    .mb-player-b  { font-size: 0.68rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #aaa; }
+    .mb-res.live  { color: var(--live-red); }
+    .mb-res.done  { color: var(--accent); }
+    .mb-board-wrap { padding: 5px; }
+    .mb-board-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 12.5%);
+      grid-template-rows: repeat(8, 12.5%);
+      border: 1px solid #444; width: 100%; aspect-ratio: 1;
+    }
+    .mb-sq       { display: flex; align-items: center; justify-content: center; }
+    .mb-sq.light { background: var(--light-sq); }
+    .mb-sq.dark  { background: var(--dark-sq); }
+    .mb-sq img   { width: 85%; height: 85%; pointer-events: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
+    .mb-eval-bar { height: 6px; display: flex; overflow: hidden; }
+    .mb-eval-bar.eval-off .mb-eval-w { opacity: 0.30; }
+    .mb-eval-bar.eval-off .mb-eval-b { opacity: 0.30; }
+    .mb-eval-w { background: #f5f5f5; flex-grow: 50; transition: flex-grow .5s cubic-bezier(.4,0,.2,1); }
+    .mb-eval-b { background: #282828; flex-grow: 50; transition: flex-grow .5s cubic-bezier(.4,0,.2,1); }
+
+    /* ── Kanalnavigation ───────────────────────────── */
+    .channel-nav {
+      width: 100%;
+      max-width: 1080px;
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+    .channel-nav.has-channels { display: flex; }
+    .ch-nav-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: .14em;
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+    .channel-tab {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s;
+      white-space: nowrap;
+    }
+    .channel-tab:hover { background: #2e2e2e; color: var(--text); border-color: #555; }
+    .channel-tab.ch-active {
+      background: #1a1a00;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .ch-type-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: .08em;
+      padding: 1px 5px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .ch-type-badge.live { background: var(--live-red); color: #fff; }
+    .ch-type-badge.pgn  { background: var(--border); color: var(--muted); border: 1px solid #444; }
+    .channel-tab.ch-active .ch-type-badge.pgn { background: #333; color: var(--accent); border-color: var(--accent); }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 700px) {
+      :root { --board-size: min(340px, 92vw); }
+      .right-panel { max-width: 100%; min-width: 0; order: 2; }
+      .side-panel { flex: 0 0 auto; width: 100%; order: 3; }
+      .board-section { order: 1; }
+      .main { flex-direction: column; align-items: center; }
+      .moves-scroll { max-height: 220px; }
+      /* Komprimera schedule-rader på mobil */
+      .schedule-row { padding: 6px 10px; font-size: 0.82rem; }
+      .sch-date { display: none; }
+      .overview-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .mini-piece { font-size: min(18px, 4.5vw); }
+    }
+  
+    /* ── Festival navigation ─────────────────────────────── */
+    .festival-nav {
+      position: sticky; top: 0; z-index: 200;
+      width: 100%;
+      background: rgba(13, 30, 50, 0.97);
+      border-bottom: 1px solid rgba(232, 181, 82, 0.25);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 0;
+    }
+    .festival-nav a.brand {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #f5cb6b;
+      text-decoration: none;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .festival-nav a.brand img { height: 26px; vertical-align: middle; margin-right: 8px; }
+    .festival-nav .fn-links { display: flex; gap: 16px; margin-left: 20px; }
+    .festival-nav .fn-links a {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.8rem;
+      color: #c9bfa8;
+      text-decoration: none;
+      letter-spacing: .06em;
+      opacity: 0.8;
+    }
+    .festival-nav .fn-links a:hover { color: #f5cb6b; opacity: 1; }
+    .festival-nav .fn-links a.active { color: #f5cb6b; opacity: 1; font-weight: 700; }
+    @media (max-width: 480px) {
+      .festival-nav .fn-links { display: none; }
+    }
+
+  </style>
+</head>
+<body>
+<!-- ── Festival navigation ───────────────────────────────────── -->
+<nav class="festival-nav">
+  <a class="brand" href="/"><img src="/logo.png" alt="UCF">Uppsala Schackfestival</a>
+  <div class="fn-links">
+    <a href="/">Hem</a>
+    <a href="/resultat.html">Resultat</a>
+    <a href="/live.html" class="active">⚡ Live</a>
+  </div>
+</nav>
+
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<div class="header">
+  <div id="status-badge" class="live-badge">
+    <div class="live-dot"></div>LIVE
+  </div>
+  <h1 id="match-title">Weekend 1 — Bergergrupper</h1>
+</div>
+
+<!-- ── Kanalnavigation ─────────────────────────────────────── -->
+<nav class="channel-nav" id="channel-nav">
+  <span class="ch-nav-label">GRUPP</span>
+  <div id="channel-tabs" style="display:contents"></div>
+</nav>
+
+<!-- ── Brädesväljare ──────────────────────────────────────── -->
+<div id="board-selector" class="board-selector">
+  <span class="bs-label">BRÄDE</span>
+  <div id="board-chips" style="display:contents"></div>
+  <span class="bs-spacer"></span>
+  <button id="btn-eval-toggle" class="btn" style="display:none;font-size:0.75rem;padding:4px 10px" onclick="toggleOvEval()">⬜ Eval AV</button>
+</div>
+
+<!-- ── Main content ───────────────────────────────────────── -->
+<div class="main" id="main">
+  <div class="loading"><div class="spinner"></div>Hämtar speldata…</div>
+</div>
+
+<!-- ── Config ─────────────────────────────────────────────── -->
+<div class="config-bar" style="display:none">
+  <div class="config-label">Ange LiveChessCloud-länk eller turneringsid</div>
+  <div class="config-row">
+    <input class="config-input" id="cfg-id" type="text"
+      placeholder="https://view.livechesscloud.com/#xxxxxxx  eller bara UUID"
+      value="a82c385f-349d-4fae-baf6-44aa6a4df5c2">
+    <select class="config-select" id="cfg-round">
+      <option>Rond 1</option><option>Rond 2</option><option>Rond 3</option>
+      <option>Rond 4</option><option>Rond 5</option><option>Rond 6</option>
+      <option>Rond 7</option><option>Rond 8</option><option>Rond 9</option>
+      <option>Rond 10</option><option>Rond 11</option><option>Rond 12</option>
+      <option>Rond 13</option>
+    </select>
+    <select class="config-select" id="cfg-game">
+      <option>Bräde 1</option><option>Bräde 2</option><option>Bräde 3</option>
+      <option>Bräde 4</option><option>Bräde 5</option><option>Bräde 6</option>
+      <option>Bräde 7</option><option>Bräde 8</option><option>Bräde 9</option>
+      <option>Bräde 10</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadGame()">▶ Ladda</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script>
+// ── Gambit-pjäser (SVG-data) ─────────────────────────────────
+const PIECE_SVG = {
+  wK: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#fff" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#fff"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0"/></g></svg>`,
+  wQ: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="#fff" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zm16.5-4.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM33 9a2 2 0 1 1-4 0 2 2 0 1 1 4 0z"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12z" stroke-linecap="butt"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z" stroke-linecap="butt"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none"/></g></svg>`,
+  wR: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="#fff" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zm3-3v-4h21v4H12zm-1-22V9h4v2h5V9h5v2h5V9h4v5" stroke-linecap="butt"/><path d="M34 14l-3 3H14l-3-3"/><path d="M31 17v12.5H14V17" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/><path d="M11 14h23" fill="none" stroke-linejoin="miter"/></g></svg>`,
+  wB: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g fill="#fff" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><path d="M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" stroke-linejoin="miter"/></g></svg>`,
+  wN: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="#fff"/><path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3" fill="#fff"/><path d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0zm5.433-9.75a.5 1.5 30 1 1-.866-.5.5 1.5 30 1 1 .866.5z" fill="#000"/></g></svg>`,
+  wP: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  bK: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#000" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#000"/><path d="M20 8h5" stroke-linejoin="miter"/><path d="M32 29.5s8.5-4 6.03-9.65C34.15 14 25 18 22.5 24.5l.01 2.1-.01-2.1C20 18 9.906 14 6.997 19.85c-2.497 5.65 4.853 9 4.853 9" stroke="#ececec"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" stroke="#ececec"/></g></svg>`,
+  bQ: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g stroke="none"><circle cx="6" cy="12" r="2.75"/><circle cx="14" cy="9" r="2.75"/><circle cx="22.5" cy="8" r="2.75"/><circle cx="31" cy="9" r="2.75"/><circle cx="39" cy="12" r="2.75"/></g><path d="M9 26c8.5-1.5 21-1.5 27 0l2.5-12.5L31 25l-.3-14.1-5.2 13.6-3-14.5-3 14.5-5.2-13.6L14 25 6.5 13.5 9 26z" stroke-linecap="butt"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z" stroke-linecap="butt"/><path d="M11 38.5a35 35 1 0 0 23 0" fill="none" stroke-linecap="butt"/><path d="M11 29a35 35 1 0 1 23 0m-21.5 2.5h20m-21 3a35 35 1 0 0 22 0m-23 3a35 35 1 0 0 24 0" fill="none" stroke="#ececec"/></g></svg>`,
+  bR: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zm3.5-7l1.5-2.5h17l1.5 2.5h-20zm-.5 4v-4h21v4H12z" stroke-linecap="butt"/><path d="M14 29.5v-13h17v13H14z" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z" stroke-linecap="butt"/><path d="M12 35.5h21m-20-4h19m-18-2h17m-17-13h17M11 14h23" fill="none" stroke="#ececec" stroke-width="1" stroke-linejoin="miter"/></g></svg>`,
+  bB: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g fill="#000" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><path d="M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" stroke="#ececec" stroke-linejoin="miter"/></g></svg>`,
+  bN: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="#000"/><path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3" fill="#000"/><path d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0zm5.433-9.75a.5 1.5 30 1 1-.866-.5.5 1.5 30 1 1 .866.5z" fill="#ececec" stroke="#ececec"/><path d="M24.55 10.4l-.45 1.45.5.15c3.15 1 5.65 2.49 7.9 6.75S35.75 29.06 35.25 39l-.05.5h2.25l.05-.5c.5-10.06-.88-16.85-3.25-21.34-2.37-4.49-5.79-6.64-9.19-7.16l-.51-.1z" fill="#ececec" stroke="none"/></g></svg>`,
+  bP: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>`
+};
+
+// ── State ────────────────────────────────────────────────────
+const BASE = 'https://1.pool.livechesscloud.com/get';
+let TID = 'a82c385f-349d-4fae-baf6-44aa6a4df5c2';
+let ROUND = 1, GAME = 1;
+
+let gameData       = null;
+let pairing        = null;
+let tournamentInfo = null;
+let matchSchedule  = [];   // array of { round, date, white, black, result, live }
+let matchP1Name    = null; // spelarnamn satta en gång från fetchMatchSchedule, aldrig rensade
+let matchP2Name    = null;
+let selectedPGNRounds = new Set(); // valda ronder för samlad PGN-nedladdning
+let flipped        = false;
+let clockTimer     = null;
+let pollTimer      = null;
+
+// ── PGN-läge ──────────────────────────────────────────────────
+let pgnMode        = false;
+let pgnGames       = [];   // array av parsade PGN-partier
+let pgnCurrentGame = 0;    // index i pgnGames
+let pgnView        = 'games'; // 'games' | 'standings'
+
+// ── Miniöversikt-läge ──────────────────────────────────────────
+let overviewMode       = false;
+let overviewData       = {};   // { slot: gameData }
+let overviewPairings   = [];   // från index.json (team-läge, [board-1])
+let overviewKeyMap     = {};   // { slot: {round, board, label} } — schema-läge
+let overviewPairBySlot = {};   // { slot: {white, black} } — schema-läge
+let overviewPollTimer = null;
+
+// Overview Stockfish round-robin
+let ovCurrentBoard       = null;  // vilket bräde analyseras just nu (1–8)
+let ovCurrentBlackToMove = false;
+let ovEvalData           = {};    // { boardNum: { type, value } }
+let ovEvalEnabled        = false; // AV som default
+
+// ── Kanalplattform ────────────────────────────────────────────
+let channels        = [];   // array från config.json (active === true)
+let activeChannelId = null; // id för vald kanal
+
+// ── Turneringstyp ─────────────────────────────────────────────
+let tournamentType    = 'match'; // 'match' | 'team' | 'roundrobin' | 'swiss'
+let teamName1         = null;    // lagnamn för team-typ
+let teamName2         = null;
+let team1Board1Color  = 'black'; // 'white'|'black' — vilken färg lag 1 spelar på bräde 1 (default: svart, alternerande)
+let teamCheckedBoards = new Set(); // bocade bräden i lagmatch-panelen
+let teamPollTimer     = null;    // bakgrundspoll för lagmatch-panel
+
+// ── Brädesväljare ─────────────────────────────────────────────
+let selectedBoards  = new Set([1]); // vilka bräden som visas (1-baserade)
+
+let clockSnap      = null;
+let snapLocalMs    = null;
+let viewPly        = 0;   // current ply displayed (0 = start, n = after n moves)
+
+// ── Analysläge ────────────────────────────────────────────────
+let analysisActive  = false;  // befinner vi oss i analysläge?
+let branchFromPly   = 0;      // spelpositionen varifrån grenen startar
+let analysisLines   = [];     // [{moves:[uci,...]}] – en per variant
+let activeLineIdx   = 0;      // vilken linje navigeras just nu
+let selectedSq      = null;   // vald ruta (pjäsmarkering)
+let legalTargets    = [];     // lagliga måltrutor för vald pjäs
+
+// ── Engine state ──────────────────────────────────────────────
+let sfWorker        = null;
+let sfEnabled       = false;
+let sfLines         = [];     // [{type,value,depth,pvRaw}, ...] en per MultiPV-linje
+let sfEval          = null;   // alias för sfLines[0] (används av evalbar)
+let sfMultiPV       = 1;      // 1 eller 2 linjer
+let sfAnalysisTimer = null;
+let sfCurrentFen    = null;   // den FEN som skickades till Stockfish senast
+
+// ── Helpers ──────────────────────────────────────────────────
+function extractUUID(str) {
+  const m = str.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+  return m ? m[1] : null;
+}
+function formatTime(s) {
+  if (s === null || s === undefined) return '--:--';
+  s = Math.max(0, Math.floor(s));  // values are already in seconds
+  if (s >= 3600) {
+    return `${Math.floor(s/3600)}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  }
+  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+function playerLabel(p) {
+  if (!p) return 'Okänd';
+  return [p.fname, p.mname, p.lname].filter(Boolean).join(' ');
+}
+
+// ── Normalisera API-resultat till standard schacknotation ─────
+// LiveChessCloud kan returnera "WHITEWIN", "BLACKWIN", "DRAW" etc.
+function normalizeResult(r) {
+  if (!r || r === '*') return r;
+  const map = {
+    WHITEWIN:  '1-0', WHITE_WIN: '1-0',
+    BLACKWIN:  '0-1', BLACK_WIN: '0-1',
+    DRAW:      '1/2-1/2',
+    '½-½':     '1/2-1/2',
+  };
+  return map[r] || r;
+}
+function resultLabel(r) {
+  const norm = normalizeResult(r);
+  return norm === '1/2-1/2' ? '½–½' : (norm || '');
+}
+
+// ── Svensk schacknotation ─────────────────────────────────────
+// Q→D (Dam), R→T (Torn), B→L (Löpare), N→S (Springare), K→K (Kung)
+const SWE_PIECE = { Q:'D', R:'T', B:'L', N:'S' };
+function sanToSwedish(san) {
+  if (!san) return san;
+  // Leading piece letter (Nf3 → Sf3, Qd4 → Dd4 etc.)
+  san = san.replace(/^([QRBN])/, m => SWE_PIECE[m] || m);
+  // Promotion (e8=Q → e8=D)
+  san = san.replace(/=([QRBN])/, (_, p) => '=' + (SWE_PIECE[p] || p));
+  return san;
+}
+
+// ── Load ─────────────────────────────────────────────────────
+function loadGame() {
+  const uuid = extractUUID(document.getElementById('cfg-id').value.trim());
+  if (!uuid) { alert('Kunde inte hitta ett giltigt UUID.'); return; }
+  TID   = uuid;
+  ROUND = document.getElementById('cfg-round').selectedIndex + 1;
+  GAME  = document.getElementById('cfg-game').selectedIndex + 1;
+  gameData = null; pairing = null; tournamentInfo = null; matchSchedule = []; viewPly = 0;
+  matchP1Name = null; matchP2Name = null;
+  sfEval = null; teamCheckedBoards = new Set();
+  if (clockTimer) clearInterval(clockTimer);
+  if (pollTimer)  clearTimeout(pollTimer);
+  stopTeamPolling();
+  // Stäng PGN-läge
+  exitPGNMode();
+  // Stäng multi-vy om den är öppen
+  selectedBoards = new Set([GAME]);
+  if (overviewMode) {
+    overviewMode = false;
+    stopOverviewPolling();
+    stopOverviewAnalysis();
+    overviewData = {}; overviewPairings = [];
+  }
+  document.getElementById('main').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
+  document.getElementById('match-title').textContent = 'Laddar…';
+  setBadge(true);
+  location.hash = TID;
+  fetchTournament();
+  fetchPairing();
+  schedulePoll(0);
+}
+
+// ── Badge ─────────────────────────────────────────────────────
+function setBadge(live) {
+  const el = document.getElementById('status-badge');
+  if (!el) return;
+  if (pgnMode) {
+    el.className = 'pgn-badge';
+    el.textContent = 'PGN';
+    return;
+  }
+  if (live) {
+    el.className = 'live-badge';
+    el.innerHTML = '<div class="live-dot"></div>LIVE';
+  } else {
+    el.className = 'ended-badge';
+    el.textContent = 'AVSLUTAT';
+  }
+}
+
+// ── No-cache fetch helper ─────────────────────────────────────
+function fetchFresh(url) {
+  return fetch(url, { cache: 'no-store' });
+}
+
+// ── Fetch tournament info ─────────────────────────────────────
+async function fetchTournament() {
+  try {
+    const r = await fetchFresh(`${BASE}/${TID}/tournament.json`);
+    if (!r.ok) return;
+    tournamentInfo = await r.json();
+    updateTitle();
+    // Fetch schedule for all rounds (ej för lagmatch — bräden hanteras i teamBoardListHTML)
+    if (tournamentType !== 'team') {
+      const rounds = tournamentInfo.rounds ? tournamentInfo.rounds.length : 0;
+      fetchMatchSchedule(rounds);
+    }
+  } catch(e) { console.warn('Tournament error:', e); }
+}
+
+// ── Fetch match schedule (all rounds) ────────────────────────
+// numBoards: 1 för match/round robin, 2 för schweizisk (toppbräden)
+async function fetchMatchSchedule(numRounds) {
+  matchSchedule = [];
+  const numBoards = tournamentType === 'swiss' ? 2 : 1;
+  for (let rn = 1; rn <= numRounds; rn++) {
+    try {
+      const r = await fetchFresh(`${BASE}/${TID}/round-${rn}/index.json`);
+      if (!r.ok) continue;
+      const data = await r.json();
+      const pairings = data.pairings || [];
+      for (let bi = 0; bi < numBoards; bi++) {
+        const p = pairings[bi];
+        if (!p) break;
+        matchSchedule.push({
+          round:  rn,
+          board:  bi + 1,
+          date:   data.date,
+          white:  p.white,
+          black:  p.black,
+          result: normalizeResult(p.result),
+          live:   p.live
+        });
+      }
+      // Spara spelarnamnen från rond 1 bräde 1 — används i matchrubriken (ej schweizisk)
+      if (rn === 1 && tournamentType !== 'swiss') {
+        const p0 = pairings[0];
+        matchP1Name = p0 && p0.white ? playerLabel(p0.white) || null : null;
+        matchP2Name = p0 && p0.black ? playerLabel(p0.black) || null : null;
+      }
+    } catch(e) {}
+  }
+  // Re-render if visible
+  if (gameData) renderScheduleWidget();
+}
+
+// ── Fetch pairing ─────────────────────────────────────────────
+async function fetchPairing() {
+  try {
+    const r = await fetchFresh(`${BASE}/${TID}/round-${ROUND}/index.json`);
+    if (!r.ok) return;
+    const data = await r.json();
+    pairing = (data.pairings || [])[GAME - 1] || null;
+    overviewPairings = data.pairings || [];   // fyll brädesväljaren
+    renderBoardSelector();
+    updateTitle();
+    // Lagmatch: uppdatera panel + starta bakgrundspoll
+    if (tournamentType === 'team') {
+      renderScheduleWidget();
+      if (!teamPollTimer) startTeamPolling();
+    }
+  } catch(e) { console.warn('Pairing error:', e); }
+}
+function updateTitle() {
+  const name = tournamentInfo ? tournamentInfo.name : 'Live Schack';
+  document.getElementById('match-title').textContent = name;
+  if (pairing) {
+    const w = playerLabel(pairing.white);
+    const b = playerLabel(pairing.black);
+    document.title = `${w} vs ${b} · ${name}`;
+  } else {
+    document.title = name;
+  }
+}
+
+// ── Poll ──────────────────────────────────────────────────────
+function schedulePoll(delay = 2000) {
+  if (pollTimer) clearTimeout(pollTimer);
+  pollTimer = setTimeout(async () => {
+    try { await fetchGame(); } catch(e) { console.warn('Poll error:', e); }
+    schedulePoll(2000);
+  }, delay);
+}
+
+async function fetchGame() {
+  const r = await fetchFresh(`${BASE}/${TID}/round-${ROUND}/game-${GAME}.json`);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const data = await r.json();
+  const prevTotal  = gameData ? (gameData.moves || []).length : -1;
+  const newTotal   = (data.moves || []).length;
+  const serialChanged = !gameData || data.serialNr !== gameData.serialNr;
+  const movesChanged  = newTotal !== prevTotal;
+  const liveChanged   = gameData && data.live !== gameData.live;
+  if (serialChanged || movesChanged || liveChanged) {
+    const isFirstLoad = prevTotal < 0;
+    const wasAtEnd    = !isFirstLoad && (viewPly >= prevTotal);
+    gameData    = data;
+    clockSnap   = data.clock || null;
+    snapLocalMs = Date.now();
+    if (isFirstLoad) {
+      const nr = normalizeResult(data.result);
+      const isLiveGame = data.live && (!nr || nr === '*');
+      viewPly = isLiveGame ? newTotal : 0;
+    } else if (wasAtEnd && !analysisActive) {
+      viewPly = newTotal; // auto-följ live — men inte om vi analyserar
+    }
+    // Om partiet precis fått ett fastställt resultat — uppdatera matchschema direkt
+    const newResult = normalizeResult(data.result);
+    if (newResult && newResult !== '*') {
+      const entry = matchSchedule.find(x => x.round === ROUND);
+      if (entry && entry.result !== newResult) {
+        entry.result = newResult;
+        entry.live   = false;
+        renderScheduleWidget();
+      }
+    }
+    // I analysläge: uppdatera bara speldata tyst, brädet ritas om utan att störa grenen
+    renderAll();
+  } else if (data.clock) {
+    // No new moves, but refresh clock snapshot so countdown stays accurate
+    clockSnap   = data.clock;
+    snapLocalMs = Date.now();
+  }
+}
+
+// ── Build position at a given ply ─────────────────────────────
+function buildAtPly(ply, lineIdx) {
+  if (typeof Chess === 'undefined') return null;
+  const c = new Chess();
+  const moves = (gameData && gameData.moves) || [];
+  const lIdx = (lineIdx !== undefined) ? lineIdx : activeLineIdx;
+
+  if (!analysisActive || ply <= branchFromPly) {
+    // Normal spelposition
+    const limit = Math.min(ply, moves.length);
+    for (let i = 0; i < limit; i++) {
+      try { c.move(moves[i].split(' ')[0]); } catch(e) {}
+    }
+  } else {
+    // Spel upp till greningspunkt, sedan analysdrag för vald linje
+    const limit = Math.min(branchFromPly, moves.length);
+    for (let i = 0; i < limit; i++) {
+      try { c.move(moves[i].split(' ')[0]); } catch(e) {}
+    }
+    const lineMoves = (analysisLines[lIdx] || { moves: [] }).moves;
+    const analysisPly = Math.min(ply - branchFromPly, lineMoves.length);
+    for (let i = 0; i < analysisPly; i++) {
+      const uci = lineMoves[i];
+      try {
+        c.move({ from: uci.slice(0,2), to: uci.slice(2,4),
+                 promotion: uci[4] ? uci[4].toUpperCase() : undefined });
+      } catch(e) { break; }
+    }
+  }
+  return c;
+}
+
+// ── Maximalt ply (spel eller analysgren) ──────────────────────
+function maxPly() {
+  if (analysisActive && analysisLines[activeLineIdx]) {
+    return branchFromPly + analysisLines[activeLineIdx].moves.length;
+  }
+  return (gameData && gameData.moves) ? gameData.moves.length : 0;
+}
+
+// Convert chess.js piece → PIECE_SVG key ('wP', 'bQ' etc.)
+function pieceKey(p) {
+  if (!p) return null;
+  return p.color + p.type.toUpperCase();
+}
+
+// ── Render all ────────────────────────────────────────────────
+function renderAll() {
+  const moves     = (gameData && gameData.moves) || [];
+  const total     = moves.length;
+  const atEnd     = viewPly >= total;
+  const normRes   = normalizeResult(gameData.result);
+  const hasResult = normRes && normRes !== '*';
+  const isLive    = !pgnMode && gameData.live === true && !hasResult;
+  setBadge(isLive);
+
+  document.getElementById('main').innerHTML = `
+    <div class="board-section">
+      ${playerCardHTML(flipped ? 'white' : 'black')}
+      ${boardOuterHTML()}
+      ${sfEnabled ? evalBarHTML() : ''}
+      ${playerCardHTML(flipped ? 'black' : 'white')}
+      <div class="nav-row">
+        <div class="nav-btns">
+          <button class="nav-btn" id="btn-first"  onclick="goToStart()"   title="Börja (Home)"        >⏮</button>
+          <button class="nav-btn" id="btn-back"   onclick="stepBack()"    title="Föregående drag (←)" >◀</button>
+          <button class="nav-btn" id="btn-fwd"    onclick="stepForward()" title="Nästa drag (→)"      >▶</button>
+          <button class="nav-btn" id="btn-last"   onclick="goToEnd()"     title="Sista draget (End)"  >⏭</button>
+        </div>
+        ${analysisActive ? '<button class="btn-exit-analysis" onclick="exitAnalysis()">✕ AVSLUTA ANALYS</button>' : ''}
+        <button class="btn" onclick="toggleFlip()">⇅ Vänd</button>
+      </div>
+    </div>
+    <div class="right-panel">
+      ${movesHTML()}
+    </div>
+    <div class="side-panel">
+      <div id="engine-panel-wrap">${enginePanelHTML()}</div>
+      <div id="side-list-wrap" style="flex:1;overflow-y:auto;min-height:0">
+        ${pgnMode
+          ? `<div id="pgn-games-widget">${pgnSidePanelHTML()}</div>`
+          : `<div id="schedule-widget">${scheduleHTML()}</div>`}
+      </div>
+    </div>
+  `;
+
+  updateNavButtons();
+
+  // Scroll notation – analys: scrolla till inline-blocket; annars till aktuellt drag
+  setTimeout(() => {
+    if (analysisActive) {
+      const scroll = document.getElementById('moves-scroll');
+      const target = scroll && (scroll.querySelector('.mv-a-move.cur') || scroll.querySelector('.analysis-wrap'));
+      if (target && scroll) scroll.scrollTop = Math.max(0, target.offsetTop - scroll.offsetTop - 12);
+    } else {
+      const cur = document.querySelector('.mv-w.cur, .mv-b.cur');
+      if (cur) cur.scrollIntoView({ block: 'nearest' });
+    }
+  }, 0);
+
+  if (clockTimer) clearInterval(clockTimer);
+  clockTimer = setInterval(tickClocks, 100);
+
+  // Trigger engine analysis for current position
+  if (sfEnabled) {
+    const pos = buildAtPly(viewPly);
+    if (pos) scheduleAnalysis(pos.fen());
+  }
+}
+
+// ── Update nav button disabled state ─────────────────────────
+function updateNavButtons() {
+  const mp = maxPly();
+  const f = document.getElementById('btn-first');
+  const b = document.getElementById('btn-back');
+  const v = document.getElementById('btn-fwd');
+  const l = document.getElementById('btn-last');
+  if (f) f.disabled = viewPly === 0;
+  if (b) b.disabled = viewPly === 0;
+  if (v) v.disabled = viewPly >= mp;
+  if (l) l.disabled = viewPly >= mp;
+}
+
+// ── Player card ───────────────────────────────────────────────
+function playerCardHTML(color) {
+  let name = color === 'white' ? 'Vit' : 'Svart';
+  let titleBadge = '', sub = '';
+  if (pairing) {
+    const p = pairing[color];
+    name = playerLabel(p);
+    if (p.title) titleBadge = `<span class="player-title-badge">${p.title}</span>`;
+    if (tournamentType === 'team' && (teamName1 || teamName2)) {
+      // Visa lagtillhörighet: avgör om spelaren tillhör lag1 eller lag2
+      const isTeam1 = (color === 'black') === team1IsBlackOn(GAME);
+      const clubName = isTeam1 ? (teamName1 || '') : (teamName2 || '');
+      sub = [clubName, p.rating].filter(Boolean).join(' · ');
+    } else {
+      sub = [p.team || p.federation, p.rating].filter(Boolean).join(' · ');
+    }
+  }
+  const time = clockSnap ? formatTime(clockSnap[color]) : '--:--';
+  return `
+    <div class="player-card">
+      <div class="player-left">
+        <div class="color-dot ${color}"></div>
+        ${titleBadge}
+        <div class="player-name-wrap">
+          <div class="player-name">${name}</div>
+          ${sub ? `<div class="player-sub">${sub}</div>` : ''}
+        </div>
+      </div>
+      <div class="player-clock" id="clk-${color}">${time}</div>
+    </div>`;
+}
+
+// ── Board ─────────────────────────────────────────────────────
+function boardOuterHTML() {
+  const engine = buildAtPly(viewPly);
+  const pos    = engine ? engine.board() : null;
+
+  // Last move squares
+  let lmFrom = null, lmTo = null;
+  if (engine && viewPly > 0) {
+    try {
+      const hist = engine.history({ verbose: true });
+      if (hist.length) { lmFrom = hist[hist.length-1].from; lmTo = hist[hist.length-1].to; }
+    } catch(e) {}
+  }
+
+  // Rank & file labels
+  const rankLabels = flipped ? ['1','2','3','4','5','6','7','8'] : ['8','7','6','5','4','3','2','1'];
+  const fileLabels = flipped ? ['h','g','f','e','d','c','b','a'] : ['a','b','c','d','e','f','g','h'];
+
+  // Build squares
+  let squares = '';
+  for (let dr = 0; dr < 8; dr++) {
+    for (let dc = 0; dc < 8; dc++) {
+      const r = flipped ? 7-dr : dr;   // board row (0=rank8)
+      const c = flipped ? 7-dc : dc;   // board col (0=file a)
+      const rankNum  = 8 - r;           // 1–8
+      const fileChar = String.fromCharCode(97 + c); // a–h
+      const sq       = fileChar + rankNum;
+
+      const isLight    = (dr + dc) % 2 === 0;
+      const isLmFrom   = sq === lmFrom;
+      const isLmTo     = sq === lmTo;
+      const isSel      = sq === selectedSq;
+      const hasPiece   = pos && pos[r][c] !== null;
+      const isLegal    = legalTargets.includes(sq);
+      const isLegalCap = isLegal && hasPiece;
+      const cls = [
+        'sq', isLight ? 'light' : 'dark',
+        isLmFrom ? 'lm-from' : '',
+        isLmTo   ? 'lm-to'   : '',
+        isSel    ? 'sel'      : '',
+        isLegal && !isLegalCap ? 'legal'     : '',
+        isLegalCap              ? 'legal-cap' : '',
+      ].filter(Boolean).join(' ');
+
+      let imgHTML = '';
+      if (pos) {
+        const p = pos[r][c];
+        const key = pieceKey(p);
+        if (key && PIECE_SVG[key]) {
+          imgHTML = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[key])}" alt="${key}">`;
+        }
+      }
+      squares += `<div class="${cls}" data-sq="${sq}" onclick="handleSquareClick('${sq}')">${imgHTML}</div>`;
+    }
+  }
+
+  const rankHTML = rankLabels.map(r => `<span>${r}</span>`).join('');
+  const fileHTML = fileLabels.map(f => `<span>${f}</span>`).join('');
+
+  // Resultatöverlägg: visa när partiet är klart och spelaren är vid slutet
+  const moves    = (gameData && gameData.moves) || [];
+  const normRes  = gameData ? normalizeResult(gameData.result) : null;
+  const hasRes   = normRes && normRes !== '*';
+  const atEnd    = viewPly >= moves.length;
+  const resOverlay = hasRes && atEnd && !analysisActive
+    ? `<div class="board-result-overlay"><span class="board-result-text">${resultLabel(normRes)}</span></div>`
+    : '';
+
+  return `
+    <div class="board-outer">
+      <div class="coords-rank">${rankHTML}</div>
+      <div class="board-col">
+        <div id="board">${squares}</div>
+        ${resOverlay}
+        <div class="coords-file">${fileHTML}</div>
+      </div>
+    </div>`;
+}
+
+// ── Analyshjälpare ────────────────────────────────────────────
+// Bygg karta: rPly → [lIdx som avviker från activeLineIdx vid rPly]
+function buildAltsMap(mainMoves) {
+  const map = {};
+  for (let lIdx = 0; lIdx < analysisLines.length; lIdx++) {
+    if (lIdx === activeLineIdx) continue;
+    const alt = analysisLines[lIdx].moves;
+    for (let rPly = 0; rPly < Math.max(alt.length, mainMoves.length); rPly++) {
+      if (alt[rPly] !== mainMoves[rPly]) {
+        let prefixOk = true;
+        for (let j = 0; j < rPly; j++) {
+          if (alt[j] !== mainMoves[j]) { prefixOk = false; break; }
+        }
+        if (prefixOk) {
+          (map[rPly] = map[rPly] || []).push(lIdx);
+        }
+        break;
+      }
+    }
+  }
+  return map;
+}
+
+// Rendera en alternativ linje som kompakt text (ej klickbar, inga taggar)
+function altLineCompact(lIdx, fromRPly, basePly, fm, bt) {
+  const line = analysisLines[lIdx];
+  if (!line || line.moves.length <= fromRPly) return '';
+  const pos = buildAtPly(basePly, activeLineIdx); // position vid greningspunkten
+  if (!pos) return '';
+  let str = '', curFm = fm, curBt = bt;
+  for (let i = fromRPly; i < line.moves.length; i++) {
+    if (!curBt)         str += (str ? ' ' : '') + `${curFm}.`;
+    else if (i===fromRPly) str += (str ? ' ' : '') + `${curFm}…`;
+    const uci = line.moves[i];
+    const mv  = pos.move({ from: uci.slice(0,2), to: uci.slice(2,4),
+                           promotion: uci[4] ? uci[4].toUpperCase() : undefined });
+    if (!mv) break;
+    str += ' ' + sanToSwedish(mv.san);
+    if (curBt) curFm++;
+    curBt = !curBt;
+  }
+  return str.trim();
+}
+
+// Rendera analysgrenen inline i notationspanelen
+function renderAnalysisInlineHTML() {
+  const mainLine = analysisLines[activeLineIdx];
+  if (!mainLine || mainLine.moves.length === 0) return '';
+  const altsMap = buildAltsMap(mainLine.moves);
+  const startPos = buildAtPly(branchFromPly, activeLineIdx);
+  if (!startPos) return '';
+
+  let html = '<div class="analysis-wrap">';
+  const pos = startPos;
+  let fm = Math.floor(branchFromPly / 2) + 1;
+  let bt = (branchFromPly % 2) === 1; // true = svart att dra
+
+  // Om vi börjar mitt i ett par (efter vitts drag): visa N…
+  if (bt && mainLine.moves.length > 0) {
+    html += `<span class="mv-a-num">${fm}…</span>`;
+  }
+
+  for (let rPly = 0; rPly < mainLine.moves.length; rPly++) {
+    const ply = branchFromPly + rPly;
+    const uci = mainLine.moves[rPly];
+
+    if (!bt) html += `<span class="mv-a-num">${fm}.</span>`;
+
+    const mv = pos.move({ from: uci.slice(0,2), to: uci.slice(2,4),
+                          promotion: uci[4] ? uci[4].toUpperCase() : undefined });
+    if (!mv) break;
+    const san   = sanToSwedish(mv.san);
+    const curPly = ply + 1;
+    const isCur  = viewPly === curPly;
+
+    html += `<span class="mv-a-move${isCur ? ' cur' : ''}" onclick="goToPlyOnLine(${curPly},${activeLineIdx})">${san}</span>`;
+
+    // Varianter som avviker vid detta rPly — visas EFTER det draget
+    const altsHere = altsMap[rPly] || [];
+    if (altsHere.length > 0) {
+      const altTexts = altsHere.map(lIdx => altLineCompact(lIdx, rPly, ply, fm, bt)).filter(Boolean);
+      if (altTexts.length > 0) {
+        html += `<span class="mv-a-alt">(${altTexts.join('; ')})</span>`;
+      }
+    }
+
+    if (bt) fm++;
+    bt = !bt;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ── Moves panel ───────────────────────────────────────────────
+function movesHTML() {
+  const moves = (gameData && gameData.moves) || [];
+  const total = moves.length;
+  if (!total) return `<div class="panel-box"><div class="panel-head">DRAG</div>
+    <div style="padding:14px;color:var(--muted);font-size:.82rem">Inga drag ännu</div></div>`;
+
+  const normResult = normalizeResult(gameData && gameData.result);
+  const finalResult = normResult && normResult !== '*' ? normResult : null;
+  const resLabel = finalResult ? resultLabel(finalResult) : null;
+  const resStyle = 'font-size:0.82rem;font-weight:700;color:var(--muted);letter-spacing:.04em;cursor:default';
+
+  // Beräkna var i notationen analysen ska injiceras
+  // (efter det dragpar som inkluderar branchFromPly)
+  const analysisInsertAfterPly = analysisActive ? Math.min(branchFromPly, total) : -1;
+  // Avrunda nedåt till närmaste jämna ply (slutet av ett dragpar)
+  const analysisInsertAfterEven = analysisActive
+    ? (analysisInsertAfterPly % 2 === 0 ? analysisInsertAfterPly : analysisInsertAfterPly + 1)
+    : -1;
+
+  let rows = '';
+  for (let i = 0; i < total; i += 2) {
+    const n    = Math.floor(i/2) + 1;
+    const wSan = moves[i]   ? sanToSwedish(moves[i].split(' ')[0])   : '';
+    const bSan = moves[i+1] ? sanToSwedish(moves[i+1].split(' ')[0]) : '';
+    // Markera aktuellt drag (speldrag) – i analysläge bara om vi navigerat tillbaka till spelet
+    const gameViewPly = (!analysisActive || viewPly <= branchFromPly) ? viewPly : -1;
+    const wCur = gameViewPly === i+1 ? ' cur' : '';
+    const bCur = gameViewPly === i+2 ? ' cur' : '';
+    const isLastPair = (i + 2 >= total);
+    const blackCell = (isLastPair && finalResult && !bSan)
+      ? `<span class="mv-b" style="${resStyle}">${resLabel}</span>`
+      : (bSan ? `<span class="mv-b${bCur}" onclick="goToPly(${i+2})">${bSan}</span>` : '<span class="mv-b"></span>');
+    rows += `<div class="move-pair">
+      <span class="mv-num">${n}.</span>
+      <span class="mv-w${wCur}" onclick="goToPly(${i+1})">${wSan}</span>
+      ${blackCell}
+    </div>`;
+
+    // Injicera analysen direkt efter rätt dragpar
+    if (analysisActive && i + 2 === analysisInsertAfterEven) {
+      const aHTML = renderAnalysisInlineHTML();
+      if (aHTML) rows += aHTML;
+    }
+  }
+  // Resultat om svart spelade sist i avslutad match
+  if (finalResult && total % 2 === 0) {
+    const n = Math.floor(total / 2) + 1;
+    rows += `<div class="move-pair">
+      <span class="mv-num">${n}.</span>
+      <span class="mv-w" style="${resStyle}">${resLabel}</span>
+      <span class="mv-b"></span>
+    </div>`;
+  }
+  // Om analysen startar EFTER alla speldrag (vanligaste fallet: sist i partiet)
+  if (analysisActive && analysisInsertAfterEven > total) {
+    const aHTML = renderAnalysisInlineHTML();
+    if (aHTML) rows += aHTML;
+  }
+
+  let pairLabel = 'DRAG';
+  if (pairing) {
+    const wn = pairing.white ? playerLabel(pairing.white) : 'Vit';
+    const bn = pairing.black ? playerLabel(pairing.black) : 'Svart';
+    pairLabel = `${wn} – ${bn}`;
+  }
+  return `<div class="panel-box">
+    <div class="panel-head" style="font-size:0.78rem">${pairLabel}</div>
+    <div class="moves-scroll" id="moves-scroll">${rows}</div>
+  </div>`;
+}
+
+// ── Match score calculator ────────────────────────────────────
+function computeMatchScore() {
+  if (!matchSchedule.length) return null;
+  const first = matchSchedule[0];
+  if (!first || !first.white || !first.black) return null;
+  // "Spelare 1" = vit i rondens 1
+  const p1Name = first.white.lname || playerLabel(first.white);
+  let p1 = 0, p2 = 0;
+  for (const s of matchSchedule) {
+    if (!s.result || s.result === '*') continue;
+    const p1IsWhite = s.white && (s.white.lname || playerLabel(s.white)) === p1Name;
+    if (s.result === '1-0')     { p1IsWhite ? p1++ : p2++; }
+    else if (s.result === '0-1') { p1IsWhite ? p2++ : p1++; }
+    else if (s.result === '1/2-1/2') { p1 += 0.5; p2 += 0.5; }
+  }
+  return { p1, p2 };
+}
+function fmtScore(v) {
+  if (v === 0) return '0';
+  if (v === Math.floor(v)) return String(v);
+  const whole = Math.floor(v);
+  return whole > 0 ? `${whole}½` : '½';
+}
+
+// ── Time control from API ─────────────────────────────────────
+function getTimeControl() {
+  if (!tournamentInfo) return null;
+  // LiveChessCloud kan exponera tidskontroll på olika fält
+  const raw = tournamentInfo.tcs || tournamentInfo.timeControl || tournamentInfo.tc
+            || tournamentInfo.time_control || tournamentInfo.time;
+  if (!raw) return null;
+  // Försök tolka "SSSS+INC" formatet (sekunder + inkrement)
+  const m = String(raw).match(/^(\d+)\+(\d+)$/);
+  if (m) {
+    const base = parseInt(m[1]);
+    const inc  = parseInt(m[2]);
+    const mins = Math.floor(base / 60);
+    const secs = base % 60;
+    const baseStr = secs > 0 ? `${mins}:${String(secs).padStart(2,'0')}` : `${mins} min`;
+    return inc > 0 ? `${baseStr} + ${inc}s` : baseStr;
+  }
+  return String(raw);
+}
+
+// ── PGN-kryssrutor & samlad nedladdning ──────────────────────
+// key = rondnummer (match) eller "rn-board" (schweizisk)
+function togglePGNSelect(key, evt) {
+  evt.stopPropagation();
+  if (selectedPGNRounds.has(key)) selectedPGNRounds.delete(key);
+  else selectedPGNRounds.add(key);
+  renderScheduleWidget();
+}
+
+async function downloadSelectedPGN() {
+  const keys = [...selectedPGNRounds].sort();
+  if (!keys.length) return;
+  const btn = document.querySelector('.sch-dl-btn');
+  if (btn) btn.textContent = 'Hämtar…';
+  const parts = [];
+  for (const key of keys) {
+    try {
+      // key = rondnummer (match) eller "rn-board" (schweizisk)
+      let rn, board;
+      if (String(key).includes('-')) {
+        [rn, board] = String(key).split('-').map(Number);
+      } else {
+        rn = Number(key); board = 1;
+      }
+      const pgn = await buildPGN(rn, board);
+      if (pgn) parts.push(pgn);
+    } catch(e) { console.warn('PGN error ' + key, e); }
+  }
+  selectedPGNRounds.clear();
+  renderScheduleWidget();
+  if (!parts.length) return;
+  const blob = new Blob([parts.join('\n\n')], { type: 'application/x-chess-pgn' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  const label = (matchP1Name && matchP2Name) ? `${matchP1Name}-${matchP2Name}`.replace(/\s/g,'_') : 'gambit';
+  a.download = `${label}-ronder-${keys.join('-')}.pgn`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── PGN-export ────────────────────────────────────────────────
+async function buildPGN(round, boardNum) {
+  const g = boardNum || 1;
+  const s = matchSchedule.find(x => x.round === round && (x.board || 1) === g);
+  if (!s) return null;
+
+  let data, wp = s.white, bp = s.black;
+  const [gameR, idxR] = await Promise.all([
+    fetchFresh(`${BASE}/${TID}/round-${round}/game-${g}.json`),
+    fetchFresh(`${BASE}/${TID}/round-${round}/index.json`)
+  ]);
+  if (!gameR.ok) return null;
+  data = await gameR.json();
+  if (idxR.ok) {
+    const idxData = await idxR.json();
+    const fp = (idxData.pairings || [])[g - 1];
+    if (fp) { wp = fp.white || wp; bp = fp.black || bp; }
+  }
+
+  const moves    = data.moves || [];
+  const eventName = (tournamentInfo && tournamentInfo.name) ? tournamentInfo.name : '?';
+  const siteName  = (tournamentInfo && (tournamentInfo.location || tournamentInfo.city || tournamentInfo.site || tournamentInfo.venue)) || '?';
+  const pgnName  = p => {
+    if (!p) return '?';
+    if (p.lname && (p.fname || p.mname)) return p.lname + ', ' + [p.fname, p.mname].filter(Boolean).join(' ');
+    return playerLabel(p);
+  };
+  const dateTag  = s.date ? s.date.replace(/-/g, '.') : '????.??.??';
+  const result   = s.result || '*';
+  const wElo     = (wp && wp.rating)     ? wp.rating     : '';
+  const bElo     = (bp && bp.rating)     ? bp.rating     : '';
+  const wTitle   = (wp && wp.title)      ? wp.title      : '';
+  const bTitle   = (bp && bp.title)      ? bp.title      : '';
+  const wFed     = (wp && wp.federation) ? wp.federation : '';
+  const bFed     = (bp && bp.federation) ? bp.federation : '';
+  const wFideId  = (wp && (wp.fideid || wp.fideId || wp.fide_id)) || '';
+  const bFideId  = (bp && (bp.fideid || bp.fideId || bp.fide_id)) || '';
+
+  const sanMoves = moves.map(mv =>
+    typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || String(mv))
+  ).filter(Boolean);
+
+  let moveText = '';
+  for (let i = 0; i < sanMoves.length; i++) {
+    if (i % 2 === 0) moveText += `${Math.floor(i/2)+1}. `;
+    moveText += sanMoves[i] + ' ';
+  }
+  moveText = moveText.trim() + ' ' + result;
+
+  const optTag = (key, val) => val ? `[${key} "${val}"]\n` : '';
+  return `[Event "${eventName}"]
+[Site "${siteName}"]
+[Date "${dateTag}"]
+[Round "${round}"]
+[White "${pgnName(wp)}"]
+[Black "${pgnName(bp)}"]
+[Result "${result}"]
+` + optTag('WhiteTitle',   wTitle)
+  + optTag('BlackTitle',   bTitle)
+  + optTag('WhiteElo',     wElo)
+  + optTag('BlackElo',     bElo)
+  + optTag('WhiteFideId',  wFideId)
+  + optTag('BlackFideId',  bFideId)
+  + optTag('WhiteCountry', wFed)
+  + optTag('BlackCountry', bFed)
+  + `\n${moveText.trim()}\n`;
+}
+
+async function downloadPGN(round, evt) {
+  evt.stopPropagation();
+  try {
+    const pgn = await buildPGN(round);
+    if (!pgn) { alert('Kunde inte hämta partiet.'); return; }
+    const s    = matchSchedule.find(x => x.round === round);
+    const wFull = s && s.white ? playerLabel(s.white) : 'vit';
+    const bFull = s && s.black ? playerLabel(s.black) : 'svart';
+    const blob = new Blob([pgn], { type: 'application/x-chess-pgn' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `gambit-r${round}-${wFull.replace(/\s/g,'_')}-${bFull.replace(/\s/g,'_')}.pgn`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e) { alert('Nätverksfel: ' + e.message); }
+}
+
+// ── Match schedule panel ──────────────────────────────────────
+function scheduleHTML() {
+  if (tournamentType === 'team') return teamBoardListHTML();
+  if (!matchSchedule.length) return '';
+
+  const isSwiss = tournamentType === 'swiss';
+
+  const rows = matchSchedule.map(s => {
+    const isActive = isSwiss
+      ? (s.round === ROUND && s.board === GAME)
+      : (s.round === ROUND);
+    const isLive   = s.live === true && (!s.result || s.result === '*');
+    const isDone   = s.result && s.result !== '*';
+    const resText  = isLive ? '●' : (isDone ? resultLabel(s.result) : '–');
+    const resCls   = isLive ? 'live' : (isDone ? 'done' : 'upcoming');
+
+    let dateStr = '';
+    if (s.date && !isSwiss) {
+      const d = new Date(s.date + 'T12:00:00');
+      const days = ['sön','mån','tis','ons','tor','fre','lör'];
+      dateStr = `${days[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`;
+    }
+
+    const wName = s.white ? playerLabel(s.white) : '?';
+    const bName = s.black ? playerLabel(s.black) : '?';
+
+    // Rond-etikett: "R5·B2" för schweizisk, annars bara rondnummer
+    const numLabel = isSwiss
+      ? `R${s.round}·B${s.board}`
+      : `${s.round}`;
+
+    // PGN-kryssruta — använd rond+bräde som nyckel
+    const pgnKey = isSwiss ? `${s.round}-${s.board}` : `${s.round}`;
+    const checked = selectedPGNRounds.has(pgnKey);
+    const dlBtn = isDone
+      ? `<input type="checkbox" class="sch-check" ${checked?'checked':''}
+           onclick="togglePGNSelect('${pgnKey}',event)" title="Markera för nedladdning">`
+      : '';
+
+    const clickFn = isSwiss
+      ? `switchRoundAndBoard(${s.round},${s.board})`
+      : `switchRound(${s.round})`;
+
+    return `<div class="schedule-row${isActive?' active':''}" onclick="${clickFn}">
+      <span class="sch-num" style="min-width:${isSwiss?'42px':'16px'};font-size:0.75rem">${numLabel}</span>
+      ${dateStr ? `<span class="sch-date">${dateStr}</span>` : ''}
+      <span class="sch-players">${escHtml(wName)} – ${escHtml(bName)}</span>
+      <span class="sch-result ${resCls}">${resText}</span>
+      ${dlBtn}
+    </div>`;
+  }).join('');
+
+  // Header och poäng
+  let headLabel, scoreStr = '';
+  if (isSwiss) {
+    const name = tournamentInfo ? tournamentInfo.name : 'Schweizisk';
+    const numRounds = matchSchedule.length > 0
+      ? Math.max(...matchSchedule.map(s => s.round))
+      : 0;
+    headLabel = `${escHtml(name)} · ${numRounds} RONDER`;
+  } else {
+    const score = computeMatchScore();
+    scoreStr = score ? `${fmtScore(score.p1)}–${fmtScore(score.p2)}` : '';
+    headLabel = (matchP1Name && matchP2Name)
+      ? `${escHtml(matchP1Name)} – ${escHtml(matchP2Name)}`
+      : `MATCH · ${matchSchedule.length} PARTIER`;
+  }
+
+  const tc = !isSwiss ? getTimeControl() : '';
+  return `<div class="panel-box">
+    <div class="panel-head" style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px">
+      <span style="font-size:0.78rem">${headLabel}</span>
+      ${scoreStr ? `<span style="color:var(--accent);font-size:1rem;letter-spacing:.04em">${scoreStr}</span>` : ''}
+    </div>
+    ${tc ? `<div style="padding:4px 12px 6px;font-size:0.7rem;color:var(--muted);letter-spacing:.04em;border-bottom:1px solid var(--border)">${tc}</div>` : ''}
+    ${rows}
+    ${selectedPGNRounds.size > 0 ? `<div class="sch-dl-bar" style="display:flex;gap:6px">
+      <button class="sch-dl-btn" style="flex:1" onclick="downloadSelectedPGN()">⬇ PGN (${selectedPGNRounds.size})</button>
+      ${selectedPGNRounds.size >= 2 ? `<button class="sch-dl-btn" style="flex:1;background:var(--accent);color:#000;border-color:var(--accent)" onclick="activateScheduleMultiView()">⊞ Visa ${selectedPGNRounds.size} partier</button>` : ''}
+    </div>` : ''}
+  </div>`;
+}
+
+function renderScheduleWidget() {
+  const el = document.getElementById('schedule-widget');
+  if (el) el.innerHTML = scheduleHTML();
+}
+
+// Navigera till specifik rond + bräde (schweizisk)
+function switchRoundAndBoard(rn, g) {
+  ROUND = rn; GAME = g;
+  selectedBoards = new Set([g]);
+  gameData = null; pairing = null; viewPly = 0; sfEval = null;
+  if (overviewMode) { overviewMode = false; stopOverviewPolling(); stopOverviewAnalysis(); overviewData = {}; overviewKeyMap = {}; overviewPairBySlot = {}; }
+  stopTeamPolling();
+  if (clockTimer) clearInterval(clockTimer);
+  if (pollTimer)  clearTimeout(pollTimer);
+  document.getElementById('main').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
+  fetchPairing();
+  schedulePoll(0);
+}
+
+function switchRound(rn) {
+  ROUND = rn; GAME = 1;
+  selectedBoards = new Set([1]);
+  gameData = null; pairing = null; viewPly = 0; sfEval = null;
+  if (overviewMode) { overviewMode = false; stopOverviewPolling(); stopOverviewAnalysis(); overviewData = {}; overviewKeyMap = {}; overviewPairBySlot = {}; }
+  stopTeamPolling();
+  if (clockTimer) clearInterval(clockTimer);
+  if (pollTimer)  clearTimeout(pollTimer);
+  document.getElementById('main').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
+  fetchPairing();
+  schedulePoll(0);
+}
+
+// ── Result panel ──────────────────────────────────────────────
+function resultHTML() {
+  const r = normalizeResult(gameData.result);
+  const labels = {'1-0':'Vit vinner','0-1':'Svart vinner','1/2-1/2':'Remi'};
+  return `<div class="panel-box"><div class="result-box">
+    <div class="result-score">${r}</div>
+    <div class="result-label">${labels[r]||''}</div>
+  </div></div>`;
+}
+
+// ── Eval bar HTML ─────────────────────────────────────────────
+function evalBarHTML() {
+  const whitePct  = sfEval ? evalToWhitePct(sfEval) : 50;
+  const blackPct  = 100 - whitePct;
+  const score     = sfEval ? formatEvalScore(sfEval) : '';
+  // chip sitter vid gränsen: blackPct% från vänster, klämmer vid kanterna
+  // chip sitter vid gränsen: whitePct% från vänster (vit är på vänster sida)
+  const chipLeft  = Math.max(5, Math.min(95, whitePct)).toFixed(1);
+  return `<div class="eval-bar-h">
+    <div class="eval-h-inner">
+      <div id="eval-h-light" class="eval-h-light" style="flex-grow:${whitePct}"></div>
+      <div id="eval-h-dark"  class="eval-h-dark"  style="flex-grow:${blackPct}"></div>
+    </div>
+    <div id="eval-h-chip" class="eval-h-chip" style="left:${chipLeft}%;${score?'':'opacity:0'}">${score}</div>
+  </div>`;
+}
+
+// ── UCI → Swedish SAN ─────────────────────────────────────────
+// Omvandlar hela UCI-varianten till numrerad svensk SAN, t.ex.
+// "40... Dc3+ 41. Kh6 42. Dxh7#"
+function pvToSwedishSan(pvRaw) {
+  if (!pvRaw) return '';
+  const MAX_PLIES = 8;
+  const uciMoves = pvRaw.trim().split(/\s+/).slice(0, MAX_PLIES);
+  // Bygg alltid från den FEN som faktiskt skickades till Stockfish
+  let pos, fullMove, blackToMove;
+  if (sfCurrentFen && typeof Chess !== 'undefined') {
+    try {
+      pos = new Chess(sfCurrentFen);
+      const parts = sfCurrentFen.split(' ');
+      fullMove   = parseInt(parts[5]) || 1;
+      blackToMove = parts[1] === 'b';
+    } catch(e) { pos = null; }
+  }
+  if (!pos) {
+    pos = buildAtPly(viewPly);
+    if (!pos) return '';
+    fullMove    = Math.floor(viewPly / 2) + 1;
+    blackToMove = (viewPly % 2) === 1;
+  }
+  const result = [];
+  if (blackToMove) result.push(`${fullMove}…`);
+  for (const uci of uciMoves) {
+    if (uci.length < 4) break;
+    if (!blackToMove) result.push(`${fullMove}.`);
+    try {
+      const mv = pos.move({ from: uci.slice(0,2), to: uci.slice(2,4),
+                            promotion: uci[4] ? uci[4].toUpperCase() : undefined });
+      if (!mv) break;
+      result.push(sanToSwedish(mv.san));
+    } catch(e) { break; }
+    if (blackToMove) fullMove++;
+    blackToMove = !blackToMove;
+  }
+  return result.join(' ');
+}
+
+function uciToSwedishSan(uciMove) {
+  if (!uciMove || uciMove.length < 4) return uciMove;
+  try {
+    const pos = buildAtPly(viewPly);
+    if (!pos) return uciMove;
+    const from  = uciMove.slice(0, 2);
+    const to    = uciMove.slice(2, 4);
+    const promo = uciMove[4] ? uciMove[4].toUpperCase() : undefined;
+    const move  = pos.move({ from, to, promotion: promo });
+    return move ? sanToSwedish(move.san) : uciMove;
+  } catch(e) { return uciMove; }
+}
+
+// ── Engine panel helpers ───────────────────────────────────────
+function lineBlockHTML(line, lineId, scoreId) {
+  const score = line ? formatEvalScore(line) : '';
+  const pv    = line ? pvToSwedishSan(line.pvRaw) : '';
+  return `<div style="margin-top:6px;padding:6px 0;border-top:1px solid var(--border);min-height:3.2rem;display:flex;gap:7px;align-items:flex-start">
+    <span id="${scoreId}" style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;color:var(--accent);white-space:nowrap;min-width:2.8rem;padding-top:1px">${score}</span>
+    <div id="${lineId}" class="engine-pv" style="line-height:1.5;word-break:break-word;flex:1;min-height:2.4rem">${pv}</div>
+  </div>`;
+}
+
+function mpvBtnStyle(active) {
+  const base = 'font-family:Lato,sans-serif;font-size:0.65rem;padding:2px 9px;border-radius:3px;letter-spacing:.06em;cursor:pointer;border:none;';
+  return active ? `${base}background:var(--accent);color:#000;font-weight:700;`
+                : `${base}background:#2a2a2a;color:#555;`;
+}
+
+function enginePanelHTML() {
+  const on        = sfEnabled;
+  const line1     = sfLines[0];
+  const line2     = sfLines[1];
+  const scoreText = line1 ? formatEvalScore(line1) : '…';
+  const depthText = line1 ? `Djup ${line1.depth}` : (on ? 'Laddar motor…' : '');
+
+  const btnBase = 'font-family:Lato,sans-serif;font-size:0.65rem;padding:2px 9px;border-radius:3px;letter-spacing:.08em;cursor:pointer;border:none;';
+  const btnOn  = on  ? `${btnBase}background:var(--accent);color:#000;font-weight:700;`
+                     : `${btnBase}background:#2a2a2a;color:#555;`;
+  const btnOff = !on ? `${btnBase}background:var(--accent);color:#000;font-weight:700;`
+                     : `${btnBase}background:#2a2a2a;color:#555;`;
+
+  return `<div class="panel-box">
+    <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;user-select:none">
+      <span>ANALYS MED STOCKFISH 18</span>
+      <span style="display:flex;gap:4px">
+        <button style="${btnOff}" onclick="if(sfEnabled)toggleEngine()">AV</button>
+        <button style="${btnOn}"  onclick="if(!sfEnabled)toggleEngine()">PÅ</button>
+      </span>
+    </div>
+    ${on ? `<div style="padding:10px 12px;min-height:${sfMultiPV >= 2 ? '8.5rem' : '5rem'}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="engine-depth" id="engine-depth" style="margin:0">${depthText}</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <span style="font-size:0.6rem;color:var(--muted);letter-spacing:.05em">LINJER</span>
+          <button id="mpv-1" style="${mpvBtnStyle(sfMultiPV===1)}" onclick="setMultiPV(1)">1</button>
+          <button id="mpv-2" style="${mpvBtnStyle(sfMultiPV===2)}" onclick="setMultiPV(2)">2</button>
+          <button id="mpv-3" style="${mpvBtnStyle(sfMultiPV===3)}" onclick="setMultiPV(3)">3</button>
+          <button id="mpv-4" style="${mpvBtnStyle(sfMultiPV===4)}" onclick="setMultiPV(4)">4</button>
+        </div>
+      </div>
+      ${lineBlockHTML(line1, 'sf-line-1', 'sf-score-1')}
+      ${sfMultiPV >= 2 ? lineBlockHTML(sfLines[1], 'sf-line-2', 'sf-score-2') : ''}
+      ${sfMultiPV >= 3 ? lineBlockHTML(sfLines[2], 'sf-line-3', 'sf-score-3') : ''}
+      ${sfMultiPV >= 4 ? lineBlockHTML(sfLines[3], 'sf-line-4', 'sf-score-4') : ''}
+    </div>` : ''}
+  </div>`;
+}
+
+// ── Engine helpers ────────────────────────────────────────────
+// Stockfish.js (äldre cdnjs-bygge) rapporterar ibland ur sidan-att-spelasperspektiv
+// i stället för alltid ur vitts. Vi normaliserar till vitts perspektiv:
+function normalizedWhiteValue(ev) {
+  // Använd den FEN som faktiskt analyseras för att avgöra vems tur det är
+  let blackToMove;
+  if (sfCurrentFen) {
+    blackToMove = sfCurrentFen.split(' ')[1] === 'b';
+  } else {
+    blackToMove = (viewPly % 2) === 1;
+  }
+  return blackToMove ? -ev.value : ev.value;
+}
+function evalToWhitePct(ev) {
+  if (ev.type === 'mate') {
+    const v = normalizedWhiteValue(ev);
+    return v > 0 ? 95 : 5;
+  }
+  return 50 + 50 * Math.tanh(normalizedWhiteValue(ev) / 400);
+}
+function formatEvalScore(ev) {
+  if (ev.type === 'mate') {
+    const v = normalizedWhiteValue(ev);
+    return v > 0 ? `M${Math.abs(ev.value)}` : `-M${Math.abs(ev.value)}`;
+  }
+  const v = normalizedWhiteValue(ev);
+  const p = (Math.abs(v) / 100).toFixed(2);
+  return v >= 0 ? `+${p}` : `-${p}`;
+}
+
+// ── Stockfish init ────────────────────────────────────────────
+// Använder SF10 via blob+importScripts mot CDN (fungerar både på HTTPS och file://).
+// Om stockfish-18-lite-single.js finns lokalt i repon kan den användas istället
+// genom att byta till: sfWorker = new Worker('stockfish-18-lite-single.js');
+const SF10_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js';
+
+let sfReady = false;
+
+function sfSetStatus(msg) {
+  const el = document.getElementById('engine-depth');
+  if (el) el.textContent = msg;
+}
+
+function initStockfish() {
+  if (sfWorker) return;
+  sfReady = false;
+  sfSetStatus('Laddar motor…');
+  try {
+    {
+      // Blob-worker mot CDN (SF10) — fungerar på alla plattformar
+      const code    = `importScripts('${SF10_CDN}');`;
+      const blob    = new Blob([code], { type: 'application/javascript' });
+      const blobURL = URL.createObjectURL(blob);
+      sfWorker = new Worker(blobURL);
+      URL.revokeObjectURL(blobURL);
+    }
+
+    sfWorker.onmessage = e => handleSfLine(
+      typeof e.data === 'string' ? e.data : ''
+    );
+    sfWorker.onerror = err => {
+      console.warn('SF worker error:', err);
+      sfWorker = null;
+      sfSetStatus('Motor-fel – se konsolen');
+    };
+    sfWorker.postMessage('uci');
+  } catch(err) {
+    sfWorker = null;
+    sfSetStatus('Motor-fel: ' + err.message);
+  }
+}
+
+// sfSearching: true medan motorn kör "go" — måste vänta på bestmove innan nya kommandon
+let sfSearching = false;
+let sfPendingFen = null;   // FEN som väntar på att skickas efter bestmove
+
+function startSfSearch(fen) {
+  sfSearching = true;
+  sfPendingFen = null;
+  sfCurrentFen = fen;
+  sfWorker.postMessage(`setoption name MultiPV value ${sfMultiPV}`);
+  sfWorker.postMessage('position fen ' + fen);
+  sfWorker.postMessage('go depth 20');
+}
+
+function handleSfLine(line) {
+  line = (line || '').trim();
+  if (!line) return;
+
+  if (line === 'uciok') {
+    sfWorker.postMessage('isready');
+    return;
+  }
+  if (line === 'readyok') {
+    sfReady = true;
+    sfSearching = false;
+    sfSetStatus('Motor redo');
+    if (overviewMode) {
+      // Starta round-robin för översikten
+      ovCurrentBoard = null;
+      analyzeNextOverviewBoard();
+    } else {
+      const pos = buildAtPly(viewPly);
+      if (pos && sfEnabled) scheduleAnalysis(pos.fen());
+    }
+    return;
+  }
+
+  // bestmove — sökning klar (antingen naturligt eller via stop)
+  if (line.startsWith('bestmove')) {
+    sfSearching = false;
+    if (overviewMode) {
+      // Overview: vänta lite och kör nästa bräde
+      setTimeout(analyzeNextOverviewBoard, 350);
+      return;
+    }
+    if (sfPendingFen) {
+      // En ny position väntade — starta den nu
+      const fen = sfPendingFen;
+      sfPendingFen = null;
+      sfLines = []; sfEval = null;
+      startSfSearch(fen);
+    }
+    return;
+  }
+
+  // Parse score lines
+  const m = line.match(/\binfo\b/);
+  if (m) {
+    const dM   = line.match(/\bdepth (\d+)/);
+    const mpM  = line.match(/\bmultipv (\d+)/);
+    const scM  = line.match(/\bscore (cp|mate) (-?\d+)/);
+    const pvM  = line.match(/\bpv (.+)/);
+
+    if (overviewMode) {
+      // Overview: vi behöver bara score, inte PV
+      if (dM && scM && ovCurrentBoard) {
+        ovEvalData[ovCurrentBoard] = {
+          type:  scM[1],
+          value: parseInt(scM[2]),
+          btm:   ovCurrentBlackToMove
+        };
+        updateOverviewEvalBar(ovCurrentBoard, ovEvalData[ovCurrentBoard]);
+      }
+    } else if (dM && scM && pvM) {
+      // Normal läge: full info
+      const idx = mpM ? parseInt(mpM[1]) - 1 : 0;
+      sfLines[idx] = {
+        type:  scM[1],
+        value: parseInt(scM[2]),
+        depth: parseInt(dM[1]),
+        pvRaw: pvM[1].trim()
+      };
+      sfEval = sfLines[0];
+      updateEvalDisplay();
+    }
+  }
+}
+
+function scheduleAnalysis(fen) {
+  if (!sfEnabled || !sfWorker || !sfReady) return;
+  if (sfAnalysisTimer) clearTimeout(sfAnalysisTimer);
+  // Rensa gamla resultat direkt (undviker inaktuella PV-drag)
+  sfLines = []; sfEval = null;
+  sfAnalysisTimer = setTimeout(() => {
+    if (sfSearching) {
+      // Motorn kör fortfarande — sätt FEN som pending och stoppa
+      sfPendingFen = fen;
+      sfWorker.postMessage('stop');
+    } else {
+      // Motorn är ledig — starta direkt
+      startSfSearch(fen);
+    }
+  }, 150);
+}
+
+function setMultiPV(n) {
+  sfMultiPV = n;
+  sfLines   = [];
+  sfEval    = null;
+  // Re-rendera motorpanelen så att rätt antal rader finns i DOM
+  const wrap = document.getElementById('engine-panel-wrap');
+  if (wrap) wrap.innerHTML = enginePanelHTML();
+  // Starta om analysen med nytt MultiPV-värde
+  const pos = buildAtPly(viewPly);
+  if (pos && sfEnabled) scheduleAnalysis(pos.fen());
+}
+
+function updateEvalDisplay() {
+  if (!sfEval) return;
+  const whitePct = evalToWhitePct(sfEval);
+  const el = id => document.getElementById(id);
+  if (el('engine-score')) el('engine-score').textContent = formatEvalScore(sfEval);
+  if (el('engine-depth')) el('engine-depth').textContent = `Djup ${sfEval.depth}`;
+  // Linje 1
+  if (el('sf-score-1')) el('sf-score-1').textContent = sfLines[0] ? formatEvalScore(sfLines[0]) : '';
+  if (el('sf-line-1'))  el('sf-line-1').textContent  = sfLines[0] ? pvToSwedishSan(sfLines[0].pvRaw) : '';
+  // Linje 2–4
+  [1,2,3].forEach(i => {
+    const n = i + 1;
+    if (el(`sf-score-${n}`)) el(`sf-score-${n}`).textContent = sfLines[i] ? formatEvalScore(sfLines[i]) : '';
+    if (el(`sf-line-${n}`))  el(`sf-line-${n}`).textContent  = sfLines[i] ? pvToSwedishSan(sfLines[i].pvRaw) : '';
+  });
+  // Evalbar
+  // Horisontell eval-stapel
+  const blackPct = 100 - whitePct;
+  if (el('eval-h-dark'))  el('eval-h-dark').style.flexGrow  = String(blackPct);
+  if (el('eval-h-light')) el('eval-h-light').style.flexGrow = String(whitePct);
+  const chip = el('eval-h-chip');
+  if (chip) {
+    chip.textContent  = formatEvalScore(sfEval);
+    chip.style.left   = Math.max(5, Math.min(95, whitePct)).toFixed(1) + '%';
+    chip.style.opacity = '1';
+  }
+}
+
+function toggleEngine() {
+  sfEnabled = !sfEnabled;
+  sfEval = null;
+  if (sfEnabled) {
+    if (sfWorker && sfReady) {
+      // Motorn är redan igång — starta analys direkt
+      const pos = buildAtPly(viewPly);
+      if (pos) scheduleAnalysis(pos.fen());
+    } else {
+      initStockfish();   // analys startar när motorn svarar "readyok"
+    }
+  } else {
+    if (sfWorker) sfWorker.postMessage('stop');
+    if (sfAnalysisTimer) clearTimeout(sfAnalysisTimer);
+    // sfReady lämnas orörd — motorn är fortfarande redo om den körs
+  }
+  renderAll();
+}
+
+// ── Clock ─────────────────────────────────────────────────────
+function tickClocks() {
+  if (!clockSnap) return;
+  const moves = (gameData && gameData.moves) || [];
+  const total = moves.length;
+  const atEnd = viewPly >= total;
+
+  if (atEnd) {
+    // Live clocks — count down in real time using server snapshot timestamp.
+    // clock.time is the Unix ms timestamp when the server made this clock snapshot.
+    // clock.white/black are in seconds.
+    // clock.run can be momentarily false right after a move (API quirk) — use gameData.live.
+    const elapsed     = (Date.now() - clockSnap.time) / 1000;  // seconds since server snapshot
+    const whiteTurn   = total % 2 === 0;
+    const gameRunning = gameData.live === true &&
+                        !(normalizeResult(gameData.result) && normalizeResult(gameData.result) !== '*');
+    let wSec = clockSnap.white;
+    let bSec = clockSnap.black;
+    if (gameRunning) {
+      if (whiteTurn) wSec = Math.max(0, wSec - elapsed);
+      else           bSec = Math.max(0, bSec - elapsed);
+    }
+    setClockEl('clk-white', wSec, gameRunning && whiteTurn);
+    setClockEl('clk-black', bSec, gameRunning && !whiteTurn);
+  } else {
+    // Review mode — show static times from move strings
+    let wDs = null, bDs = null;
+    for (let i = 0; i < viewPly && i < moves.length; i++) {
+      const m = moves[i].match(/\s(\d+)\+/);
+      if (m) {
+        const t = parseInt(m[1]);
+        if (i % 2 === 0) wDs = t; else bDs = t;
+      }
+    }
+    setClockEl('clk-white', wDs, false);
+    setClockEl('clk-black', bDs, false);
+  }
+}
+function setClockEl(id, ds, active) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = formatTime(ds);
+  el.className = 'player-clock' + (active ? (ds < 30 ? ' low-time' : ' running') : '');
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function goToStart() {
+  selectedSq = null; legalTargets = [];
+  viewPly = 0; renderAll();
+}
+function stepBack() {
+  selectedSq = null; legalTargets = [];
+  if (viewPly === 0) return;
+  viewPly--; renderAll();
+}
+function stepForward() {
+  selectedSq = null; legalTargets = [];
+  if (viewPly >= maxPly()) return;
+  viewPly++; renderAll();
+}
+function goToEnd() {
+  selectedSq = null; legalTargets = [];
+  viewPly = maxPly(); renderAll();
+}
+function goToPly(n) {
+  selectedSq = null; legalTargets = [];
+  viewPly = Math.max(0, Math.min(n, maxPly())); renderAll();
+}
+
+// ── Analysläge: klick på ruta ─────────────────────────────────
+function handleSquareClick(sq) {
+  const pos = buildAtPly(viewPly);
+  if (!pos) return;
+
+  if (selectedSq) {
+    if (sq === selectedSq) {
+      // Avmarkera
+      selectedSq = null; legalTargets = [];
+      renderBoard(); return;
+    }
+    if (legalTargets.includes(sq)) {
+      // Giltigt drag — gör det
+      const piece = pos.get(selectedSq);
+      let promo = '';
+      if (piece && piece.type === 'p') {
+        const rank = sq[1];
+        if ((piece.color === 'w' && rank === '8') || (piece.color === 'b' && rank === '1'))
+          promo = 'q';  // auto-dam
+      }
+      const uci = selectedSq + sq + promo;
+      selectedSq = null; legalTargets = [];
+      makeAnalysisMove(uci); return;
+    }
+    // Försök markera annan pjäs
+    selectedSq = null; legalTargets = [];
+  }
+
+  // Markera pjäs om det är rätt sidas tur
+  const piece = pos.get(sq);
+  if (piece && piece.color === pos.turn()) {
+    selectedSq = sq;
+    legalTargets = pos.moves({ square: sq, verbose: true }).map(m => m.to);
+  }
+  renderBoard();
+}
+
+function makeAnalysisMove(uci) {
+  selectedSq = null; legalTargets = [];
+
+  if (!analysisActive || viewPly < branchFromPly) {
+    // Starta (om) analysläge från aktuell position
+    branchFromPly  = viewPly;
+    analysisLines  = [{ moves: [] }];
+    activeLineIdx  = 0;
+    analysisActive = true;
+  }
+
+  const rPly       = viewPly - branchFromPly;
+  const curMoves   = analysisLines[activeLineIdx].moves;
+
+  if (rPly < curMoves.length) {
+    // Mitt i en befintlig linje
+    if (curMoves[rPly] === uci) {
+      // Samma drag — bara navigera framåt
+      viewPly++;
+      renderAll();
+      if (sfEnabled) { const p = buildAtPly(viewPly); if (p) scheduleAnalysis(p.fen()); }
+      return;
+    }
+    // Annat drag — kolla om denna variant redan finns
+    const existIdx = analysisLines.findIndex((ln, i) =>
+      i !== activeLineIdx &&
+      ln.moves.slice(0, rPly).join(',') === curMoves.slice(0, rPly).join(',') &&
+      ln.moves[rPly] === uci
+    );
+    if (existIdx >= 0) {
+      activeLineIdx = existIdx;
+    } else {
+      // Skapa ny linje som delar prefix med aktiv linje
+      const newLine = { moves: [...curMoves.slice(0, rPly), uci] };
+      analysisLines.push(newLine);
+      activeLineIdx = analysisLines.length - 1;
+    }
+  } else {
+    // Förläng aktiv linje i slutet
+    curMoves.push(uci);
+  }
+
+  viewPly++;
+  renderAll();
+  if (sfEnabled) { const p = buildAtPly(viewPly); if (p) scheduleAnalysis(p.fen()); }
+}
+
+function exitAnalysis() {
+  analysisActive = false; branchFromPly = 0;
+  analysisLines  = []; activeLineIdx = 0;
+  selectedSq     = null; legalTargets = [];
+  viewPly = (gameData && gameData.moves) ? gameData.moves.length : 0;
+  renderAll();
+  if (sfEnabled) { const p = buildAtPly(viewPly); if (p) scheduleAnalysis(p.fen()); }
+}
+
+// Navigera till ett drag i en specifik analysvariant
+function goToPlyOnLine(ply, lIdx) {
+  selectedSq = null; legalTargets = [];
+  activeLineIdx = lIdx;
+  const maxP = branchFromPly + (analysisLines[lIdx] ? analysisLines[lIdx].moves.length : 0);
+  viewPly = Math.max(0, Math.min(ply, maxP));
+  renderAll();
+  if (sfEnabled) { const p = buildAtPly(viewPly); if (p) scheduleAnalysis(p.fen()); }
+}
+
+// Rendera bara brädet (utan att bygga om allt) — används vid pjäsmarkering
+function renderBoard() {
+  const boardEl = document.getElementById('board');
+  if (!boardEl) { renderAll(); return; }
+  // Snabb rebuild av brädet
+  const newOuter = document.createElement('div');
+  newOuter.innerHTML = boardOuterHTML();
+  const newBoard = newOuter.querySelector('#board');
+  if (newBoard) boardEl.replaceWith(newBoard);
+  updateNavButtons();
+}
+
+// ── Keyboard ──────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  // Don't hijack input fields
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowLeft'  || e.key === 'Left')  { e.preventDefault(); stepBack(); }
+  if (e.key === 'ArrowRight' || e.key === 'Right') { e.preventDefault(); stepForward(); }
+  if (e.key === 'Home')  { e.preventDefault(); goToStart(); }
+  if (e.key === 'End')   { e.preventDefault(); goToEnd(); }
+});
+
+// ── Controls ──────────────────────────────────────────────────
+function toggleFlip() { flipped = !flipped; renderAll(); }
+function refresh()    { fetchPairing(); schedulePoll(0); }
+
+// ── PGN-parser ────────────────────────────────────────────────
+// Tar bort kapslade varianter ( ... ) med stöd för nästlad djup
+function _pgnRemoveVariants(s) {
+  let r = '', d = 0;
+  for (const ch of s) {
+    if (ch === '(') d++;
+    else if (ch === ')') { if (d > 0) d--; }
+    else if (d === 0) r += ch;
+  }
+  return r;
+}
+
+// Tar bort kommentarer { ... }
+function _pgnRemoveComments(s) {
+  let r = '', inC = false;
+  for (const ch of s) {
+    if (ch === '{') inC = true;
+    else if (ch === '}') inC = false;
+    else if (!inC) r += ch;
+  }
+  return r;
+}
+
+// Extraherar rena SAN-drag från en PGN-movetextsträng
+function _pgnExtractMoves(movetext) {
+  let s = _pgnRemoveComments(movetext);
+  s = _pgnRemoveVariants(s);
+  s = s.replace(/\$\d+/g, '');               // ta bort NAG
+  s = s.replace(/\d+\s*\.{1,3}/g, ' ');      // ta bort dragtal "1." "1..."
+  const RESULTS = new Set(['1-0','0-1','1/2-1/2','*']);
+  return s.split(/\s+/).map(t => t.trim()).filter(t => t && !RESULTS.has(t));
+}
+
+// Parsar ett PGN-textblock till ett partiobject
+function _parseSinglePGN(text) {
+  const tags = {};
+  let lastTagEnd = 0;
+  const tagRe = /\[(\w+)\s+"([^"]*)"\]/g;
+  let m;
+  while ((m = tagRe.exec(text)) !== null) {
+    tags[m[1]] = m[2];
+    lastTagEnd = m.index + m[0].length;
+  }
+  const movetext = text.slice(lastTagEnd).trim();
+  const rawMoves = _pgnExtractMoves(movetext);
+
+  // Validera med chess.js
+  const c = new Chess();
+  const validMoves = [];
+  for (const san of rawMoves) {
+    try {
+      const mv = c.move(san);
+      if (mv) validMoves.push(mv.san);
+      else break;
+    } catch(e) { break; }
+  }
+  if (!Object.keys(tags).length && !validMoves.length) return null;
+  return { tags, moves: validMoves, result: normalizeResult(tags.Result || '*') };
+}
+
+// Delar upp en PGN-sträng i enskilda partier
+function parsePGN(text) {
+  const lines = text.split('\n');
+  const boundaries = [0];
+  let inMovetext = false;
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i].trim();
+    if (l.startsWith('[')) {
+      if (inMovetext) { boundaries.push(i); inMovetext = false; }
+    } else if (l && !l.startsWith(';')) {
+      inMovetext = true;
+    }
+  }
+  const games = [];
+  for (let bi = 0; bi < boundaries.length; bi++) {
+    const start = boundaries[bi];
+    const end   = bi + 1 < boundaries.length ? boundaries[bi + 1] : lines.length;
+    const block = lines.slice(start, end).join('\n');
+    const g = _parseSinglePGN(block);
+    if (g) games.push(g);
+  }
+  return games;
+}
+
+// Bygger pairing-objekt från PGN-taggar (matchar API-format)
+function _pgnMakePlayer(name, elo, title, fed, fideId) {
+  let fname = '', lname = '';
+  const n = (name || '?').trim();
+  if (n.includes(',')) {
+    const parts = n.split(','); lname = parts[0].trim(); fname = (parts[1] || '').trim();
+  } else {
+    const parts = n.split(' ');
+    lname = parts[parts.length - 1] || n;
+    fname = parts.slice(0, -1).join(' ');
+  }
+  return { fname, lname, title: title || '', rating: elo || '', federation: fed || '', fideid: fideId || '' };
+}
+
+// Aktivera ett enskilt PGN-parti
+function activatePGNGame(idx) {
+  if (idx < 0 || idx >= pgnGames.length) return;
+  pgnCurrentGame = idx;
+  const g = pgnGames[idx];
+  const t = g.tags;
+
+  gameData = { moves: g.moves, result: g.result, live: false, clock: null };
+  clockSnap = null; snapLocalMs = null;
+
+  pairing = {
+    white: _pgnMakePlayer(t.White, t.WhiteElo, t.WhiteTitle, t.WhiteCountry || t.WhiteFideCountry, t.WhiteFideId),
+    black: _pgnMakePlayer(t.Black, t.BlackElo, t.BlackTitle, t.BlackCountry || t.BlackFideCountry, t.BlackFideId),
+  };
+  tournamentInfo = { name: t.Event || 'PGN' };
+
+  viewPly = 0; sfEval = null;
+  analysisActive = false; branchFromPly = 0; analysisLines = []; activeLineIdx = 0;
+  selectedSq = null; legalTargets = [];
+
+  updateTitle();
+  renderAll();
+}
+
+// Hantera filval
+function loadPGNFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById('pgn-file-label');
+  if (label) label.textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const games = parsePGN(e.target.result);
+    if (!games.length) { alert('Inga giltiga partier hittades i filen.'); return; }
+    // Stoppa eventuellt pågående API-polling
+    if (pollTimer)  clearTimeout(pollTimer);
+    if (clockTimer) clearInterval(clockTimer);
+    if (overviewMode) { overviewMode = false; stopOverviewPolling(); stopOverviewAnalysis(); }
+    pgnMode = true; pgnGames = games; pgnCurrentGame = 0;
+    matchSchedule = []; matchP1Name = null; matchP2Name = null;
+    const btn = document.getElementById('btn-overview');
+    if (btn) btn.style.display = 'none';  // dölj "Alla bräden" i PGN-läge
+    activatePGNGame(0);
+  };
+  reader.readAsText(file);
+  // Nollställ input så samma fil kan laddas igen
+  input.value = '';
+}
+
+// Byt PGN-parti (från spellistan)
+function switchPGNGame(idx) {
+  if (sfWorker && sfSearching) sfWorker.postMessage('stop');
+  sfLines = []; sfEval = null;
+  activatePGNGame(idx);
+}
+
+// Avsluta PGN-läge (vid ny API-laddning)
+function exitPGNMode() {
+  if (!pgnMode) return;
+  pgnMode = false; pgnGames = []; pgnCurrentGame = 0; pgnView = 'games';
+  const btn = document.getElementById('btn-overview');
+  if (btn) btn.style.display = '';
+  const label = document.getElementById('pgn-file-label');
+  if (label) label.textContent = '';
+}
+
+// HTML för PGN-spellista i sidopanelen
+function pgnGamesHTML() {
+  if (!pgnGames.length) return '';
+  const eventName = (pgnGames[0] && pgnGames[0].tags.Event) || 'PGN';
+
+  // Kolla om det finns Round-taggar och om det finns flera unika ronder
+  const hasRounds = pgnGames.some(g => g.tags.Round && g.tags.Round !== '?');
+  const roundKey  = g => {
+    const r = g.tags.Round || '';
+    // "1.1", "1.2" → rond 1; "2" → rond 2
+    return r ? String(parseInt(r, 10) || r) : null;
+  };
+
+  let html = '';
+  if (hasRounds) {
+    // Gruppera per rond
+    const groups = {};
+    const order  = [];
+    pgnGames.forEach((g, i) => {
+      const rk = roundKey(g) || '?';
+      if (!groups[rk]) { groups[rk] = []; order.push(rk); }
+      groups[rk].push({ g, i });
+    });
+    // Hitta vilken rond det aktiva partiet tillhör
+    const activeRk = roundKey(pgnGames[pgnCurrentGame]) || '?';
+    order.forEach(rk => {
+      const label   = rk === '?' ? 'Okänd rond' : `ROND ${rk}`;
+      const isOpen  = rk === activeRk;  // öppna aktiv rond automatiskt
+      // Räkna ut poäng för ronden (vit/svarts perspektiv spelar ingen roll här)
+      const entries = groups[rk];
+      const rows = entries.map(({ g, i }) => {
+        const t = g.tags;
+        const wName = t.White ? t.White.split(',')[0].trim() : '?';
+        const bName = t.Black ? t.Black.split(',')[0].trim() : '?';
+        const norm  = g.result;
+        const resCls = (norm && norm !== '*') ? 'done' : 'upcoming';
+        const resText = norm === '1/2-1/2' ? '½–½' : (norm && norm !== '*' ? norm : '–');
+        const isActive = i === pgnCurrentGame;
+        return `<div class="schedule-row${isActive ? ' active' : ''}" onclick="switchPGNGame(${i})">
+          <span class="sch-players" style="font-size:0.78rem">${escHtml(wName)} – ${escHtml(bName)}</span>
+          <span class="sch-result ${resCls}">${resText}</span>
+        </div>`;
+      }).join('');
+      html += `<details class="pgn-round-group"${isOpen ? ' open' : ''}>
+        <summary>
+          <span class="pgn-round-toggle">▶</span>
+          <span>${label}</span>
+          <span class="pgn-round-score">${entries.length} partier</span>
+        </summary>
+        ${rows}
+      </details>`;
+    });
+  } else {
+    // Ingen rondinfo — lista sekventiellt med nummer
+    html = pgnGames.map((g, i) => {
+      const t = g.tags;
+      const wName = t.White ? t.White.split(',')[0].trim() : '?';
+      const bName = t.Black ? t.Black.split(',')[0].trim() : '?';
+      const norm  = g.result;
+      const resCls = (norm && norm !== '*') ? 'done' : 'upcoming';
+      const resText = norm === '1/2-1/2' ? '½–½' : (norm && norm !== '*' ? norm : '–');
+      const isActive = i === pgnCurrentGame;
+      return `<div class="schedule-row${isActive ? ' active' : ''}" onclick="switchPGNGame(${i})">
+        <span class="sch-num">${i + 1}</span>
+        <span class="sch-players">${escHtml(wName)} – ${escHtml(bName)}</span>
+        <span class="sch-result ${resCls}">${resText}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Bygg vyknapp-raden (visas bara om det finns >2 spelare = troligen turnering)
+  const players = new Set();
+  pgnGames.forEach(g => {
+    if (g.tags.White) players.add(g.tags.White.split(',')[0].trim());
+    if (g.tags.Black) players.add(g.tags.Black.split(',')[0].trim());
+  });
+  const showToggle = players.size > 2;
+  const toggleHTML = showToggle ? `<div class="pgn-view-toggle">
+    <button class="pgn-view-btn${pgnView === 'games' ? ' pgv-active' : ''}" onclick="setPgnView('games')">PARTIER</button>
+    <button class="pgn-view-btn${pgnView === 'standings' ? ' pgv-active' : ''}" onclick="setPgnView('standings')">TABELL</button>
+  </div>` : '';
+
+  return `<div class="panel-box">
+    <div class="panel-head" style="font-size:0.78rem">${escHtml(eventName)} · ${pgnGames.length} PARTI${pgnGames.length > 1 ? 'ER' : ''}</div>
+    ${toggleHTML}
+    ${html}
+  </div>`;
+}
+
+// Ställningstabell beräknad från laddad PGN (round-robin)
+function pgnStandingsHTML() {
+  if (!pgnGames.length) return '';
+
+  // Räkna poäng per spelare
+  const stats = {};
+  const addP  = name => { if (!stats[name]) stats[name] = { w: 0, d: 0, l: 0, pts: 0, gp: 0 }; };
+
+  pgnGames.forEach(g => {
+    const w = g.tags.White ? g.tags.White.split(',')[0].trim() : null;
+    const b = g.tags.Black ? g.tags.Black.split(',')[0].trim() : null;
+    const r = g.result;
+    if (!w || !b || !r || r === '*') return;
+    addP(w); addP(b);
+    if (r === '1-0') {
+      stats[w].w++; stats[w].pts += 1; stats[w].gp++;
+      stats[b].l++;                    stats[b].gp++;
+    } else if (r === '0-1') {
+      stats[b].w++; stats[b].pts += 1; stats[b].gp++;
+      stats[w].l++;                    stats[w].gp++;
+    } else if (r === '1/2-1/2') {
+      stats[w].d++; stats[w].pts += 0.5; stats[w].gp++;
+      stats[b].d++; stats[b].pts += 0.5; stats[b].gp++;
+    }
+  });
+
+  // Sortera: poäng desc, sedan vinster desc
+  const sorted = Object.entries(stats).sort(([,a],[,b]) =>
+    b.pts - a.pts || b.w - a.w
+  );
+
+  const eventName = (pgnGames[0] && pgnGames[0].tags.Event) || 'PGN';
+  const curW = pgnGames[pgnCurrentGame]?.tags?.White?.split(',')[0]?.trim() || '';
+  const curB = pgnGames[pgnCurrentGame]?.tags?.Black?.split(',')[0]?.trim() || '';
+  const fmtP = pts => pts % 1 === 0 ? String(pts) : pts.toFixed(1);
+
+  let rank = 1;
+  const rows = sorted.map(([name, s], i) => {
+    if (i > 0 && (s.pts !== sorted[i-1][1].pts || s.w !== sorted[i-1][1].w)) rank = i + 1;
+    const isCur = name === curW || name === curB;
+    // Kortare namn: ta sista delen (efternamn) om format "Efternamn, Förnamn"
+    const displayName = name.includes(',') ? name.split(',')[0].trim() : name;
+    return `<div class="pgn-standing-row${isCur ? ' pgn-st-active' : ''}">
+      <span class="pgn-st-rank">${rank}</span>
+      <span class="pgn-st-name" title="${escHtml(name)}">${escHtml(displayName)}</span>
+      <span class="pgn-st-wdl">${s.w}/${s.d}/${s.l}</span>
+      <span class="pgn-st-pts">${fmtP(s.pts)}</span>
+    </div>`;
+  }).join('');
+
+  // Vyknapp-raden
+  const toggleHTML = `<div class="pgn-view-toggle">
+    <button class="pgn-view-btn${pgnView === 'games' ? ' pgv-active' : ''}" onclick="setPgnView('games')">PARTIER</button>
+    <button class="pgn-view-btn${pgnView === 'standings' ? ' pgv-active' : ''}" onclick="setPgnView('standings')">TABELL</button>
+  </div>`;
+
+  return `<div class="panel-box">
+    <div class="panel-head" style="font-size:0.78rem">${escHtml(eventName)} · ${sorted.length} SPELARE</div>
+    ${toggleHTML}
+    <div class="pgn-st-header">
+      <span class="pgn-st-rank">#</span>
+      <span class="pgn-st-name">SPELARE</span>
+      <span class="pgn-st-wdl">V/R/F</span>
+      <span class="pgn-st-pts">P</span>
+    </div>
+    ${rows}
+  </div>`;
+}
+
+// Växla mellan Partier och Tabell
+function setPgnView(v) {
+  pgnView = v;
+  const el = document.getElementById('pgn-games-widget');
+  if (el) el.innerHTML = pgnView === 'standings' ? pgnStandingsHTML() : pgnGamesHTML();
+}
+
+// Wrapper som väljer rätt vy
+function pgnSidePanelHTML() {
+  return pgnView === 'standings' ? pgnStandingsHTML() : pgnGamesHTML();
+}
+
+// Bygg mini-bräde från spelets slutposition med samma SVG-pjäser som huvudbrädet
+function miniBoardHTML(data) {
+  if (!data || typeof Chess === 'undefined') {
+    return '<div class="mini-loading"><div class="spinner"></div></div>';
+  }
+  const c = new Chess();
+  for (const mv of (data.moves || [])) {
+    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
+    if (!san) break;
+    try { c.move(san); } catch(e) { break; }
+  }
+  const pos = c.board();
+  let html = '<div class="mini-board">';
+  for (let dr = 0; dr < 8; dr++) {
+    for (let dc = 0; dc < 8; dc++) {
+      const isLight = (dr + dc) % 2 === 0;
+      const piece = pos[dr][dc];
+      let inner = '';
+      if (piece) {
+        const key = piece.color + piece.type.toUpperCase();
+        if (PIECE_SVG[key]) {
+          inner = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[key])}" alt="${key}">`;
+        }
+      }
+      html += `<div class="mini-sq ${isLight ? 'light' : 'dark'}">${inner}</div>`;
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+// Rendera 4×2-grid med alla bräden
+function renderOverview() {
+  if (!overviewMode) { renderAll(); return; }
+
+  const boards = [...selectedBoards].sort((a, b) => a - b);
+  const n    = boards.length;
+  const cols = n <= 2 ? 2 : n <= 4 ? 2 : n <= 6 ? 3 : 4;
+
+  const panels = boards.map(g => {
+    const data  = overviewData[g];
+    const km    = overviewKeyMap[g];  // finns vid schema-läge
+    const p     = km ? overviewPairBySlot[g] : overviewPairings[g - 1];
+    const slotLabel = km ? km.label : `B${g}`;
+    const wName = p ? (p.white ? playerLabel(p.white) || '?' : '?') : '?';
+    const bName = p ? (p.black ? playerLabel(p.black) || '?' : '?') : '?';
+
+    let resText = '', resCls = '';
+    if (data) {
+      const norm   = normalizeResult(data.result);
+      const isLive = data.live === true && (!norm || norm === '*');
+      if (isLive)               { resText = '● LIVE'; resCls = 'live'; }
+      else if (norm && norm !== '*') { resText = resultLabel(norm); resCls = 'done'; }
+      else if ((data.moves||[]).length) resText = `${(data.moves||[]).length} drag`;
+    }
+
+    const norm   = data ? normalizeResult(data.result) : null;
+    const isDone = norm && norm !== '*';
+    const mbOverlay = isDone
+      ? `<div class="mb-result-overlay"><span class="mb-result-text">${resultLabel(norm)}</span></div>`
+      : '';
+    const boardHTML = data
+      ? mbBoardHTML(data)
+      : '<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center"><div class="spinner"></div></div>';
+
+    const ev = ovEvalData[g];
+    let wPct = 50;
+    if (ev) {
+      const normV = ev.btm ? -ev.value : ev.value;
+      wPct = ev.type === 'mate' ? (normV > 0 ? 95 : 5) : 50 + 50 * Math.tanh(normV / 400);
+    }
+    const bPct = 100 - wPct;
+    const evalOffCls = ovEvalEnabled ? '' : ' eval-off';
+
+    return `<div class="mb-panel${g === GAME ? ' mb-cur' : ''}" onclick="focusBoard(${g})">
+      <div class="mb-top">
+        <div class="mb-top-row1">
+          <span class="mb-board-num">${slotLabel}</span>
+          ${resText ? `<span class="mb-res ${resCls}">${resText}</span>` : ''}
+        </div>
+        <span class="mb-player-w">⬜ ${escHtml(wName)}</span>
+        <span class="mb-player-b">⬛ ${escHtml(bName)}</span>
+      </div>
+      <div class="mb-board-wrap">${boardHTML}${mbOverlay}</div>
+      <div class="mb-eval-bar${evalOffCls}" id="mb-eval-${g}">
+        <div class="mb-eval-w" style="flex-grow:${wPct.toFixed(1)}"></div>
+        <div class="mb-eval-b" style="flex-grow:${bPct.toFixed(1)}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const listContent = pgnMode
+    ? `<div id="pgn-games-widget">${pgnSidePanelHTML()}</div>`
+    : `<div id="schedule-widget">${tournamentType === 'team' ? teamBoardListHTML() : scheduleHTML()}</div>`;
+
+  document.getElementById('main').innerHTML =
+    `<div style="flex:1;min-width:0;overflow:hidden">
+       <div class="mb-grid mb-cols-${cols}">${panels}</div>
+     </div>
+     <div class="side-panel">
+       <div id="engine-panel-wrap">${enginePanelHTML()}</div>
+       <div id="side-list-wrap" style="flex:1;overflow-y:auto;min-height:0">${listContent}</div>
+     </div>`;
+}
+
+// Hämta data för valda bräden i vald runda
+async function fetchOverviewData() {
+  if (!overviewMode) return;
+
+  // Hämta pairings (behövs för spelarnamn)
+  try {
+    const idxR = await fetchFresh(`${BASE}/${TID}/round-${ROUND}/index.json`);
+    if (idxR.ok) {
+      const idxData = await idxR.json();
+      overviewPairings = idxData.pairings || [];
+    }
+  } catch(e) {}
+
+  // Hämta bara valda bräden parallellt
+  const boards = [...selectedBoards];
+  const results = await Promise.all(
+    boards.map(g =>
+      fetchFresh(`${BASE}/${TID}/round-${ROUND}/game-${g}.json`)
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null)
+    )
+  );
+  boards.forEach((g, i) => { if (results[i]) overviewData[g] = results[i]; });
+
+  if (overviewMode) {
+    renderOverview();
+    renderBoardSelector(); // uppdatera statusdottar
+  }
+}
+
+// ── Overview Stockfish round-robin ────────────────────────────
+// Analyserar ett bräde i taget till djup 12, cyklar genom 1–8.
+// Uppdaterar eval-baren direkt i DOM utan omritning.
+
+function analyzeNextOverviewBoard() {
+  if (!overviewMode || !sfWorker || !sfReady) return;
+
+  const boards = Object.keys(overviewData).map(Number).sort((a, b) => a - b);
+  if (!boards.length) return;
+
+  // Välj nästa bräde i cykeln
+  const idx = boards.indexOf(ovCurrentBoard);
+  ovCurrentBoard = boards[(idx + 1) % boards.length];
+
+  const data = overviewData[ovCurrentBoard];
+  if (!data || !(data.moves || []).length) {
+    // Inga drag än – hoppa vidare direkt
+    setTimeout(analyzeNextOverviewBoard, 200);
+    return;
+  }
+
+  // Bygg positionen
+  const c = new Chess();
+  for (const mv of (data.moves || [])) {
+    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
+    if (!san) break;
+    try { c.move(san); } catch(e) { break; }
+  }
+  ovCurrentBlackToMove = c.turn() === 'b';
+  const fen = c.fen();
+  sfCurrentFen = fen;
+
+  sfSearching = true;
+  sfWorker.postMessage('setoption name MultiPV value 1');
+  sfWorker.postMessage('position fen ' + fen);
+  sfWorker.postMessage('go depth 12');
+}
+
+function updateOverviewEvalBar(g, ev) {
+  let wPct;
+  if (ev.type === 'mate') {
+    const normV = ev.btm ? -ev.value : ev.value;
+    wPct = normV > 0 ? 95 : 5;
+  } else {
+    const normV = ev.btm ? -ev.value : ev.value;
+    wPct = 50 + 50 * Math.tanh(normV / 400);
+  }
+  const bPct = 100 - wPct;
+  // Stöder både ny multi-vy (mb-eval) och gammal mini-vy
+  const bar = document.getElementById('mb-eval-' + g) || document.getElementById('mini-eval-' + g);
+  if (!bar) return;
+  const wEl = bar.querySelector('.mb-eval-w') || bar.querySelector('.mini-eval-white');
+  const bEl = bar.querySelector('.mb-eval-b') || bar.querySelector('.mini-eval-black');
+  if (wEl) wEl.style.flexGrow = wPct.toFixed(1);
+  if (bEl) bEl.style.flexGrow = bPct.toFixed(1);
+}
+
+// Toggla Stockfish-eval i multi-vy
+function toggleOvEval() {
+  ovEvalEnabled = !ovEvalEnabled;
+  renderBoardSelector(); // uppdaterar knapptexten
+  // Uppdatera eval-bar-opacitet direkt i DOM utan omritning
+  document.querySelectorAll('.mb-eval-bar').forEach(el =>
+    el.classList.toggle('eval-off', !ovEvalEnabled)
+  );
+  if (ovEvalEnabled) startOverviewAnalysis();
+  else stopOverviewAnalysis();
+}
+
+function startOverviewAnalysis() {
+  if (!sfWorker) {
+    // Initiera SF tyst — analysen startar från readyok-handlern
+    initStockfish();
+    return;
+  }
+  if (!sfReady) return; // väntar på readyok
+  if (sfSearching) { sfWorker.postMessage('stop'); return; } // bestmove triggar nästa
+  ovCurrentBoard = null;
+  analyzeNextOverviewBoard();
+}
+
+function stopOverviewAnalysis() {
+  if (sfWorker && sfSearching) sfWorker.postMessage('stop');
+  ovCurrentBoard = null;
+}
+
+function startOverviewPolling() {
+  fetchOverviewData();
+  overviewPollTimer = setInterval(fetchOverviewData, 5000);
+}
+
+function stopOverviewPolling() {
+  if (overviewPollTimer) { clearInterval(overviewPollTimer); overviewPollTimer = null; }
+}
+
+// ── Lagmatch: bakgrundspoll av alla bräden ────────────────────
+async function fetchTeamPairings() {
+  try {
+    const r = await fetchFresh(`${BASE}/${TID}/round-${ROUND}/index.json`);
+    if (!r.ok) return;
+    const data = await r.json();
+    overviewPairings = data.pairings || [];
+    renderScheduleWidget();
+  } catch(e) {}
+}
+
+function startTeamPolling() {
+  fetchTeamPairings();
+  teamPollTimer = setInterval(fetchTeamPairings, 30000);
+}
+
+function stopTeamPolling() {
+  if (teamPollTimer) { clearInterval(teamPollTimer); teamPollTimer = null; }
+}
+
+// Navigera till ett bräde via lagmatch-panelen
+function switchToTeamBoard(g) {
+  if (g === GAME && gameData) return;
+  GAME = g;
+  selectedBoards = new Set([g]);
+  gameData = null; pairing = null; viewPly = 0; sfEval = null;
+  if (overviewMode) {
+    overviewMode = false;
+    stopOverviewPolling();
+    stopOverviewAnalysis();
+    overviewData = {};
+  }
+  if (clockTimer) clearInterval(clockTimer);
+  if (pollTimer)  clearTimeout(pollTimer);
+  document.getElementById('main').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
+  fetchPairing();
+  schedulePoll(0);
+}
+
+// ── Lagmatch: färgordning per bräde ──────────────────────────
+// Returnerar true om lag 1 spelar svart på bräde g
+function team1IsBlackOn(g) {
+  const board1Black = (team1Board1Color === 'black');
+  const isOdd = (g % 2 === 1);
+  return board1Black ? isOdd : !isOdd;
+}
+
+// ── Lagmatch: högerkolumn ─────────────────────────────────────
+function teamBoardListHTML() {
+  if (!overviewPairings.length) return '';
+
+  // Beräkna lagresultat (lag 1 = hemmalag)
+  let s1 = 0, s2 = 0, counted = 0;
+  overviewPairings.forEach((p, i) => {
+    const g = i + 1;
+    const r = normalizeResult(p.result);
+    const t1black = team1IsBlackOn(g);
+    if (r === '1-0')         { if (t1black) s2 += 1; else s1 += 1; counted++; }
+    else if (r === '0-1')    { if (t1black) s1 += 1; else s2 += 1; counted++; }
+    else if (r === '1/2-1/2') { s1 += 0.5; s2 += 0.5; counted++; }
+  });
+
+  const headLabel = (teamName1 && teamName2)
+    ? `${teamName1} – ${teamName2}`
+    : 'LAGMATCH';
+  const scoreStr = counted > 0 ? `${fmtScore(s1)}–${fmtScore(s2)}` : '';
+
+  const rows = overviewPairings.map((p, i) => {
+    const g        = i + 1;
+    const isActive = g === GAME;
+    const isChecked = teamCheckedBoards.has(g);
+    const t1black  = team1IsBlackOn(g);
+
+    // Hemmalag alltid till vänster
+    const leftP  = t1black ? p.black : p.white;
+    const rightP = t1black ? p.white : p.black;
+    const leftName  = leftP  ? playerLabel(leftP)  : '?';
+    const rightName = rightP ? playerLabel(rightP) : '?';
+
+    const r      = normalizeResult(p.result);
+    const isLive = p.live === true && (!r || r === '*');
+    const isDone = r && r !== '*';
+
+    // Resultat från lag 1:s perspektiv (vänster spelare)
+    let resText, resCls;
+    if (isLive)       { resText = '●';  resCls = 'live'; }
+    else if (!isDone) { resText = '–';  resCls = 'upcoming'; }
+    else {
+      const t1wins = (t1black && r === '0-1') || (!t1black && r === '1-0');
+      const draw   = r === '1/2-1/2';
+      resText = draw ? '½-½' : r;   // visa schacknotering: 1-0, 0-1, ½-½
+      resCls  = draw ? 'done' : (t1wins ? 'done' : 'upcoming');
+    }
+
+    return `<div class="schedule-row${isActive ? ' active' : ''}"
+        onclick="switchToTeamBoard(${g})" style="cursor:pointer">
+      <span class="sch-num" style="min-width:24px;font-size:0.78rem;font-family:'Bebas Neue',sans-serif">B${g}</span>
+      <span class="sch-players" style="font-size:0.82rem">${escHtml(leftName)} – ${escHtml(rightName)}</span>
+      <span class="sch-result ${resCls}" style="margin-left:4px;font-size:0.9rem">${resText}</span>
+      <input type="checkbox" class="sch-cb" ${isChecked ? 'checked' : ''}
+        onclick="toggleTeamCheck(${g},event)" title="Markera bräde">
+    </div>`;
+  }).join('');
+
+  // Åtgärdsrad när bräden är bocade
+  const n = teamCheckedBoards.size;
+  const actionBar = n > 0 ? `<div class="team-action-bar">
+    <button class="team-act-btn pgn" onclick="downloadTeamBoardsPGN()">⬇ PGN (${n})</button>
+    ${n >= 2 ? `<button class="team-act-btn multi" onclick="activateTeamMultiView()">⊞ Visa ${n} bräden</button>` : ''}
+  </div>` : '';
+
+  return `<div class="panel-box">
+    <div class="panel-head" style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px">
+      <span style="font-size:0.78rem">${escHtml(headLabel)}</span>
+      ${scoreStr ? `<span style="color:var(--accent);font-size:1rem;letter-spacing:.04em">${scoreStr}</span>` : ''}
+    </div>
+    ${rows}
+    ${actionBar}
+  </div>`;
+}
+
+// ── Lagmatch: kryssruta togglad ───────────────────────────────
+function toggleTeamCheck(g, event) {
+  event.stopPropagation(); // förhindra radklick
+  if (teamCheckedBoards.has(g)) teamCheckedBoards.delete(g);
+  else teamCheckedBoards.add(g);
+  renderScheduleWidget();
+}
+
+// ── Lagmatch: aktivera multi-vy med valda bräden ──────────────
+function activateTeamMultiView() {
+  if (teamCheckedBoards.size < 2) return;
+  selectedBoards = new Set(teamCheckedBoards);
+  if (!overviewMode) {
+    overviewMode = true;
+    if (pollTimer)  clearTimeout(pollTimer);
+    if (clockTimer) clearInterval(clockTimer);
+    ovEvalData = {};
+    ovEvalEnabled = sfEnabled; // synka med motor-inställningen
+  }
+  renderBoardSelector();
+  startOverviewPolling();
+  if (ovEvalEnabled) startOverviewAnalysis();
+}
+
+// ── Schema-multivy: aktivera för match/roundrobin/swiss ──────────
+function activateScheduleMultiView() {
+  if (selectedPGNRounds.size < 2) return;
+  const isSwiss = tournamentType === 'swiss';
+
+  // Bygg keyMap: slot → {round, board, label}
+  overviewKeyMap    = {};
+  overviewPairBySlot = {};
+  overviewData      = {};
+  ovEvalData        = {};
+
+  const sortedKeys = [...selectedPGNRounds].sort((a, b) => {
+    const [ra, ba] = a.split('-').map(Number);
+    const [rb, bb] = b.split('-').map(Number);
+    return ra !== rb ? ra - rb : ((ba||1) - (bb||1));
+  });
+
+  selectedBoards = new Set();
+  sortedKeys.forEach((key, i) => {
+    const slot = i + 1;
+    const parts = key.split('-').map(Number);
+    const round = parts[0];
+    const board = parts[1] || 1;
+    const label = isSwiss ? `R${round}·B${board}` : `R${round}`;
+    overviewKeyMap[slot] = { round, board, label };
+    selectedBoards.add(slot);
+  });
+
+  overviewMode  = true;
+  ovEvalEnabled = sfEnabled;
+  if (pollTimer)  clearTimeout(pollTimer);
+  if (clockTimer) clearInterval(clockTimer);
+
+  renderBoardSelector();
+  fetchOverviewDataSchedule();
+  if (ovEvalEnabled) startOverviewAnalysis();
+}
+
+async function fetchOverviewDataSchedule() {
+  if (!overviewMode) return;
+  const slots = [...selectedBoards].sort((a, b) => a - b);
+  await Promise.all(slots.map(async slot => {
+    const km = overviewKeyMap[slot];
+    if (!km) return;
+    try {
+      const [gameR, idxR] = await Promise.all([
+        fetchFresh(`${BASE}/${TID}/round-${km.round}/game-${km.board}.json`),
+        fetchFresh(`${BASE}/${TID}/round-${km.round}/index.json`)
+      ]);
+      if (gameR.ok) overviewData[slot] = await gameR.json();
+      if (idxR.ok) {
+        const idxData = await idxR.json();
+        const p = (idxData.pairings || [])[km.board - 1];
+        if (p) overviewPairBySlot[slot] = p;
+      }
+    } catch(e) {}
+  }));
+  if (overviewMode) { renderOverview(); renderBoardSelector(); }
+}
+
+// ── Lagmatch: ladda ner PGN för bocade bräden ─────────────────
+async function downloadTeamBoardsPGN() {
+  const boards = [...teamCheckedBoards].sort((a, b) => a - b);
+  const parts  = [];
+  for (const g of boards) {
+    try {
+      const r = await fetchFresh(`${BASE}/${TID}/round-${ROUND}/game-${g}.json`);
+      if (!r.ok) continue;
+      const data = await r.json();
+      const p    = overviewPairings[g - 1] || {};
+      const wName = p.white ? playerLabel(p.white) : '?';
+      const bName = p.black ? playerLabel(p.black) : '?';
+      const res   = normalizeResult(data.result) || '*';
+      const moves = (data.moves || []).map(mv =>
+        typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
+      ).filter(Boolean);
+
+      let pgn = `[Event "${escHtml(tournamentInfo ? tournamentInfo.name : 'Lagmatch')}"]\n`;
+      pgn += `[Round "${ROUND}.${g}"]\n`;
+      pgn += `[White "${wName}"]\n`;
+      pgn += `[Black "${bName}"]\n`;
+      pgn += `[Result "${res}"]\n\n`;
+      let moveText = '';
+      for (let i = 0; i < moves.length; i++) {
+        if (i % 2 === 0) moveText += `${Math.floor(i / 2) + 1}. `;
+        moveText += moves[i] + ' ';
+      }
+      pgn += moveText.trim() + ' ' + res;
+      parts.push(pgn);
+    } catch(e) { console.warn('PGN error board', g, e); }
+  }
+  if (!parts.length) return;
+  const blob = new Blob([parts.join('\n\n')], { type: 'application/x-chess-pgn' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `lagmatch-rond${ROUND}.pgn`;
+  a.click();
+  URL.revokeObjectURL(url);
+  teamCheckedBoards.clear();
+  renderScheduleWidget();
+}
+
+// ── Brädesväljare ─────────────────────────────────────────────
+
+// Bygg HTML för ett bräde i multi-vyn (skalat, inga koordinater)
+function mbBoardHTML(data) {
+  const c = new Chess();
+  for (const mv of (data.moves || [])) {
+    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
+    if (!san) break;
+    try { c.move(san); } catch(e) { break; }
+  }
+  const pos = c.board();
+  let html = '<div class="mb-board-grid">';
+  for (let dr = 0; dr < 8; dr++) {
+    for (let dc = 0; dc < 8; dc++) {
+      const isLight = (dr + dc) % 2 === 0;
+      const piece = pos[dr][dc];
+      let inner = '';
+      if (piece) {
+        const key = piece.color + piece.type.toUpperCase();
+        if (PIECE_SVG[key]) inner = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[key])}" alt="${key}">`;
+      }
+      html += `<div class="mb-sq ${isLight ? 'light' : 'dark'}">${inner}</div>`;
+    }
+  }
+  return html + '</div>';
+}
+
+// Render brädes-chips i väljaren
+function renderBoardSelector() {
+  const bar     = document.getElementById('board-selector');
+  const chips   = document.getElementById('board-chips');
+  const evalBtn = document.getElementById('btn-eval-toggle');
+  if (!bar || !chips) return;
+
+  const n = overviewPairings.length;
+  // Lagmatch/schweizisk: navigering sker i högerkolumnen – dölj chip-raden
+  if (n <= 1 || pgnMode || tournamentType === 'team' || tournamentType === 'swiss') { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+
+  chips.innerHTML = overviewPairings.map((p, i) => {
+    const g     = i + 1;
+    const wName = p.white ? (p.white.lname || playerLabel(p.white) || '?') : '?';
+    const bName = p.black ? (p.black.lname || playerLabel(p.black) || '?') : '?';
+    const isSel = selectedBoards.has(g);
+    const data  = overviewData[g];
+    let dotHtml = '';
+    if (data) {
+      const norm   = normalizeResult(data.result);
+      const isLive = data.live === true && (!norm || norm === '*');
+      if (isLive) dotHtml = '<span class="bc-dot live">●</span>';
+      else if (norm && norm !== '*') dotHtml = '<span class="bc-dot done">✓</span>';
+    }
+    return `<button class="board-chip${isSel ? ' bc-sel' : ''}" onclick="toggleBoardSelection(${g})">
+      <span class="bc-num">B${g}</span>
+      <span class="bc-names">${escHtml(wName)}–${escHtml(bName)}</span>
+      ${dotHtml}
+    </button>`;
+  }).join('');
+
+  // Eval-knapp: bara synlig i multi-vy
+  if (evalBtn) {
+    const isMulti = selectedBoards.size > 1;
+    evalBtn.style.display = isMulti ? '' : 'none';
+    if (isMulti) {
+      evalBtn.className = ovEvalEnabled ? 'btn btn-primary' : 'btn';
+      evalBtn.style.cssText = 'font-size:0.75rem;padding:4px 10px';
+      evalBtn.textContent   = ovEvalEnabled ? '⬛ Eval PÅ' : '⬜ Eval AV';
+    }
+  }
+}
+
+// Klick på ett chip → välj/avvälj bräde
+function toggleBoardSelection(g) {
+  if (selectedBoards.has(g)) {
+    if (selectedBoards.size <= 1) return; // minst ett bräde måste vara valt
+    selectedBoards.delete(g);
+  } else {
+    selectedBoards.add(g);
+  }
+
+  const isMulti = selectedBoards.size > 1;
+
+  if (isMulti) {
+    if (!overviewMode) {
+      overviewMode = true;
+      if (pollTimer)       clearTimeout(pollTimer);
+      if (clockTimer)      clearInterval(clockTimer);
+      if (sfAnalysisTimer) clearTimeout(sfAnalysisTimer);
+      ovEvalData = {};
+      if (!ovEvalEnabled) stopOverviewAnalysis();
+    }
+    renderBoardSelector();
+    startOverviewPolling();
+  } else {
+    const onlyBoard = [...selectedBoards][0];
+    if (overviewMode) {
+      overviewMode = false;
+      stopOverviewPolling();
+      stopOverviewAnalysis();
+    }
+    overviewData = {};
+    renderBoardSelector();
+    if (onlyBoard !== GAME) {
+      GAME = onlyBoard;
+      gameData = null; pairing = null; viewPly = 0; sfEval = null;
+      if (clockTimer) clearInterval(clockTimer);
+      if (pollTimer)  clearTimeout(pollTimer);
+      document.getElementById('main').innerHTML =
+        '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
+      fetchPairing();
+      schedulePoll(0);
+    } else {
+      renderAll();
+      schedulePoll(2000);
+      if (sfEnabled && sfWorker && sfReady) {
+        const pos = buildAtPly(viewPly);
+        if (pos) scheduleAnalysis(pos.fen());
+      }
+    }
+  }
+}
+
+// Klick på ett bräde i multi-vy → fokusera enstaka bräde
+function focusBoard(g) {
+  if (!overviewMode) return;
+  overviewMode = false;
+  stopOverviewPolling();
+  stopOverviewAnalysis();
+  overviewData        = {};
+  overviewPairBySlot  = {};
+  const km = overviewKeyMap[g];
+  overviewKeyMap      = {};
+  if (km) {
+    // Schema-läge: byt till rätt rond + bräde
+    ROUND = km.round;
+    GAME  = km.board;
+  } else {
+    GAME = g;
+  }
+  selectedBoards = new Set([GAME]);
+  gameData = null; pairing = null; viewPly = 0; sfEval = null;
+  if (clockTimer) clearInterval(clockTimer);
+  if (pollTimer)  clearTimeout(pollTimer);
+  renderBoardSelector();
+  document.getElementById('main').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Hämtar speldata…</div>';
+  fetchPairing();
+  schedulePoll(0);
+}
+
+// Äldre funktion (bakåtkompatibilitet)
+function switchToBoard(g) { focusBoard(g); }
+
+// ── Kanalplattform ────────────────────────────────────────────
+// Hämtar config.json och renderar kanaltabbar.
+// Returnerar true om minst en kanal hittades (och första kanalen laddades).
+async function fetchChannelConfig() {
+  try {
+    const r = await fetch('config.json', { cache: 'no-store' });
+    if (!r.ok) return false;
+    const data = await r.json();
+    channels = (data.channels || []).filter(c => c.active !== false);
+    renderChannelNav();
+    if (channels.length > 0) {
+      selectChannel(channels[0].id);
+      return true;
+    }
+    return false;
+  } catch(e) {
+    console.warn('config.json kunde inte laddas:', e);
+    return false;
+  }
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderChannelNav() {
+  const nav  = document.getElementById('channel-nav');
+  const tabs = document.getElementById('channel-tabs');
+  if (!nav || !tabs) return;
+  if (channels.length === 0) { nav.classList.remove('has-channels'); return; }
+  nav.classList.add('has-channels');
+  tabs.innerHTML = channels.map(ch => {
+    const isActive  = ch.id === activeChannelId;
+    const typeLabel = ch.type === 'live' ? 'LIVE' : 'PGN';
+    const typeCls   = ch.type === 'live' ? 'live' : 'pgn';
+    return `<button class="channel-tab${isActive ? ' ch-active' : ''}"
+        onclick="selectChannel('${escHtml(ch.id)}')">
+      <span class="ch-type-badge ${typeCls}">${typeLabel}</span>
+      ${escHtml(ch.title || '(namnlös)')}
+    </button>`;
+  }).join('');
+}
+
+function selectChannel(id) {
+  const ch = channels.find(c => c.id === id);
+  if (!ch) return;
+  activeChannelId = id;
+  renderChannelNav();
+
+  // Sätt turneringstyp och lagnamn från kanalconfig
+  tournamentType   = ch.tournamentType  || 'match';
+  teamName1        = ch.team1           || null;
+  teamName2        = ch.team2           || null;
+  team1Board1Color = ch.team1Board1Color || 'black'; // default: hemmalag svart bräde 1
+  teamCheckedBoards = new Set();
+
+  if (ch.type === 'live') {
+    // Extrahera UUID från TID-fältet (kan vara url eller ren uuid)
+    const uuid = extractUUID(ch.tid || '');
+    if (!uuid) { alert('Ogiltigt TID i kanal: ' + escHtml(ch.title)); return; }
+    document.getElementById('cfg-id').value = uuid;
+    document.getElementById('cfg-round').selectedIndex = 0;
+    document.getElementById('cfg-game').selectedIndex  = 0;
+    loadGame();
+
+  } else if (ch.type === 'pgn') {
+    if (!ch.pgn) { alert('Ingen PGN-data i kanal: ' + escHtml(ch.title)); return; }
+    // Städa upp live-läge
+    if (clockTimer) clearInterval(clockTimer);
+    if (pollTimer)  clearTimeout(pollTimer);
+    if (overviewMode) {
+      overviewMode = false;
+      stopOverviewPolling();
+      overviewData = {}; overviewPairings = [];
+      const btn = document.getElementById('btn-overview');
+      if (btn) { btn.classList.remove('btn-primary'); btn.textContent = '⊞ Alla bräden'; }
+    }
+    // Parsea och aktivera PGN
+    const games = parsePGN(ch.pgn);
+    if (!games || games.length === 0) {
+      alert('Inga giltiga partier hittades i PGN-datan för: ' + ch.title);
+      return;
+    }
+    exitPGNMode();
+    pgnMode = true;
+    pgnGames = games;
+    pgnCurrentGame = 0;
+    document.getElementById('match-title').textContent = ch.title || 'PGN';
+    const label = document.getElementById('pgn-file-label');
+    if (label) label.textContent = ch.title || 'PGN-kanal';
+    activatePGNGame(0);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────
+(async function() {
+  const uuid = extractUUID(location.hash.replace('#',''));
+  if (uuid) { TID = uuid; document.getElementById('cfg-id').value = uuid; }
+
+  // Försök ladda kanalconfig från servern.
+  // Om kanaler finns laddas den första automatiskt via selectChannel().
+  // Annars faller vi tillbaka på standardpartiet (TID i hash eller defaultvärdet).
+  const hasChannels = await fetchChannelConfig();
+  if (!hasChannels) {
+    fetchTournament();
+    fetchPairing();
+    schedulePoll(0);
+  }
+
+  // Förhindra att piltangenter scrollar sidan
+  window.addEventListener('keydown', e => {
+    if (['ArrowLeft','ArrowRight','Home','End'].includes(e.key) &&
+        e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>

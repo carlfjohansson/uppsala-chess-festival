@@ -1,0 +1,36 @@
+{
+  "channels": [
+    {
+      "id": "grupp-1",
+      "title": "Grupp 1",
+      "type": "live",
+      "tournamentType": "swiss",
+      "tid": "b9c6cd2c-e05d-4b1a-a4db-25c98c291b52",
+      "active": true
+    },
+    {
+      "id": "grupp-2",
+      "title": "Grupp 2",
+      "type": "live",
+      "tournamentType": "swiss",
+      "tid": "8d579e31-c216-43c4-817e-597ba58db845",
+      "active": true
+    },
+    {
+      "id": "grupp-3",
+      "title": "Grupp 3",
+      "type": "live",
+      "tournamentType": "swiss",
+      "tid": "3e1dead3-0b84-4d70-8dfe-34b099bd019b",
+      "active": true
+    },
+    {
+      "id": "grupp-4",
+      "title": "Grupp 4 (2 partier live)",
+      "type": "live",
+      "tournamentType": "swiss",
+      "tid": "b0741cd4-79ba-4ad3-990b-4e766946ca16",
+      "active": true
+    }
+  ]
+}
