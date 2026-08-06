@@ -580,6 +580,18 @@ function ibBoard() {
   el.innerHTML = h;
 }
 
+function ibVarHTML(vk) {
+  const vm = IB.allVars[vk];
+  if (!vm || !vm.length) return '';
+  let h = '<div class="ib-var-line">(';
+  vm.forEach((s, mi) => {
+    const inV = String(IB.varBase) === vk && IB.varIdx === mi + 1;
+    h += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${vk},${mi+1})">${sweSAN(s)}</span>`;
+    if (mi < vm.length - 1) h += ' ';
+  });
+  return h + ')</div>';
+}
+
 function ibMoves() {
   const el = document.getElementById('single-ml');
   if (!el) return;
@@ -588,42 +600,20 @@ function ibMoves() {
     return;
   }
   let html = '';
-  for (let i = 0; i < IB.mains.length; i++) {
-    const n  = Math.floor(i / 2) + 1;
-    const iw = i % 2 === 0;
-    const cur = IB.varBase < 0 && IB.idx === i + 1;
-    const san = sweSAN(IB.mains[i]);
-    if (iw) html += `<div class="ib-row"><span class="ml-num">${n}.</span>`;
-    html += `<span class="${iw ? 'ib-w' : 'ib-b'}${cur ? ' ib-cur' : ''}" onclick="ibGoto(${i+1})">${san}</span>`;
-    // Variant som börjar EFTER drag i+1
-    const vk = String(i + 1);
-    if (IB.allVars[vk] && IB.allVars[vk].length) {
-      const vm = IB.allVars[vk];
-      let vhtml = '<span class="ib-var-line">(';
-      vm.forEach((s, mi) => {
-        const inV = IB.varBase === (i + 1) && IB.varIdx === mi + 1;
-        vhtml += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${i+1},${mi+1})">${sweSAN(s)}</span>`;
-        if (mi < vm.length - 1) vhtml += ' ';
-      });
-      vhtml += ')</span>';
-      if (iw) {
-        html += `<span class="ib-b"></span></div><div class="ib-row"><span></span><span style="grid-column:2/-1">${vhtml.replace('<span class="ib-var-line">(','').replace(')</span>','')}</span></div>`;
-        // Actually let's do it simpler:
-      }
-    }
-    if (!iw || i === IB.mains.length - 1) html += iw ? '<span class="ib-b"></span></div>' : '</div>';
-    // Variant visas på ny rad
-    const vk2 = String(i + 1);
-    if (IB.allVars[vk2] && IB.allVars[vk2].length) {
-      let vhtml = '<div class="ib-var-line">(';
-      IB.allVars[vk2].forEach((s, mi) => {
-        const inV = IB.varBase === (i + 1) && IB.varIdx === mi + 1;
-        vhtml += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${i+1},${mi+1})">${sweSAN(s)}</span>`;
-        if (mi < IB.allVars[vk2].length - 1) vhtml += ' ';
-      });
-      vhtml += ')</div>';
-      html += vhtml;
-    }
+  for (let i = 0; i < IB.mains.length; i += 2) {
+    const n    = i / 2 + 1;
+    const wSan = sweSAN(IB.mains[i]);
+    const bSan = IB.mains[i+1] ? sweSAN(IB.mains[i+1]) : '';
+    const wCur = IB.varBase < 0 && IB.idx === i + 1;
+    const bCur = IB.varBase < 0 && IB.idx === i + 2;
+    html += `<div class="ib-row"><span class="ml-num">${n}.</span>`;
+    html += `<span class="ib-w${wCur ? ' ib-cur' : ''}" onclick="ibGoto(${i+1})">${wSan}</span>`;
+    html += bSan
+      ? `<span class="ib-b${bCur ? ' ib-cur' : ''}" onclick="ibGoto(${i+2})">${bSan}</span>`
+      : `<span class="ib-b"></span>`;
+    html += `</div>`;
+    html += ibVarHTML(String(i + 1));
+    if (bSan) html += ibVarHTML(String(i + 2));
   }
   el.innerHTML = html;
   el.querySelector('.ib-cur')?.scrollIntoView({ block: 'nearest' });
@@ -635,26 +625,24 @@ function ibClick(sq) {
     const move = c.moves({ square: IB.selSq, verbose: true }).find(m => m.to === sq);
     if (move) {
       const san = move.san;
+      if (IB.varBase < 0 && IB.mains[IB.idx] === san) {
+        // Matchar nästa huvuddrag → navigera framåt
+        IB.idx++; IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); ibUpdNav(); return;
+      }
+      // Lägg till/fortsätt variant
       if (IB.varBase < 0) {
-        // Är det nästa huvuddrag?
-        if (IB.mains[IB.idx] === san || (IB.mains[IB.idx] && new Chess().move && (() => { try { const t = ibC(); t.move(IB.mains[IB.idx]); return t.fen() === (() => { const u = ibC(); u.move(san); return u.fen(); })(); } catch(e) { return false; } })() )) {
-          IB.idx++; IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); return;
-        }
-        // Ny variant
         const vk = String(IB.idx);
-        if (!IB.allVars[vk]) IB.allVars[vk] = [];
-        IB.allVars[vk].push(san);
+        IB.allVars[vk] = [san];
         IB.varBase = IB.idx;
         IB.varMvs  = IB.allVars[vk];
-        IB.varIdx  = IB.allVars[vk].length;
+        IB.varIdx  = 1;
       } else {
-        // Fortsätt befintlig variant
         const vk = String(IB.varBase);
         IB.allVars[vk].push(san);
         IB.varMvs = IB.allVars[vk];
         IB.varIdx++;
       }
-      IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); return;
+      IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); ibUpdNav(); return;
     }
     // Klick på egen pjäs → byt markering
     const pc = c.get(sq);
@@ -874,7 +862,10 @@ function renderSingle() {
         </div>
         <button class="sf-btn" id="sf-btn" onclick="sfToggle()">▶ Analys på</button>
       </div>
-      <div class="sf-bar-wrap" id="sf-bar-wrap"><div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div></div>
+      <div class="sf-bar-wrap" id="sf-bar-wrap" style="position:relative">
+        <div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div>
+        <div style="position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 5px;pointer-events:none;font-size:0.55rem;font-weight:800;color:rgba(255,255,255,0.4);letter-spacing:.06em"><span>VIT</span><span>SV</span></div>
+      </div>
       <div class="sf-pv" id="sf-pv"></div>
       <div class="single-ml" id="single-ml"></div>
     </div>`;
