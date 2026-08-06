@@ -278,12 +278,6 @@
     }
     .sf-bar-wrap.vis { display: block; }
     .sf-bar-w { height: 100%; background: #f0f0f0; transition: width .4s; }
-    .sf-eval {
-      font-size: clamp(0.7rem, 1.4vh, 0.9rem); font-weight: 700;
-      font-variant-numeric: tabular-nums; color: var(--navy);
-      display: none;
-    }
-    .sf-eval.vis { display: inline; }
     .sf-pv {
       font-size: clamp(0.6rem, 1.2vh, 0.78rem); color: var(--muted);
       display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -398,23 +392,23 @@ function sfMsg(e) {
     else if (cpM) score = parseInt(cpM[1]) / 100;
 
     if (score !== null) {
-      const evalEl = document.getElementById('sf-eval');
-      const barEl  = document.getElementById('sf-bar-w');
-      const pvEl   = document.getElementById('sf-pv');
-      if (!evalEl) return;
+      const barEl = document.getElementById('sf-bar-w');
+      const pvEl  = document.getElementById('sf-pv');
 
-      // Vit positivt = vit bättre
-      let label = isMate ? (score > 0 ? `#${score}` : `#${score}`) : (score > 0 ? `+${score.toFixed(1)}` : score.toFixed(1));
-      evalEl.textContent = label;
+      // Evalvärde
+      let label = isMate
+        ? (score > 0 ? `#${score}` : `#${score}`)
+        : (score > 0 ? `+${score.toFixed(2)}` : score.toFixed(2));
+      sfLastEval = label;
 
       // Stapel
-      let pct = isMate ? (score > 0 ? 90 : 10) : 50 + Math.min(Math.max(score * 5, -40), 40);
+      let pct = isMate ? (score > 0 ? 92 : 8) : 50 + Math.min(Math.max(score * 6, -42), 42);
       if (barEl) barEl.style.width = pct + '%';
 
-      // Bästa drag i svensk notation
+      // Eval + drag på en rad
       if (pvEl && pvM) {
         const uciMoves = pvM[1].trim().split(' ');
-        pvEl.textContent = 'Bästa: ' + uciToSwe(sfCurrentFen, uciMoves);
+        pvEl.textContent = pvLine(sfCurrentFen, uciMoves, label);
       }
     }
   }
@@ -422,33 +416,44 @@ function sfMsg(e) {
 
 let sfCurrentFen = null;
 
-function uciToSwe(fen, uciMoves) {
-  if (!fen) return uciMoves.join(' ');
+let sfLastEval = '';
+
+function pvLine(fen, uciMoves, evalStr) {
+  if (!fen || !uciMoves.length) return evalStr;
   try {
     const c = new Chess(fen);
-    return uciMoves.slice(0, 5).map(uci => {
-      const from = uci.slice(0, 2), to = uci.slice(2, 4), promo = uci[4];
-      try { const m = c.move({ from, to, promotion: promo }); return m ? sweSAN(m.san) : uci; }
-      catch(e) { return uci; }
-    }).join(' ');
-  } catch(e) { return uciMoves.join(' '); }
+    const parts = fen.split(' ');
+    let moveNum = parseInt(parts[5]) || 1;
+    let isBlack = parts[1] === 'b';
+    let line = isBlack ? moveNum + '\u2026' : ''; // … om svart börjar
+
+    for (const uci of uciMoves.slice(0, 14)) {
+      const from = uci.slice(0,2), to = uci.slice(2,4), promo = uci[4];
+      try {
+        const m = c.move({ from, to, promotion: promo });
+        if (!m) break;
+        const san = sweSAN(m.san);
+        if (!isBlack) { line += (line ? ' ' : '') + moveNum + '.' + san; }
+        else           { line += ' ' + san; moveNum++; }
+        isBlack = !isBlack;
+      } catch(e) { break; }
+    }
+    return evalStr + '  ' + line;
+  } catch(e) { return evalStr; }
 }
 
 function sfApplyUI() {
   const btn     = document.getElementById('sf-btn');
   const barWrap = document.getElementById('sf-bar-wrap');
-  const evalEl  = document.getElementById('sf-eval');
   const pvEl    = document.getElementById('sf-pv');
   if (!btn) return;
   if (sfOn) {
     btn.textContent = '⬛ Analys av'; btn.classList.add('on');
     barWrap && barWrap.classList.add('vis');
-    evalEl  && evalEl.classList.add('vis');
     pvEl    && pvEl.classList.add('vis');
   } else {
     btn.textContent = '▶ Analys på'; btn.classList.remove('on');
     barWrap && barWrap.classList.remove('vis');
-    evalEl  && evalEl.classList.remove('vis');
     pvEl    && pvEl.classList.remove('vis');
   }
 }
@@ -632,7 +637,6 @@ function renderSingle() {
       </div>
       <div class="sf-row">
         <button class="sf-btn" id="sf-btn" onclick="sfToggle()">▶ Analys på</button>
-        <span class="sf-eval" id="sf-eval"></span>
       </div>
       <div class="sf-bar-wrap" id="sf-bar-wrap"><div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div></div>
       <div class="sf-pv" id="sf-pv"></div>
