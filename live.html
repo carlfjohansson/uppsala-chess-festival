@@ -1191,6 +1191,7 @@
       <li><a href="/">Hem</a></li>
       <li><a href="/resultat.html">Resultat</a></li>
       <li><a href="/live.html" class="active">⚡ Live</a></li>
+      <li><a href="/display.html" style="font-size:0.75rem;opacity:0.5;letter-spacing:.04em" title="Visningsläge för spellokal">📺</a></li>
     </ul>
   </div>
 </nav>
@@ -3965,7 +3966,7 @@ function initStadium() {
       <div class="sg-boards">`;
 
     for (let b = 1; b <= grp.boards; b++) {
-      html += `<div class="sg-board">
+      html += `<div class="sg-board" onclick="focusGame('${grp.id}', ${b})" title="Klicka för fullständig spelvy">
         <div class="sg-board-top">
           <span class="sg-board-num">Bord ${b}</span>
           <span class="sg-board-result" id="sgr-${grp.id}-${b}"></span>
@@ -3991,7 +3992,7 @@ function initStadium() {
           <div class="sg-eval-score" id="sges-${grp.id}-${b}">…</div>
         </div>
         <button class="sg-analysis-btn" id="sgab-${grp.id}-${b}"
-          onclick="toggleStadiumAnalysis('${grp.id}', ${b})">⚡ Analys AV</button>
+          onclick="event.stopPropagation(); toggleStadiumAnalysis('${grp.id}', ${b})">⚡ Analys AV</button>
       </div>`;
     }
 
