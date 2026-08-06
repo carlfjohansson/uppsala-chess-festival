@@ -157,6 +157,8 @@
   .btn-add:hover { border-color: var(--navy); color: var(--navy); background: rgba(13, 58, 110, 0.04); }
   .btn-add.added { background: var(--green); border-color: var(--green); color: #fff; }
   .btn-add.added:hover { background: #3a9566; border-color: #3a9566; }
+  .btn-add.closed { background: #6b7280; border-color: #6b7280; color: #fff; cursor: not-allowed; opacity: 0.75; }
+  .btn-add.closed:hover { background: #6b7280; border-color: #6b7280; color: #fff; }
 
   /* CART BAR */
   .cart-bar {
@@ -1011,6 +1013,41 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelector('nav.top ul').classList.remove('open');
     });
   });
+
+  // ── Anmälningsdeadlines ──────────────────────────────────────────
+  // Datum/tid i CEST (UTC+2). Anmälan stängs en dag innan tävlingsstart,
+  // eller vid startögonblicket för Weekend 1 (som startar dag 1 av festivalen).
+  // För att ändra inför nästa år: uppdatera datumen nedan.
+  const DEADLINES = {
+    'Weekend 1':   new Date('2026-08-07T16:00:00+02:00'), // Fre 7 aug 16:00
+    'Snabbschack': new Date('2026-08-09T23:59:00+02:00'), // Sön 9 aug (dagen innan)
+    'Chess960':    new Date('2026-08-10T23:59:00+02:00'), // Mån 10 aug
+    'Blixt':       new Date('2026-08-11T23:59:00+02:00'), // Tis 11 aug
+    'Amatör':      new Date('2026-08-12T23:59:00+02:00'), // Ons 12 aug
+    'Weekend 2':   new Date('2026-08-13T23:59:00+02:00'), // Tor 13 aug
+    'Ungdom':      new Date('2026-08-15T23:59:00+02:00'), // Lör 15 aug
+  };
+
+  function applyDeadlines() {
+    const now = new Date();
+    const lang = document.documentElement.lang;
+    document.querySelectorAll('.btn-add').forEach(btn => {
+      const name = btn.dataset.tournament;
+      if (!DEADLINES[name]) return;
+      if (now >= DEADLINES[name] && !btn.classList.contains('added')) {
+        btn.classList.add('closed');
+        btn.disabled = true;
+        btn.onclick = null;
+        btn.innerHTML = lang === 'en'
+          ? '<span data-en>Tournament has started</span>'
+          : '<span data-sv>Tävlingen har startat</span>';
+      }
+    });
+  }
+
+  applyDeadlines();
+  // Kolla varje minut (ifall sidan är öppen precis när deadline passeras)
+  setInterval(applyDeadlines, 60000);
 });
 
 function togglePlayerSearch() {

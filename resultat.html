@@ -106,6 +106,17 @@ footer a{color:#f5cb6b}
   .tourn-grid{grid-template-columns:repeat(2,1fr)}
   .results-header{flex-direction:column;align-items:flex-start}
 }
+
+/* ── Berger-grupper ─────────────────────────────────────── */
+#groups-panel { margin-top: 40px; }
+.groups-heading { font-family: var(--serif); font-size: 1.4rem; color: var(--navy); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--gold); }
+.group-section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 28px; overflow: hidden; }
+.group-section-header { background: var(--navy); color: #fff; padding: 12px 20px; display: flex; align-items: baseline; gap: 12px; }
+.group-section-header h3 { font-family: var(--serif); font-size: 1.1rem; color: #f5cb6b; margin: 0; }
+.group-section-header .group-range { font-size: .78rem; color: #c9bfa8; }
+.group-section-body { padding: 0; }
+.groups-placeholder { background: var(--panel); border: 1px dashed var(--line); border-radius: 10px; padding: 32px; text-align: center; color: var(--ink-mute); }
+.groups-placeholder strong { display: block; font-size: 1rem; color: var(--navy); margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -159,6 +170,13 @@ footer a{color:#f5cb6b}
       <div id="tab-startlist" style="display:none"></div>
       <div class="gen" id="results-footer"></div>
     </div>
+
+    <!-- ── Berger-grupper Weekend 1 ────────────────────────────── -->
+    <div id="groups-panel" style="display:none">
+      <h2 class="groups-heading sv">Bergergrupper – Weekend 1</h2>
+      <h2 class="groups-heading en" style="display:none">Berger Groups – Weekend 1</h2>
+      <div id="groups-container"></div>
+    </div>
   </div>
 </div>
 
@@ -178,6 +196,13 @@ const TOURNAMENTS = [
   {id:'youth',sv:'Ungdom',           en:'Youth',          date:'16 aug', youth:true},
 ];
 const YOUTH_IDS = [18502,18501,18500,18499];
+
+// ── Berger-grupper Weekend 1 ─────────────────────────────────────────
+// Fyll i riktiga SSF-turnerings-IDs när de är tilldelade (tätt inpå rond 1).
+// Varje element är ett SSF-turnerings-ID för en Bergergrupp.
+// Exempel nästa år: const WEEKEND1_GROUPS = [12345, 12346, 12347, 12348];
+// Lämna tomt ([]) tills IDsen är kända — då visas ett väntningsmeddelande.
+const WEEKEND1_GROUPS = []; // ← Lägg in grupp-IDs här när de är klara
 const BASE = 'https://member.schack.se/public/api/v1';
 let lang = 'sv';
 let currentId = null;
@@ -455,6 +480,73 @@ function standingsTable(players) {
     h+=`<td class="td-cell">${p.sp}</td><td class="td-cell td-w">${p.wins}</td><td class="td-cell td-d">${p.draws}</td><td class="td-cell td-l">${p.losses}</td><td class="td-score">${fmt(p.score)}</td><td class="td-kvp">${p.kvp}</td></tr>`;
   });
   return h+'</tbody></table>';
+}
+
+
+// ── Berger-grupper ───────────────────────────────────────────────────
+async function loadGroups() {
+  const container = document.getElementById('groups-container');
+  if (!WEEKEND1_GROUPS.length) {
+    container.innerHTML = `<div class="groups-placeholder">
+      <strong>${lang==='sv'?'Grupperna sätts ihop tätt inpå tävlingsstart':'Groups will be formed shortly before round 1'}</strong>
+      <p>${lang==='sv'?'Ladda om sidan när tävlingen startat så visas krysstabellerna här.':'Reload the page once the tournament has started to see the cross-tables here.'}</p>
+    </div>`;
+    return;
+  }
+  container.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar grupper…':'Fetching groups…'}</div>`;
+  
+  const sections = await Promise.all(WEEKEND1_GROUPS.map((gid, idx) => loadOneGroup(gid, idx)));
+  container.innerHTML = sections.join('');
+}
+
+async function loadOneGroup(gid, idx) {
+  const groupNum = idx + 1;
+  const header = `<div class="group-section-header">
+    <h3>${lang==='sv'?'Grupp':'Group'} ${groupNum}</h3>
+    <span class="group-range"><a href="https://member.schack.se/ShowTournamentServlet?id=${gid}&listingtype=1" target="_blank" style="color:#c9bfa8">member.schack.se</a></span>
+  </div>`;
+  try {
+    const [table, rounds] = await Promise.all([
+      api(`/tournamentresults/table/id/${gid}`),
+      api(`/tournamentresults/roundresults/id/${gid}`)
+    ]);
+    if (!Array.isArray(table) || !table.length) {
+      // Tävlingen har inte startat — visa startlista
+      const startData = await api(`/tournament/group/id/${gid}`);
+      const rawList = startData.players||startData.contenders||startData.participants||[];
+      const players = rawList.map(p=>{
+        const pi=p.playerInfo||{};
+        return {
+          name:[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${p.contenderId}`,
+          club:pi.club||'',
+          rating:pi.elo?.rating||pi.rating||0
+        };
+      }).sort((a,b)=>b.rating-a.rating);
+      
+      if (!players.length) {
+        return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${lang==='sv'?'Inga spelare ännu':'No players yet'}</p></div></div></div>`;
+      }
+      const rows = players.map((p,i)=>`<tr>
+        <td class="td-rank">${i+1}</td>
+        <td class="td-name">${esc(p.name)}</td>
+        <td style="padding:5px 10px;font-size:.82rem;color:var(--ink-mute)">${esc(p.club)}</td>
+        <td style="padding:5px 10px;text-align:right;font-weight:600">${p.rating||'—'}</td>
+      </tr>`).join('');
+      const tbl = `<table><thead><tr>
+        <th class="th-num">#</th>
+        <th class="th-name" style="text-align:left">${lang==='sv'?'Spelare':'Player'}</th>
+        <th class="th-stat">${lang==='sv'?'Klubb':'Club'}</th>
+        <th class="th-stat">Rating</th>
+      </tr></thead><tbody>${rows}</tbody></table>`;
+      return `<div class="group-section">${header}<div class="group-section-body"><div class="table-wrap">${tbl}</div></div></div>`;
+    }
+    
+    const players = standings(table);
+    const {matrix} = processRounds(players, rounds);
+    return `<div class="group-section">${header}<div class="group-section-body"><div class="table-wrap">${crossTable(players,matrix)}</div></div></div>`;
+  } catch(e) {
+    return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${esc(String(e))}</p></div></div></div>`;
+  }
 }
 
 async function api(path) {
