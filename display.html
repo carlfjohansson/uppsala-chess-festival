@@ -440,14 +440,22 @@ function sfMsg(e) {
       const barEl = document.getElementById('sf-bar-w');
       const pvEl  = document.getElementById('sf-pv');
 
-      // Evalvärde
-      let label = isMate
-        ? (score > 0 ? `#${score}` : `#${score}`)
-        : (score > 0 ? `+${score.toFixed(2)}` : score.toFixed(2));
+      // Stockfish rapporterar från sidans-att-röra-sig perspektiv.
+      // Vi vill alltid ha vitts perspektiv: om svart är att röra sig, flippa tecknet.
+      const isBlackTurn = sfCurrentFen && sfCurrentFen.split(' ')[1] === 'b';
+      const whitePov = isBlackTurn ? -score : score;
+
+      // Evalvärde (alltid från vitts håll: + = vit bättre, - = svart bättre)
+      let label;
+      if (isMate) {
+        label = whitePov > 0 ? `+#${Math.abs(score)}` : `-#${Math.abs(score)}`;
+      } else {
+        label = whitePov > 0 ? `+${whitePov.toFixed(2)}` : whitePov.toFixed(2);
+      }
       sfLastEval = label;
 
-      // Stapel
-      let pct = isMate ? (score > 0 ? 100 : 0) : 50 + Math.min(Math.max(score * 8, -48), 48);
+      // Stapel: 100 = full vit, 0 = full svart
+      let pct = isMate ? (whitePov > 0 ? 100 : 0) : 50 + Math.min(Math.max(whitePov * 8, -48), 48);
       if (barEl) barEl.style.width = pct + '%';
 
       // Eval + drag på en rad
