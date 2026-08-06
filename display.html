@@ -249,13 +249,55 @@
     .single-ml {
       flex: 1; min-height: 0;
       overflow-y: auto; scrollbar-width: thin;
-      display: flex; flex-direction: column; justify-content: flex-start;
     }
-    .single-ml .ml-row {
-      font-size: clamp(0.85rem, 1.8vh, 1.1rem);
-      line-height: 1.85;
-      grid-template-columns: 2.2em 1fr 1fr;
+    /* Interaktiv notation */
+    .ib-row {
+      display: grid; grid-template-columns: 2.2em 1fr 1fr;
+      font-size: clamp(0.85rem, 1.8vh, 1.1rem); line-height: 1.9;
     }
+    .ib-row .ml-num { color: var(--muted); font-size: 0.85em; text-align: right; padding-right: 0.25em; }
+    .ib-w, .ib-b {
+      cursor: pointer; border-radius: 3px; padding: 0 3px;
+      font-weight: 700;
+    }
+    .ib-b { color: rgba(18,32,58,0.72); }
+    .ib-w:hover, .ib-b:hover { background: rgba(18,32,58,0.08); }
+    .ib-cur { background: var(--navy) !important; color: var(--gold) !important; border-radius: 3px; }
+    .ib-var-line {
+      grid-column: 1/-1;
+      font-size: 0.82em; color: var(--muted);
+      padding: 0 0 2px 2.2em; line-height: 1.6;
+    }
+    .ib-vm { cursor: pointer; }
+    .ib-vm:hover { color: var(--accent); }
+    .ib-vm.ib-cur { color: var(--gold); }
+    /* Interaktivt bräde */
+    .sq { cursor: pointer; position: relative; }
+    .sq.sel-li { background: #f6f669 !important; }
+    .sq.sel-da { background: #b9ca43 !important; }
+    .ib-dot {
+      position: absolute; width: 30%; height: 30%;
+      border-radius: 50%; background: rgba(0,0,0,0.18);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .sq.ib-cap::after {
+      content: ''; position: absolute; inset: 0;
+      border-radius: 50%; border: 3px solid rgba(0,0,0,0.25);
+      pointer-events: none;
+    }
+    /* Nav-knappar */
+    .ib-nav {
+      display: flex; gap: 4px; flex-shrink: 0; margin-bottom: 4px;
+    }
+    .ib-nav-btn {
+      background: #f0ede7; border: 1px solid var(--border);
+      border-radius: 4px; padding: 2px 9px; cursor: pointer;
+      font-size: clamp(0.7rem, 1.4vh, 0.9rem); color: var(--navy);
+      font-weight: 700;
+    }
+    .ib-nav-btn:hover:not(:disabled) { background: #e4e0d8; }
+    .ib-nav-btn:disabled { opacity: 0.35; cursor: default; }
     .single-result {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.1rem; color: var(--accent); letter-spacing: .06em;
@@ -476,14 +518,213 @@ function sfToggle() {
 
 function sfRunNow() {
   if (!sfOn) return;
-  const data = (gameData[SINGLE_GID] || {})[SINGLE_BOARD];
-  const c = new Chess();
-  for (const mv of (data && data.moves ? data.moves : [])) {
-    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
-    if (!san) break; try { c.move(san); } catch(e) { break; }
-  }
-  sfAnalyze(c.fen());
+  sfAnalyze(ibC().fen());
 }
+// ═══════════════════════════════════════════════════════
+//  INTERAKTIVT BRÄDE
+// ═══════════════════════════════════════════════════════
+const IB = {
+  mains:   [],    // Spelets SAN-drag (från API)
+  idx:     0,     // Vyposition i huvudlinje (0=start)
+  varBase: -1,    // Idx i mains varianten utgår från (-1=i mains)
+  varMvs:  [],    // Variantdrag (SAN) som visas just nu
+  varIdx:  0,     // Hur långt in i varianten vi är
+  allVars: {},    // Sparade varianter: { 'N': [SAN, SAN, ...] }
+  selSq:   null,  // Markerat fält ('e2' etc.)
+  inited:  false,
+};
+
+function ibC() {
+  // Chess-instans vid aktuell vyposition
+  const c = new Chess();
+  for (let i = 0; i < IB.idx; i++) {
+    try { c.move(IB.mains[i]); } catch(e) { break; }
+  }
+  if (IB.varBase >= 0 && IB.varIdx > 0) {
+    for (let i = 0; i < IB.varIdx; i++) {
+      try { c.move(IB.varMvs[i]); } catch(e) { break; }
+    }
+  }
+  return c;
+}
+
+function ibSqN(sq) { return (8 - parseInt(sq[1])) * 8 + (sq.charCodeAt(0) - 97); }
+
+function ibBoard() {
+  const el = document.querySelector('.single-board-grid');
+  if (!el) return;
+  const c = ibC();
+  const legal = IB.selSq
+    ? new Set(c.moves({ square: IB.selSq, verbose: true }).map(m => m.to))
+    : new Set();
+  const hist = c.history({ verbose: true });
+  let lmF = -1, lmT = -1;
+  if (hist.length) { lmF = ibSqN(hist.at(-1).from); lmT = ibSqN(hist.at(-1).to); }
+  const pos = c.board();
+  let h = '';
+  for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
+    const idx = r * 8 + f;
+    const sq  = String.fromCharCode(97 + f) + (8 - r);
+    const li  = (r + f) % 2 === 0;
+    const lm  = idx === lmF || idx === lmT;
+    const sel = sq === IB.selSq;
+    const leg = legal.has(sq);
+    let cls = sel ? (li ? 'sel-li' : 'sel-da') : lm ? (li ? 'll' : 'ld') : (li ? 'li' : 'da');
+    const p = pos[r][f];
+    let inner = '';
+    if (p) { const k = p.color + p.type.toUpperCase(); if (PIECE_SVG[k]) inner = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[k])}" alt="${k}">`; }
+    const dot  = (leg && !p) ? '<div class="ib-dot"></div>' : '';
+    const cap  = (leg &&  p) ? ' ib-cap' : '';
+    h += `<div class="sq ${cls}${cap}" onclick="ibClick('${sq}')">${inner}${dot}</div>`;
+  }
+  el.innerHTML = h;
+}
+
+function ibMoves() {
+  const el = document.getElementById('single-ml');
+  if (!el) return;
+  if (!IB.mains.length) {
+    el.innerHTML = '<div class="ib-row"><span class="ml-num">1.</span><span class="ib-w" style="color:var(--muted)">…</span><span class="ib-b"></span></div>';
+    return;
+  }
+  let html = '';
+  for (let i = 0; i < IB.mains.length; i++) {
+    const n  = Math.floor(i / 2) + 1;
+    const iw = i % 2 === 0;
+    const cur = IB.varBase < 0 && IB.idx === i + 1;
+    const san = sweSAN(IB.mains[i]);
+    if (iw) html += `<div class="ib-row"><span class="ml-num">${n}.</span>`;
+    html += `<span class="${iw ? 'ib-w' : 'ib-b'}${cur ? ' ib-cur' : ''}" onclick="ibGoto(${i+1})">${san}</span>`;
+    // Variant som börjar EFTER drag i+1
+    const vk = String(i + 1);
+    if (IB.allVars[vk] && IB.allVars[vk].length) {
+      const vm = IB.allVars[vk];
+      let vhtml = '<span class="ib-var-line">(';
+      vm.forEach((s, mi) => {
+        const inV = IB.varBase === (i + 1) && IB.varIdx === mi + 1;
+        vhtml += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${i+1},${mi+1})">${sweSAN(s)}</span>`;
+        if (mi < vm.length - 1) vhtml += ' ';
+      });
+      vhtml += ')</span>';
+      if (iw) {
+        html += `<span class="ib-b"></span></div><div class="ib-row"><span></span><span style="grid-column:2/-1">${vhtml.replace('<span class="ib-var-line">(','').replace(')</span>','')}</span></div>`;
+        // Actually let's do it simpler:
+      }
+    }
+    if (!iw || i === IB.mains.length - 1) html += iw ? '<span class="ib-b"></span></div>' : '</div>';
+    // Variant visas på ny rad
+    const vk2 = String(i + 1);
+    if (IB.allVars[vk2] && IB.allVars[vk2].length) {
+      let vhtml = '<div class="ib-var-line">(';
+      IB.allVars[vk2].forEach((s, mi) => {
+        const inV = IB.varBase === (i + 1) && IB.varIdx === mi + 1;
+        vhtml += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${i+1},${mi+1})">${sweSAN(s)}</span>`;
+        if (mi < IB.allVars[vk2].length - 1) vhtml += ' ';
+      });
+      vhtml += ')</div>';
+      html += vhtml;
+    }
+  }
+  el.innerHTML = html;
+  el.querySelector('.ib-cur')?.scrollIntoView({ block: 'nearest' });
+}
+
+function ibClick(sq) {
+  const c = ibC();
+  if (IB.selSq) {
+    const move = c.moves({ square: IB.selSq, verbose: true }).find(m => m.to === sq);
+    if (move) {
+      const san = move.san;
+      if (IB.varBase < 0) {
+        // Är det nästa huvuddrag?
+        if (IB.mains[IB.idx] === san || (IB.mains[IB.idx] && new Chess().move && (() => { try { const t = ibC(); t.move(IB.mains[IB.idx]); return t.fen() === (() => { const u = ibC(); u.move(san); return u.fen(); })(); } catch(e) { return false; } })() )) {
+          IB.idx++; IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); return;
+        }
+        // Ny variant
+        const vk = String(IB.idx);
+        if (!IB.allVars[vk]) IB.allVars[vk] = [];
+        IB.allVars[vk].push(san);
+        IB.varBase = IB.idx;
+        IB.varMvs  = IB.allVars[vk];
+        IB.varIdx  = IB.allVars[vk].length;
+      } else {
+        // Fortsätt befintlig variant
+        const vk = String(IB.varBase);
+        IB.allVars[vk].push(san);
+        IB.varMvs = IB.allVars[vk];
+        IB.varIdx++;
+      }
+      IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); return;
+    }
+    // Klick på egen pjäs → byt markering
+    const pc = c.get(sq);
+    if (pc && pc.color === c.turn()) { IB.selSq = sq; ibBoard(); return; }
+    IB.selSq = null; ibBoard(); return;
+  }
+  const pc = c.get(sq);
+  if (pc && pc.color === c.turn()) { IB.selSq = sq; ibBoard(); }
+}
+
+function ibGoto(n) {
+  IB.idx = Math.max(0, Math.min(n, IB.mains.length));
+  IB.varBase = -1; IB.varMvs = []; IB.varIdx = 0; IB.selSq = null;
+  ibBoard(); ibMoves(); if (sfOn) sfRunNow();
+  ibUpdNav();
+}
+
+function ibGoVar(base, sub) {
+  IB.varBase = base;
+  IB.varMvs  = IB.allVars[String(base)] || [];
+  IB.varIdx  = Math.min(sub, IB.varMvs.length);
+  IB.selSq   = null;
+  ibBoard(); ibMoves(); if (sfOn) sfRunNow();
+  ibUpdNav();
+}
+
+function ibFwd() {
+  if (IB.varBase >= 0) {
+    if (IB.varIdx < IB.varMvs.length) { IB.varIdx++; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); ibUpdNav(); }
+    return;
+  }
+  if (IB.idx < IB.mains.length) ibGoto(IB.idx + 1);
+}
+
+function ibBack() {
+  if (IB.varBase >= 0) {
+    IB.varIdx--;
+    if (IB.varIdx <= 0) { IB.varBase = -1; IB.varMvs = []; IB.varIdx = 0; }
+    IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); ibUpdNav(); return;
+  }
+  if (IB.idx > 0) ibGoto(IB.idx - 1);
+}
+
+function ibStart() { ibGoto(0); }
+function ibEnd()   { ibGoto(IB.mains.length); }
+
+function ibUpdNav() {
+  const atStart = IB.idx === 0 && IB.varBase < 0;
+  const atEnd   = IB.varBase < 0 ? IB.idx >= IB.mains.length : IB.varIdx >= IB.varMvs.length;
+  ['ib-btn-start','ib-btn-back'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = atStart; });
+  ['ib-btn-fwd','ib-btn-end'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = atEnd; });
+}
+
+function ibSync(data) {
+  const raw = data && data.moves ? data.moves : [];
+  const newMains = raw.map(mv => typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')).filter(Boolean);
+  const wasEnd = IB.idx === IB.mains.length;
+  IB.mains = newMains;
+  if (wasEnd) IB.idx = Math.min(IB.idx, IB.mains.length);
+  if (IB.inited) { ibBoard(); ibMoves(); ibUpdNav(); }
+}
+
+document.addEventListener('keydown', e => {
+  if (!SINGLE_MODE) return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); ibFwd(); }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); ibBack(); }
+  if (e.key === 'ArrowUp')    { e.preventDefault(); ibStart(); }
+  if (e.key === 'ArrowDown')  { e.preventDefault(); ibEnd(); }
+});
+
 function sweSAN(san) {
   if (!san) return '';
   return san
@@ -609,39 +850,39 @@ function renderSingle() {
   const content = document.getElementById('single-content');
   if (!content) return;
 
-  const boardSrc = boardHTML(data);
-  const bigBoard = boardSrc.replace('class="board-grid"', 'class="single-board-grid"');
-  const mlHTML   = moveListHTML(data);
-
-  // ── Redan initierad: uppdatera bara bräde + draglista (inget blinkande) ──
-  const existing = content.querySelector('.single-board-grid');
-  if (existing) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = bigBoard;
-    const newGrid = tmp.firstElementChild;
-    existing.replaceWith(newGrid);
-    const mlEl = document.getElementById('single-ml');
-    if (mlEl) mlEl.innerHTML = mlHTML;
+  // ── Redan initierad: uppdatera bara speldata via IB ─────────────────
+  if (IB.inited) {
+    ibSync(data);
     sfApplyUI();
-    if (sfOn) sfRunNow();
     return;
   }
 
   // ── Första render: bygg hela strukturen ──────────────────────────────────
   content.innerHTML =
-    bigBoard +
+    `<div class="single-board-grid"></div>` +
     `<div class="single-ml-col">
       <div class="single-players">
         <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span><span class="single-p-rating">${w.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span>${res}</div>
         <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span><span class="single-p-rating">${bl.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
       </div>
-      <div class="sf-row">
+      <div class="sf-row" style="display:flex;align-items:center;gap:6px">
+        <div class="ib-nav">
+          <button class="ib-nav-btn" id="ib-btn-start" onclick="ibStart()" title="Början (↑)">⏮</button>
+          <button class="ib-nav-btn" id="ib-btn-back"  onclick="ibBack()"  title="Föregående (←)">◀</button>
+          <button class="ib-nav-btn" id="ib-btn-fwd"   onclick="ibFwd()"   title="Nästa (→)">▶</button>
+          <button class="ib-nav-btn" id="ib-btn-end"   onclick="ibEnd()"   title="Slutet (↓)">⏭</button>
+        </div>
         <button class="sf-btn" id="sf-btn" onclick="sfToggle()">▶ Analys på</button>
       </div>
       <div class="sf-bar-wrap" id="sf-bar-wrap"><div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div></div>
       <div class="sf-pv" id="sf-pv"></div>
-      <div class="single-ml" id="single-ml">${mlHTML}</div>
+      <div class="single-ml" id="single-ml"></div>
     </div>`;
+
+  IB.inited = true;
+  ibSync(data);
+  ibEnd(); // börja vid senaste draget
+  ibUpdNav();
 }
 
 
