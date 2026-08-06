@@ -268,7 +268,7 @@
       text-align: center;
       padding: 4px 10px;
       border-radius: 6px;
-      background: #2e2e2e;
+      background: #e8e4dc;
       color: var(--text);
       transition: background .15s, color .15s;
       flex-shrink: 0;
@@ -355,10 +355,10 @@
       display: grid;
       grid-template-columns: repeat(8, 12.5%);
       grid-template-rows: repeat(8, 12.5%);
-      border: 2px solid #555;
+      border: 2px solid var(--border);
       border-radius: 2px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
     }
     .coords-file {
       display: flex;
@@ -496,7 +496,7 @@
       border-radius: 4px;
       padding: 1px 2px;
     }
-    .move-pair:hover { background: #2e2e2e; }
+    .move-pair:hover { background: #ede9e2; }
     .mv-num {
       font-size: 0.73rem;
       color: var(--muted);
@@ -513,10 +513,10 @@
       white-space: nowrap;
       letter-spacing: 0.02em;
     }
-    .mv-w:hover, .mv-b:hover { background: #3a3a3a; }
+    .mv-w:hover, .mv-b:hover { background: #ede9e2; }
     .mv-w.cur, .mv-b.cur {
-      background: var(--accent);
-      color: #000;
+      background: var(--navy);
+      color: var(--gold);
     }
     .result-box {
       padding: 18px;
@@ -542,7 +542,7 @@
     }
     .nav-btns { display: flex; gap: 3px; }
     .nav-btn {
-      background: #2e2e2e;
+      background: #f0ede7;
       border: 1px solid var(--border);
       color: var(--text);
       width: 36px;
@@ -556,7 +556,7 @@
       transition: background .1s;
       flex-shrink: 0;
     }
-    .nav-btn:hover:not(:disabled) { background: #3a3a3a; }
+    .nav-btn:hover:not(:disabled) { background: #e4e0d8; }
     .nav-btn:disabled { opacity: 0.28; cursor: default; }
     .ply-label {
       font-size: 0.75rem;
@@ -566,7 +566,7 @@
       font-variant-numeric: tabular-nums;
     }
     .review-badge {
-      background: #2e2e2e;
+      background: #ede9e2;
       border: 1px solid var(--border);
       color: var(--muted);
       padding: 3px 8px;
@@ -661,7 +661,7 @@
       transition: background .1s;
     }
     .schedule-row:last-child { border-bottom: none; }
-    .schedule-row:hover { background: #2e2e2e; }
+    .schedule-row:hover { background: #ede9e2; }
     .schedule-row.active { background: #2a2a1a; }
     .sch-num {
       font-family: 'Bebas Neue', sans-serif;
@@ -772,8 +772,8 @@
       font-family: 'Lato', sans-serif; font-size: 0.75rem;
       font-weight: 700; cursor: pointer; border: none; white-space: nowrap;
     }
-    .team-act-btn.pgn { background: #2e2e2e; border: 1px solid var(--border); color: var(--muted); }
-    .team-act-btn.pgn:hover { color: var(--text); background: #3a3a3a; }
+    .team-act-btn.pgn { background: #f0ede7; border: 1px solid var(--border); color: var(--muted); }
+    .team-act-btn.pgn:hover { color: var(--text); background: #e4e0d8; }
     .team-act-btn.multi { background: var(--accent); color: #000; }
     .team-act-btn.multi:hover { background: #c8e020; }
 
@@ -926,7 +926,7 @@
       transition: background .1s, border-color .1s, color .1s;
       white-space: nowrap;
     }
-    .board-chip:hover  { background: #2e2e2e; color: var(--text); }
+    .board-chip:hover  { background: #ede9e2; color: var(--text); }
     .board-chip.bc-sel {
       background: #1a1a00; border-color: var(--accent); color: var(--accent);
     }
@@ -1013,7 +1013,7 @@
       transition: background .12s, color .12s, border-color .12s;
       white-space: nowrap;
     }
-    .channel-tab:hover { background: #2e2e2e; color: var(--text); border-color: #555; }
+    .channel-tab:hover { background: #ede9e2; color: var(--text); border-color: #555; }
     .channel-tab.ch-active {
       background: #1a1a00;
       border-color: var(--accent);
@@ -1157,7 +1157,7 @@
 
     /* ── Enkelt-spelvy (dark panel, inbäddad i sida) ──── */
     #game-view {
-      background: #1a1a1a;
+      background: var(--bg);
       min-height: calc(100vh - 65px);
       display: flex; flex-direction: column; align-items: center;
       padding: 0 16px 40px;
@@ -1165,7 +1165,7 @@
     #game-view .header { padding-top: 20px; }
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
-      color: #c9bfa8; font-size: 0.82rem; background: none; border: none;
+      color: var(--muted); font-size: 0.82rem; background: none; border: none;
       cursor: pointer; padding: 16px 0 0; font-family: 'Lato', sans-serif;
       letter-spacing: .04em; transition: color 0.2s; width: 100%;
       max-width: 1080px;

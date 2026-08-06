@@ -131,31 +131,31 @@
       flex-shrink: 0;
     }
 
-    /* Bräde — kvadratisk, passar alltid i cellen */
+    /* Bräde — varje ruta får aspect-ratio:1, brädet blir automatiskt kvadratiskt */
     .bw {
       flex: 1; min-height: 0;
       display: flex; align-items: center; justify-content: center;
-      padding: 0.2vh 0;
       overflow: hidden;
     }
     .board-grid {
-      display: grid; grid-template-columns: repeat(8, 1fr);
-      /* Bredd: 25vw minus padding; Höjd: 1/3 av skärmen minus header och spelarinfo */
-      --bw: calc(25vw - 1.8vw);
-      --bh: calc((100vh - 4.2vh - 4vh) / 3 - 5.5vh);
-      width: min(var(--bw), var(--bh));
-      height: min(var(--bw), var(--bh));
-      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      /* Bredd begränsas av kolumnbredd OCH tillgänglig höjd (brädet ska alltid rymmas) */
+      width: min(
+        calc(25vw - 1.6vw),
+        calc((100vh - 4.2vh - 4.2vh) / 3 - 5.8vh)
+      );
       border-radius: 3px; overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,.18);
     }
-    .sq { display: flex; align-items: center; justify-content: center; }
+    /* Varje ruta tvingas vara kvadratisk — height sätts automatiskt */
+    .sq { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
     .sq.li { background: var(--light-sq); }
     .sq.da { background: var(--dark-sq);  }
     .sq.ll { background: var(--lm-light); }
     .sq.ld { background: var(--lm-dark);  }
     .sq img {
-      width: 82%; height: 82%; pointer-events: none;
+      width: 80%; height: 80%; pointer-events: none;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
     }
   </style>
