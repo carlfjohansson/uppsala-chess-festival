@@ -131,17 +131,21 @@
       flex-shrink: 0;
     }
 
-    /* Bräde */
+    /* Bräde — kvadratisk, passar alltid i cellen */
     .bw {
       flex: 1; min-height: 0;
       display: flex; align-items: center; justify-content: center;
       padding: 0.2vh 0;
+      overflow: hidden;
     }
     .board-grid {
       display: grid; grid-template-columns: repeat(8, 1fr);
-      aspect-ratio: 1 / 1;
-      height: 100%; width: 100%;
-      max-height: 100%; max-width: 100%;
+      /* Bredd: 25vw minus padding; Höjd: 1/3 av skärmen minus header och spelarinfo */
+      --bw: calc(25vw - 1.8vw);
+      --bh: calc((100vh - 4.2vh - 4vh) / 3 - 5.5vh);
+      width: min(var(--bw), var(--bh));
+      height: min(var(--bw), var(--bh));
+      flex-shrink: 0;
       border-radius: 3px; overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,.18);
     }

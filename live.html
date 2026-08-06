@@ -62,7 +62,7 @@
     .config-input {
       flex: 1;
       min-width: 180px;
-      background: #1a1a1a;
+      background: #fff;
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 10px;
@@ -73,7 +73,7 @@
     }
     .config-input:focus { border-color: var(--accent); }
     .config-select {
-      background: #1a1a1a;
+      background: #fff;
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 10px;
@@ -84,9 +84,9 @@
       cursor: pointer;
     }
     .btn {
-      background: #2e2e2e;
+      background: #f0ede7;
       border: 1px solid var(--border);
-      color: var(--muted);
+      color: var(--text);
       padding: 8px 14px;
       border-radius: 6px;
       font-size: 0.82rem;
@@ -95,14 +95,14 @@
       transition: background .12s, color .12s;
       white-space: nowrap;
     }
-    .btn:hover { background: #3a3a3a; color: var(--text); }
+    .btn:hover { background: #e4e0d8; color: var(--navy); }
     .btn-primary {
-      background: var(--accent);
-      color: #000;
+      background: var(--navy);
+      color: var(--gold);
       font-weight: 700;
       border-color: transparent;
     }
-    .btn-primary:hover { background: #c8e020; color: #000; }
+    .btn-primary:hover { background: #1a4a7e; color: var(--gold); }
 
     /* ── Header ────────────────────────────────────── */
     .header {
@@ -1070,6 +1070,23 @@
     nav.top ul a.active { color: #f5cb6b; font-weight: 700; }
     @media (max-width: 720px) {
       nav.top ul { display: none; }
+      nav.top ul.open { display: flex; flex-direction: column; gap: 12px;
+        position: absolute; top: 100%; right: 0; left: 0;
+        background: rgba(13,30,50,0.98); padding: 14px 24px;
+        border-bottom: 1px solid rgba(232,181,82,0.2); z-index: 300; }
+      .nav-menu-btn {
+        display: flex; flex-direction: column; gap: 5px;
+        background: none; border: none; cursor: pointer;
+        padding: 4px; margin-left: auto;
+      }
+      .nav-menu-btn span {
+        display: block; width: 22px; height: 2px;
+        background: #c9bfa8; border-radius: 2px; transition: background 0.2s;
+      }
+      .nav-menu-btn:hover span { background: #f5cb6b; }
+    }
+    @media (min-width: 721px) {
+      .nav-menu-btn { display: none; }
     }
 
     /* ── Stadionvy ───────────────────────────────────────── */
@@ -1180,6 +1197,33 @@
       font-size: 0.75rem; text-align: center; color: var(--accent);
       font-weight: 700; letter-spacing: .05em;
     }
+
+    /* ── Mobilrespons ────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      #stadium-view { padding: 16px 10px 40px; gap: 20px; }
+      .sg-board-top { margin-bottom: 4px; }
+    }
+    @media (max-width: 580px) {
+      /* Stadionvy: bräden staplade i en kolumn */
+      .sg-boards { grid-template-columns: 1fr; }
+      .sg-board {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 14px;
+      }
+      .sg-board:last-child { border-bottom: none; }
+      /* Bredare spelarnamnsfält */
+      .sg-player-name { max-width: none; }
+      /* Lite kompaktare header */
+      .sg-header { padding: 10px 14px; }
+      #stadium-view { padding: 12px 8px 36px; gap: 16px; }
+      /* Analys-knapp: full bredd på mobil */
+      .sg-analysis-btn { width: 100%; margin-top: 8px; }
+    }
+    @media (max-width: 400px) {
+      nav.top .inner { padding: 10px 14px; }
+      .nav-logo { height: 28px; }
+    }
 </style>
 </head>
 <body>
@@ -1187,12 +1231,15 @@
 <nav class="top">
   <div class="inner">
     <a href="/" class="brand"><img src="/logo.png" alt="UCF" class="nav-logo">Uppsala Schackfestival</a>
-    <ul>
+    <ul id="nav-ul">
       <li><a href="/">Hem</a></li>
       <li><a href="/resultat.html">Resultat</a></li>
       <li><a href="/live.html" class="active">⚡ Live</a></li>
       <li><a href="/display.html" style="font-size:0.75rem;opacity:0.5;letter-spacing:.04em" title="Visningsläge för spellokal">📺</a></li>
     </ul>
+    <button class="nav-menu-btn" onclick="this.nextElementSibling;document.getElementById('nav-ul').classList.toggle('open')" aria-label="Meny">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
