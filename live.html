@@ -2468,6 +2468,12 @@ function initStockfish() {
     sfWorker.onerror = err => {
       console.warn('SF worker error:', err);
       sfWorker = null;
+      sfReady = false;
+      // Återställ alla analys-knappar
+      document.querySelectorAll('.sg-analysis-btn').forEach(b => {
+        b.textContent = '⚡ Analys AV'; b.classList.remove('sg-on');
+      });
+      stadiumAnalysisEnabled = {};
       sfSetStatus('Motor-fel – se konsolen');
     };
     sfWorker.postMessage('uci');
@@ -2504,6 +2510,13 @@ function handleSfLine(line) {
     sfSetStatus('Motor redo');
     if (stadiumMode && getEnabledStadiumBoards().length > 0) {
       stadiumCurrentAn = null;
+      // Uppdatera knappar till "PÅ" nu när motorn är redo
+      getEnabledStadiumBoards().forEach(({gid, board}) => {
+        const b = document.getElementById(`sgab-${gid}-${board}`);
+        if (b) { b.textContent = '⚡ Analys PÅ'; b.classList.add('sg-on'); }
+        const e = document.getElementById(`sge-${gid}-${board}`);
+        if (e) e.style.display = '';
+      });
       analyzeNextStadiumBoard();
     } else if (overviewMode) {
       // Starta round-robin för översikten
@@ -3925,10 +3938,10 @@ function selectChannel(id) {
 // ══════════════════════════════════════════════════════════════
 
 const STADIUM_GROUPS = [
-  { id: 'grupp-1', label: 'Grupp 1', tid: 'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52', boards: 3 },
-  { id: 'grupp-2', label: 'Grupp 2', tid: '8d579e31-c216-43c4-817e-597ba58db845', boards: 3 },
-  { id: 'grupp-3', label: 'Grupp 3', tid: '3e1dead3-0b84-4d70-8dfe-34b099bd019b', boards: 3 },
-  { id: 'grupp-4', label: 'Grupp 4', tid: 'b0741cd4-79ba-4ad3-990b-4e766946ca16', boards: 3 },
+  { id: 'grupp-1', label: 'Weekend 1 – grupp 1', tid: 'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52', boards: 3 },
+  { id: 'grupp-2', label: 'Weekend 1 – grupp 2', tid: '8d579e31-c216-43c4-817e-597ba58db845', boards: 3 },
+  { id: 'grupp-3', label: 'Weekend 1 – grupp 3', tid: '3e1dead3-0b84-4d70-8dfe-34b099bd019b', boards: 3 },
+  { id: 'grupp-4', label: 'Weekend 1 – grupp 4', tid: 'b0741cd4-79ba-4ad3-990b-4e766946ca16', boards: 3 },
 ];
 
 let stadiumGameData = {};    // stadiumGameData['grupp-1'][1] = gameJson
@@ -4067,6 +4080,11 @@ function updateStadiumGroup(grp) {
       liveEl.textContent = '';
     }
   }
+
+  // Starta om analys om motorn är redo men inaktiv (t.ex. data kom efter att analys slogs på)
+  if (stadiumMode && sfWorker && sfReady && !sfSearching && getEnabledStadiumBoards().length > 0) {
+    analyzeNextStadiumBoard();
+  }
 }
 
 async function pollStadium() {
@@ -4163,6 +4181,7 @@ function toggleStadiumAnalysis(gid, board) {
     if (evalEl) evalEl.style.display = '';
     // Starta motorn vid behov
     if (!sfWorker) {
+      if (btn) btn.textContent = '⚡ Laddar motor…';
       initStockfish(); // analyzeNextStadiumBoard anropas från readyok
     } else if (sfReady && !sfSearching) {
       stadiumCurrentAn = null;
