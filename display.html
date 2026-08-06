@@ -447,7 +447,7 @@ function sfMsg(e) {
       sfLastEval = label;
 
       // Stapel
-      let pct = isMate ? (score > 0 ? 92 : 8) : 50 + Math.min(Math.max(score * 6, -42), 42);
+      let pct = isMate ? (score > 0 ? 100 : 0) : 50 + Math.min(Math.max(score * 8, -48), 48);
       if (barEl) barEl.style.width = pct + '%';
 
       // Eval + drag på en rad
@@ -629,7 +629,13 @@ function ibDragStart(e, sq) {
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/plain', sq);
   IB.selSq = sq;
-  requestAnimationFrame(ibBoard); // markera efter drag-snapshot
+  // Använd bara pjäs-bilden som drag-ghost, inte hela rutan
+  const img = e.currentTarget.querySelector('img');
+  if (img) {
+    const r = img.getBoundingClientRect();
+    e.dataTransfer.setDragImage(img, r.width / 2, r.height / 2);
+  }
+  requestAnimationFrame(ibBoard);
 }
 
 function ibDrop(e, sq) {
