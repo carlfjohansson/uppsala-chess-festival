@@ -1077,10 +1077,7 @@
       width: 100%; max-width: 1160px; margin: 0 auto;
       padding: 28px 16px 60px; display: flex; flex-direction: column; gap: 32px;
     }
-    .stadium-intro {
-      font-size: 0.85rem; color: var(--muted); text-align: center;
-      margin-bottom: -12px; letter-spacing: .04em;
-    }
+
     .stadium-group {
       background: var(--panel); border-radius: 14px;
       border: 1px solid var(--border);
@@ -1158,7 +1155,32 @@
     }
     .back-btn:hover { color: var(--gold); }
 
-  </style>
+  
+    .sg-analysis-btn {
+      display: block; width: 100%; margin-top: 8px;
+      padding: 5px 0; font-size: 0.7rem; letter-spacing: .1em;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 5px; cursor: pointer; color: var(--muted);
+      font-family: 'Lato', sans-serif; transition: all 0.18s;
+      text-transform: uppercase;
+    }
+    .sg-analysis-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .sg-analysis-btn.sg-on {
+      background: var(--accent); border-color: var(--accent);
+      color: #fff; font-weight: 700;
+    }
+    .sg-eval-wrap { display: none; padding-top: 7px; }
+    .sg-eval-bar {
+      height: 5px; border-radius: 3px; display: flex; overflow: hidden;
+      margin-bottom: 3px; background: #ddd;
+    }
+    .sg-eval-w { background: #f5f5f5; border: 0.5px solid #bbb; }
+    .sg-eval-b { background: #333; }
+    .sg-eval-score {
+      font-size: 0.75rem; text-align: center; color: var(--accent);
+      font-weight: 700; letter-spacing: .05em;
+    }
+</style>
 </head>
 <body>
 <!-- ── Festival navigation (identisk med index.html) ──────────── -->
@@ -1175,7 +1197,6 @@
 
 <!-- ── Stadionvy (standardvy) ─────────────────────────────────── -->
 <div id="stadium-view">
-  <p class="stadium-intro">Klicka på ett parti för att öppna fullständig spelvy med notation och analys</p>
   <!-- Groups rendered by JS -->
 </div>
 
@@ -2481,7 +2502,10 @@ function handleSfLine(line) {
     sfReady = true;
     sfSearching = false;
     sfSetStatus('Motor redo');
-    if (overviewMode) {
+    if (stadiumMode && getEnabledStadiumBoards().length > 0) {
+      stadiumCurrentAn = null;
+      analyzeNextStadiumBoard();
+    } else if (overviewMode) {
       // Starta round-robin för översikten
       ovCurrentBoard = null;
       analyzeNextOverviewBoard();
@@ -2495,6 +2519,10 @@ function handleSfLine(line) {
   // bestmove — sökning klar (antingen naturligt eller via stop)
   if (line.startsWith('bestmove')) {
     sfSearching = false;
+    if (stadiumMode && stadiumCurrentAn) {
+      setTimeout(analyzeNextStadiumBoard, 350);
+      return;
+    }
     if (overviewMode) {
       // Overview: vänta lite och kör nästa bräde
       setTimeout(analyzeNextOverviewBoard, 350);
@@ -2518,7 +2546,18 @@ function handleSfLine(line) {
     const scM  = line.match(/\bscore (cp|mate) (-?\d+)/);
     const pvM  = line.match(/\bpv (.+)/);
 
-    if (overviewMode) {
+    if (stadiumMode && stadiumCurrentAn) {
+      // Stadium: spara eval och uppdatera evalbar för aktuellt bräde
+      if (dM && scM) {
+        const { gid, board } = stadiumCurrentAn;
+        if (!stadiumEvalData[gid]) stadiumEvalData[gid] = {};
+        stadiumEvalData[gid][board] = Object.assign(
+          stadiumEvalData[gid][board] || {},
+          { type: scM[1], value: parseInt(scM[2]) }
+        );
+        updateStadiumEval(gid, board);
+      }
+    } else if (overviewMode) {
       // Overview: vi behöver bara score, inte PV
       if (dM && scM && ovCurrentBoard) {
         ovEvalData[ovCurrentBoard] = {
@@ -3902,7 +3941,7 @@ function initStadium() {
   const sv = document.getElementById('stadium-view');
   if (!sv) return;
 
-  let html = '<p class="stadium-intro">Klicka på ett parti för fullständig spelvy med dragnotation och Stockfish-analys</p>';
+  let html = '';
 
   STADIUM_GROUPS.forEach(grp => {
     html += `<div class="stadium-group" id="stg-${grp.id}">
@@ -3913,7 +3952,7 @@ function initStadium() {
       <div class="sg-boards">`;
 
     for (let b = 1; b <= grp.boards; b++) {
-      html += `<div class="sg-board" onclick="focusGame('${grp.id}', ${b})">
+      html += `<div class="sg-board">
         <div class="sg-board-top">
           <span class="sg-board-num">Bräde ${b}</span>
           <span class="sg-board-result" id="sgr-${grp.id}-${b}"></span>
@@ -3931,13 +3970,21 @@ function initStadium() {
         <div class="sg-mini-board" id="sgmb-${grp.id}-${b}">
           ${mbBoardHTML(null)}
         </div>
+        <div class="sg-eval-wrap" id="sge-${grp.id}-${b}">
+          <div class="sg-eval-bar">
+            <div class="sg-eval-w" id="sgew-${grp.id}-${b}" style="flex-grow:50"></div>
+            <div class="sg-eval-b" id="sgeb-${grp.id}-${b}" style="flex-grow:50"></div>
+          </div>
+          <div class="sg-eval-score" id="sges-${grp.id}-${b}">…</div>
+        </div>
+        <button class="sg-analysis-btn" id="sgab-${grp.id}-${b}"
+          onclick="toggleStadiumAnalysis('${grp.id}', ${b})">⚡ Analys AV</button>
       </div>`;
     }
 
     html += `</div></div>`;
   });
 
-  // Replace only the dynamic content (keep intro in HTML already)
   sv.innerHTML = html;
 }
 
@@ -4089,6 +4136,117 @@ function backToStadium() {
 }
 
 // ── Modifierad init: starta i stadionvy ──────────────────────
+
+// ── Stadium Stockfish-analys ─────────────────────────────────
+let stadiumAnalysisEnabled = {}; // {gid: Set<board>}
+let stadiumEvalData       = {}; // {gid: {b: {type, value, btm}}}
+let stadiumCurrentAn      = null; // {gid, board}
+
+function toggleStadiumAnalysis(gid, board) {
+  if (!stadiumAnalysisEnabled[gid]) stadiumAnalysisEnabled[gid] = new Set();
+  const en = stadiumAnalysisEnabled[gid];
+  const btn = document.getElementById(`sgab-${gid}-${board}`);
+  const evalEl = document.getElementById(`sge-${gid}-${board}`);
+
+  if (en.has(board)) {
+    en.delete(board);
+    if (btn)    { btn.textContent = '⚡ Analys AV'; btn.classList.remove('sg-on'); }
+    if (evalEl) evalEl.style.display = 'none';
+    // Stoppa pågående sökning om detta var aktuellt bräde
+    if (stadiumCurrentAn && stadiumCurrentAn.gid === gid && stadiumCurrentAn.board === board) {
+      if (sfWorker && sfSearching) sfWorker.postMessage('stop');
+      stadiumCurrentAn = null;
+    }
+  } else {
+    en.add(board);
+    if (btn)    { btn.textContent = '⚡ Analys PÅ'; btn.classList.add('sg-on'); }
+    if (evalEl) evalEl.style.display = '';
+    // Starta motorn vid behov
+    if (!sfWorker) {
+      initStockfish(); // analyzeNextStadiumBoard anropas från readyok
+    } else if (sfReady && !sfSearching) {
+      stadiumCurrentAn = null;
+      analyzeNextStadiumBoard();
+    }
+  }
+}
+
+function getEnabledStadiumBoards() {
+  const result = [];
+  STADIUM_GROUPS.forEach(grp => {
+    const en = stadiumAnalysisEnabled[grp.id];
+    if (!en) return;
+    for (let b = 1; b <= grp.boards; b++) {
+      if (en.has(b)) result.push({ gid: grp.id, board: b });
+    }
+  });
+  return result;
+}
+
+function analyzeNextStadiumBoard() {
+  if (!stadiumMode || !sfWorker || !sfReady) return;
+  const all = getEnabledStadiumBoards();
+  if (!all.length) return;
+
+  // Nästa bräde i cykeln
+  let nextIdx = 0;
+  if (stadiumCurrentAn) {
+    const cur = all.findIndex(x => x.gid === stadiumCurrentAn.gid && x.board === stadiumCurrentAn.board);
+    if (cur >= 0) nextIdx = (cur + 1) % all.length;
+  }
+  const next = all[nextIdx];
+  stadiumCurrentAn = next;
+
+  const data = (stadiumGameData[next.gid] || {})[next.board] || null;
+  if (!data || !(data.moves || []).length) {
+    setTimeout(analyzeNextStadiumBoard, 400);
+    return;
+  }
+
+  const c = new Chess();
+  for (const mv of (data.moves || [])) {
+    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
+    if (!san) break;
+    try { c.move(san); } catch(e) { break; }
+  }
+  const blackToMove = c.turn() === 'b';
+  if (!stadiumEvalData[next.gid]) stadiumEvalData[next.gid] = {};
+  stadiumEvalData[next.gid][next.board] = stadiumEvalData[next.gid][next.board] || {};
+  stadiumEvalData[next.gid][next.board].btm = blackToMove;
+
+  sfSearching = true;
+  sfCurrentFen = c.fen();
+  sfWorker.postMessage('setoption name MultiPV value 1');
+  sfWorker.postMessage('position fen ' + sfCurrentFen);
+  sfWorker.postMessage('go depth 14');
+}
+
+function updateStadiumEval(gid, board) {
+  const ev = (stadiumEvalData[gid] || {})[board];
+  if (!ev) return;
+  const normV = ev.btm ? -ev.value : ev.value;
+  let wPct;
+  if (ev.type === 'mate') {
+    wPct = normV > 0 ? 95 : 5;
+  } else {
+    wPct = 50 + 50 * Math.tanh(normV / 400);
+  }
+  const bPct = 100 - wPct;
+  let score;
+  if (ev.type === 'mate') {
+    score = normV > 0 ? `M${Math.abs(ev.value)}` : `-M${Math.abs(ev.value)}`;
+  } else {
+    const p = (Math.abs(normV) / 100).toFixed(2);
+    score = normV >= 0 ? `+${p}` : `-${p}`;
+  }
+  const wEl = document.getElementById(`sgew-${gid}-${board}`);
+  const bEl = document.getElementById(`sgeb-${gid}-${board}`);
+  const sEl = document.getElementById(`sges-${gid}-${board}`);
+  if (wEl) wEl.style.flexGrow = wPct.toFixed(1);
+  if (bEl) bEl.style.flexGrow = bPct.toFixed(1);
+  if (sEl) sEl.textContent = score;
+}
+
 // ── Init ──────────────────────────────────────────────────────
 (async function() {
   // Starta i stadionvy som standard
