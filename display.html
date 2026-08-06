@@ -10,176 +10,170 @@
     :root {
       --light-sq: #e8c870;
       --dark-sq:  #4a7ec4;
-      --lm-light: #f0d838;
-      --lm-dark:  #5c9ee8;
+      --lm-light: #f5e040;
+      --lm-dark:  #6a9fd8;
+      --bg:       #f8f6f2;
+      --navy:     #0d3a6e;
+      --gold:     #f5cb6b;
+      --accent:   #c07010;
+      --border:   rgba(18,32,58,0.12);
+      --text:     #12203a;
+      --muted:    rgba(18,32,58,0.45);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #0d1b2e;
-      color: #eee;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Inter', sans-serif;
-      min-height: 100vh;
     }
-    header {
-      text-align: center;
-      padding: 14px 20px;
-      background: rgba(13,26,46,0.98);
-      border-bottom: 2px solid rgba(245,203,107,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+
+    /* ── Topplisten ─────────────────────────────────────── */
+    #top {
+      height: 4.2vh; min-height: 34px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.2vw;
+      background: var(--navy);
+      border-bottom: 3px solid var(--gold);
+      flex-shrink: 0;
     }
-    .hdr-title {
+    #top h1 {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.7rem;
-      color: #f5cb6b;
-      letter-spacing: 0.07em;
+      font-size: clamp(1rem, 2.2vh, 1.5rem);
+      color: var(--gold);
+      letter-spacing: 0.08em;
     }
     .live-dot {
-      display: inline-block;
-      width: 9px; height: 9px;
-      background: #e74c3c;
-      border-radius: 50%;
-      animation: pulse 1.4s infinite;
-      margin-right: 8px;
+      display: inline-block; width: 0.65em; height: 0.65em;
+      background: #e74c3c; border-radius: 50%;
+      animation: pulse 1.4s infinite; margin-right: 0.4em;
       vertical-align: middle;
     }
-    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.25} }
-    .hdr-time {
-      font-size: 1.1rem;
-      color: rgba(255,255,255,0.45);
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+    #clock {
+      font-size: clamp(0.8rem, 1.8vh, 1.1rem);
+      color: rgba(245,203,107,0.6);
       font-variant-numeric: tabular-nums;
-      min-width: 60px;
-      text-align: right;
     }
 
-    .groups {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .group {
-      background: rgba(255,255,255,0.03);
-      border-radius: 10px;
-      border: 1px solid rgba(245,203,107,0.13);
+    /* ── Huvud-grid: 4 kolumner × (rubrik + 3 bräden) ── */
+    #grid {
+      height: calc(100vh - 4.2vh);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto 1fr 1fr 1fr;
       overflow: hidden;
     }
-    .group-header {
-      background: rgba(13,58,110,0.55);
-      padding: 7px 16px;
+
+    /* Grupprubrik */
+    .g-hdr {
+      background: var(--navy);
+      border-right: 1px solid rgba(245,203,107,0.2);
+      border-bottom: 2px solid rgba(245,203,107,0.25);
+      padding: 0.3vh 0.8vw;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
-      color: #f5cb6b;
+      font-size: clamp(0.7rem, 1.5vh, 1rem);
+      color: var(--gold);
       letter-spacing: 0.07em;
+      display: flex; align-items: center;
     }
-    .boards-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-    }
-    .board-card {
-      padding: 12px;
-      border-right: 1px solid rgba(255,255,255,0.07);
-    }
-    .board-card:last-child { border-right: none; }
-    .board-card-hdr {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 7px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .result-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #f5cb6b;
-      background: rgba(192,112,16,0.25);
-      padding: 1px 7px;
-      border-radius: 4px;
-    }
-    .player-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-bottom: 4px;
-    }
-    .color-dot {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .color-dot.w { background: #f5f5f5; border: 1px solid #777; }
-    .color-dot.b { background: #1a1a1a; border: 1px solid #555; }
-    .player-name-text {
-      font-size: 0.88rem;
-      font-weight: 600;
-      white-space: nowrap;
+
+    /* Bord-cell */
+    .bc {
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column;
       overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
+      padding: 0.5vh 0.55vw 0.3vh;
     }
-    .player-rating {
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.4);
-      flex-shrink: 0;
+    .bc:nth-child(4n) { border-right: none; }
+
+    .bc-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; margin-bottom: 0.25vh;
     }
-    .title-badge {
-      font-size: 0.65rem;
+    .bc-num {
+      font-size: clamp(0.5rem, 1vh, 0.7rem);
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--muted); font-weight: 700;
+    }
+    .bc-result {
+      font-size: clamp(0.5rem, 1vh, 0.68rem);
+      font-weight: 700; color: var(--accent);
+    }
+
+    .p-row {
+      display: flex; align-items: center; gap: 0.35em;
+      flex-shrink: 0; margin-bottom: 0.2vh;
+    }
+    .p-dot {
+      width: clamp(5px, 0.85vh, 8px); height: clamp(5px, 0.85vh, 8px);
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .p-dot.w { background: #f0f0f0; border: 1px solid #aaa; }
+    .p-dot.b { background: #1a1a1a; border: 1px solid #777; }
+    .p-name {
+      font-size: clamp(0.62rem, 1.25vh, 0.85rem);
       font-weight: 700;
-      color: #f5cb6b;
-      background: rgba(245,203,107,0.15);
-      padding: 1px 4px;
-      border-radius: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 1; color: var(--text);
+    }
+    .p-rating {
+      font-size: clamp(0.48rem, 0.95vh, 0.65rem);
+      color: var(--muted); flex-shrink: 0;
+    }
+    .p-title {
+      font-size: clamp(0.48rem, 0.85vh, 0.62rem);
+      font-weight: 700; color: var(--accent);
       flex-shrink: 0;
     }
 
-    .board-wrap { margin-top: 8px; }
-    .board-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      aspect-ratio: 1 / 1;
-      border-radius: 4px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,.5);
-    }
-    .sq {
+    /* Bräde */
+    .bw {
+      flex: 1; min-height: 0;
       display: flex; align-items: center; justify-content: center;
+      padding: 0.2vh 0;
     }
-    .sq.light   { background: var(--light-sq); }
-    .sq.dark    { background: var(--dark-sq);  }
-    .sq.lm-l    { background: var(--lm-light); }
-    .sq.lm-d    { background: var(--lm-dark);  }
+    .board-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      aspect-ratio: 1 / 1;
+      height: 100%; width: 100%;
+      max-height: 100%; max-width: 100%;
+      border-radius: 3px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .sq { display: flex; align-items: center; justify-content: center; }
+    .sq.li { background: var(--light-sq); }
+    .sq.da { background: var(--dark-sq);  }
+    .sq.ll { background: var(--lm-light); }
+    .sq.ld { background: var(--lm-dark);  }
     .sq img {
-      width: 82%; height: 82%;
-      pointer-events: none;
-      filter: drop-shadow(0 1px 2px rgba(0,0,0,.55));
+      width: 82%; height: 82%; pointer-events: none;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
     }
   </style>
 </head>
 <body>
 
-<header>
+<div id="top">
   <div></div>
-  <div class="hdr-title"><span class="live-dot"></span>Uppsala Schackfestival 2026</div>
-  <div class="hdr-time" id="hdr-clock">--:--</div>
-</header>
-
-<div class="groups" id="groups"></div>
+  <h1><span class="live-dot"></span>Uppsala Schackfestival 2026</h1>
+  <div id="clock"></div>
+</div>
+<div id="grid"></div>
 
 <script>
 const BASE = 'https://1.pool.livechesscloud.com/get';
 const GROUPS = [
-  { id:'grupp-1', label:'Weekend 1 – grupp 1', tid:'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52', boards:3 },
-  { id:'grupp-2', label:'Weekend 1 – grupp 2', tid:'8d579e31-c216-43c4-817e-597ba58db845', boards:3 },
-  { id:'grupp-3', label:'Weekend 1 – grupp 3', tid:'3e1dead3-0b84-4d70-8dfe-34b099bd019b', boards:3 },
-  { id:'grupp-4', label:'Weekend 1 – grupp 4', tid:'b0741cd4-79ba-4ad3-990b-4e766946ca16', boards:3 },
+  { id:'g1', label:'Weekend 1 – grupp 1', tid:'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52' },
+  { id:'g2', label:'Weekend 1 – grupp 2', tid:'8d579e31-c216-43c4-817e-597ba58db845' },
+  { id:'g3', label:'Weekend 1 – grupp 3', tid:'3e1dead3-0b84-4d70-8dfe-34b099bd019b' },
+  { id:'g4', label:'Weekend 1 – grupp 4', tid:'b0741cd4-79ba-4ad3-990b-4e766946ca16' },
 ];
+const BOARDS = 3;
 
 const PIECE_SVG = {
   wK: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#fff" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#fff"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0"/></g></svg>`,
@@ -196,134 +190,75 @@ const PIECE_SVG = {
   bP: `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>`
 };
 
-let gameData = {};
-let pairData = {};
+let gameData = {}, pairData = {};
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function playerLabel(p) {
-  if (!p) return null;
-  return [p.fname, p.lname].filter(Boolean).join(' ') || p.name || null;
-}
-
-function sqIdx(sq) {
-  return (8 - parseInt(sq[1])) * 8 + (sq.charCodeAt(0) - 97);
-}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pLabel(p){ return p?([p.fname,p.lname].filter(Boolean).join(' ')||p.name||null):null; }
+function sqIdx(sq){ return (8-parseInt(sq[1]))*8+(sq.charCodeAt(0)-97); }
 
 function boardHTML(data) {
-  const c = new Chess();
-  let lmFrom = -1, lmTo = -1;
-  for (const mv of (data && data.moves ? data.moves : [])) {
-    const san = typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '');
-    if (!san) break;
-    try { c.move(san); } catch(e) { break; }
+  const c = new Chess(); let lmF=-1,lmT=-1;
+  for (const mv of (data&&data.moves?data.moves:[])) {
+    const san=typeof mv==='string'?mv.split(' ')[0]:(mv.m||mv.san||'');
+    if(!san)break; try{c.move(san);}catch(e){break;}
   }
-  const hist = c.history({ verbose: true });
-  if (hist.length) {
-    lmFrom = sqIdx(hist[hist.length-1].from);
-    lmTo   = sqIdx(hist[hist.length-1].to);
+  const hist=c.history({verbose:true});
+  if(hist.length){lmF=sqIdx(hist[hist.length-1].from);lmT=sqIdx(hist[hist.length-1].to);}
+  const pos=c.board(); let h='';
+  for(let dr=0;dr<8;dr++) for(let dc=0;dc<8;dc++){
+    const idx=dr*8+dc,isLi=(dr+dc)%2===0,isLM=idx===lmF||idx===lmT;
+    const cls=isLM?(isLi?'ll':'ld'):(isLi?'li':'da');
+    const p=pos[dr][dc]; let inner='';
+    if(p){const k=p.color+p.type.toUpperCase();if(PIECE_SVG[k])inner=`<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[k])}" alt="${k}">`;}
+    h+=`<div class="sq ${cls}">${inner}</div>`;
   }
-  const pos = c.board();
-  let html = '<div class="board-grid">';
-  for (let dr = 0; dr < 8; dr++) {
-    for (let dc = 0; dc < 8; dc++) {
-      const idx = dr * 8 + dc;
-      const isLight = (dr + dc) % 2 === 0;
-      const isLM    = idx === lmFrom || idx === lmTo;
-      const cls = isLM ? (isLight ? 'lm-l' : 'lm-d') : (isLight ? 'light' : 'dark');
-      const piece = pos[dr][dc];
-      let inner = '';
-      if (piece) {
-        const key = piece.color + piece.type.toUpperCase();
-        if (PIECE_SVG[key]) {
-          inner = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[key])}" alt="${key}">`;
-        }
-      }
-      html += `<div class="sq ${cls}">${inner}</div>`;
-    }
-  }
-  return html + '</div>';
+  return `<div class="board-grid">${h}</div>`;
 }
 
-function render() {
-  let html = '';
-  GROUPS.forEach(grp => {
-    html += `<div class="group">
-      <div class="group-header">${escHtml(grp.label)}</div>
-      <div class="boards-row">`;
-    for (let b = 1; b <= grp.boards; b++) {
-      const data = (gameData[grp.id] || {})[b];
-      const pair = (pairData[grp.id] || {})[b] || {};
-      const w = pair.white || {};
-      const bl = pair.black || {};
-      const wName = playerLabel(w) || 'Vit';
-      const bName = playerLabel(bl) || 'Svart';
-      const wTitle = w.title ? `<span class="title-badge">${escHtml(w.title)}</span>` : '';
-      const bTitle = bl.title ? `<span class="title-badge">${escHtml(bl.title)}</span>` : '';
-      const wRating = w.rating ? `<span class="player-rating">${w.rating}</span>` : '';
-      const bRating = bl.rating ? `<span class="player-rating">${bl.rating}</span>` : '';
-      const result = data && data.result && data.result !== '*'
-        ? `<span class="result-badge">${escHtml(data.result)}</span>` : '';
-      html += `<div class="board-card">
-        <div class="board-card-hdr"><span>Bord ${b}</span>${result}</div>
-        <div class="player-row">
-          <span class="color-dot w"></span>
-          ${wTitle}
-          <span class="player-name-text">${escHtml(wName)}</span>
-          ${wRating}
-        </div>
-        <div class="player-row">
-          <span class="color-dot b"></span>
-          ${bTitle}
-          <span class="player-name-text">${escHtml(bName)}</span>
-          ${bRating}
-        </div>
-        <div class="board-wrap">${boardHTML(data)}</div>
-      </div>`;
-    }
-    html += '</div></div>';
-  });
-  document.getElementById('groups').innerHTML = html;
+function initGrid() {
+  let html='';
+  GROUPS.forEach(g=>{ html+=`<div class="g-hdr">${esc(g.label)}</div>`; });
+  for(let b=1;b<=BOARDS;b++) GROUPS.forEach(g=>{ html+=`<div class="bc" id="bc-${g.id}-${b}"></div>`; });
+  document.getElementById('grid').innerHTML=html;
 }
 
-async function fetchGroup(grp) {
-  if (!gameData[grp.id]) gameData[grp.id] = {};
-  if (!pairData[grp.id]) pairData[grp.id] = {};
-  try {
-    const r = await fetch(`${BASE}/${grp.tid}/round-1/index.json`, { cache:'no-store' });
-    if (r.ok) {
-      const idx = await r.json();
-      (idx.pairings || []).forEach((p, i) => {
-        if (i < grp.boards) pairData[grp.id][i + 1] = p;
-      });
-    }
-  } catch(e) {}
-  for (let b = 1; b <= grp.boards; b++) {
-    try {
-      const r = await fetch(`${BASE}/${grp.tid}/round-1/game-${b}.json`, { cache:'no-store' });
-      if (r.ok) gameData[grp.id][b] = await r.json();
-    } catch(e) {}
+function updateBoard(g,b) {
+  const el=document.getElementById(`bc-${g.id}-${b}`); if(!el)return;
+  const data=(gameData[g.id]||{})[b];
+  const pair=(pairData[g.id]||{})[b]||{};
+  const w=pair.white||{},bl=pair.black||{};
+  const wN=pLabel(w)||'Vit', bN=pLabel(bl)||'Svart';
+  const wT=w.title?`<span class="p-title">${esc(w.title)}</span>`:'';
+  const bT=bl.title?`<span class="p-title">${esc(bl.title)}</span>`:'';
+  const wR=w.rating?`<span class="p-rating">${w.rating}</span>`:'';
+  const bR=bl.rating?`<span class="p-rating">${bl.rating}</span>`:'';
+  const res=data&&data.result&&data.result!=='*'?`<span class="bc-result">${esc(data.result)}</span>`:'';
+  el.innerHTML=
+    `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span>${res}</div>`+
+    `<div class="p-row"><span class="p-dot w"></span>${wT}<span class="p-name">${esc(wN)}</span>${wR}</div>`+
+    `<div class="p-row"><span class="p-dot b"></span>${bT}<span class="p-name">${esc(bN)}</span>${bR}</div>`+
+    `<div class="bw">${boardHTML(data)}</div>`;
+}
+
+async function fetchGroup(g) {
+  if(!gameData[g.id])gameData[g.id]={};
+  if(!pairData[g.id])pairData[g.id]={};
+  try{const r=await fetch(`${BASE}/${g.tid}/round-1/index.json`,{cache:'no-store'});
+    if(r.ok){const idx=await r.json();(idx.pairings||[]).forEach((p,i)=>{if(i<BOARDS)pairData[g.id][i+1]=p;});}}catch(e){}
+  for(let b=1;b<=BOARDS;b++){
+    try{const r=await fetch(`${BASE}/${g.tid}/round-1/game-${b}.json`,{cache:'no-store'});
+      if(r.ok)gameData[g.id][b]=await r.json();}catch(e){}
   }
 }
 
-function updateClock() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('hdr-clock').textContent = `${h}:${m}`;
-}
-
-async function poll() {
+async function poll(){
   await Promise.all(GROUPS.map(fetchGroup));
-  render();
-  setTimeout(poll, 3000);
+  GROUPS.forEach(g=>{for(let b=1;b<=BOARDS;b++)updateBoard(g,b);});
+  setTimeout(poll,3000);
 }
 
-updateClock();
-setInterval(updateClock, 10000);
-poll();
+function tick(){const n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+initGrid(); tick(); setInterval(tick,10000); poll();
 </script>
 </body>
 </html>
