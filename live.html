@@ -2515,7 +2515,7 @@ function handleSfLine(line) {
         const b = document.getElementById(`sgab-${gid}-${board}`);
         if (b) { b.textContent = '⚡ Analys PÅ'; b.classList.add('sg-on'); }
         const e = document.getElementById(`sge-${gid}-${board}`);
-        if (e) e.style.display = '';
+        if (e) e.style.display = 'block';
       });
       analyzeNextStadiumBoard();
     } else if (overviewMode) {
@@ -4178,7 +4178,7 @@ function toggleStadiumAnalysis(gid, board) {
   } else {
     en.add(board);
     if (btn)    { btn.textContent = '⚡ Analys PÅ'; btn.classList.add('sg-on'); }
-    if (evalEl) evalEl.style.display = '';
+    if (evalEl) evalEl.style.display = 'block';
     // Starta motorn vid behov
     if (!sfWorker) {
       if (btn) btn.textContent = '⚡ Laddar motor…';
@@ -4217,7 +4217,7 @@ function analyzeNextStadiumBoard() {
   stadiumCurrentAn = next;
 
   const data = (stadiumGameData[next.gid] || {})[next.board] || null;
-  if (!data || !(data.moves || []).length) {
+  if (!data) {
     setTimeout(analyzeNextStadiumBoard, 400);
     return;
   }
