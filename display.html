@@ -317,18 +317,28 @@
     }
     .sf-btn:hover { background: #e4e0d8; }
     .sf-btn.on { background: var(--navy); color: var(--gold); border-color: var(--navy); }
-    .sf-bar-wrap {
-      height: 10px; border-radius: 3px; overflow: hidden;
-      background: #1a1a1a; display: none; margin-top: 5px;
+    /* Lodrätt evalbar till vänster om brädet */
+    .board-stack {
+      display: flex; align-items: stretch; gap: 4px; flex-shrink: 0;
     }
-    .sf-bar-wrap.vis { display: block; }
-    .sf-bar-w { height: 100%; background: #f0f0f0; transition: width .4s; }
+    .sf-vert-bar {
+      width: 10px; flex-shrink: 0;
+      border-radius: 3px; overflow: hidden;
+      background: #1a1a1a; position: relative;
+      display: none;
+    }
+    .sf-vert-bar.vis { display: block; }
+    .sf-vert-fill {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 50%; background: #f0f0f0; transition: height .4s;
+    }
     .sf-pv {
       font-size: clamp(0.6rem, 1.2vh, 0.78rem); color: var(--muted);
       display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex-shrink: 0; padding: 2px 0;
     }
     .sf-pv.vis { display: block; }
-    .sf-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .sf-row { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -437,7 +447,7 @@ function sfMsg(e) {
     else if (cpM) score = parseInt(cpM[1]) / 100;
 
     if (score !== null) {
-      const barEl = document.getElementById('sf-bar-w');
+      const barEl = document.getElementById('sf-vert-fill');
       const pvEl  = document.getElementById('sf-pv');
 
       // Stockfish rapporterar från sidans-att-röra-sig perspektiv.
@@ -456,7 +466,7 @@ function sfMsg(e) {
 
       // Stapel: 100 = full vit, 0 = full svart
       let pct = isMate ? (whitePov > 0 ? 100 : 0) : 50 + Math.min(Math.max(whitePov * 8, -48), 48);
-      if (barEl) barEl.style.width = pct + '%';
+      if (barEl) barEl.style.height = pct + '%';
 
       // Eval + drag på en rad
       if (pvEl && pvM) {
@@ -496,18 +506,18 @@ function pvLine(fen, uciMoves, evalStr) {
 }
 
 function sfApplyUI() {
-  const btn     = document.getElementById('sf-btn');
-  const barWrap = document.getElementById('sf-bar-wrap');
-  const pvEl    = document.getElementById('sf-pv');
+  const btn    = document.getElementById('sf-btn');
+  const vBar   = document.getElementById('sf-vert-bar');
+  const pvEl   = document.getElementById('sf-pv');
   if (!btn) return;
   if (sfOn) {
     btn.textContent = '⬛ Analys av'; btn.classList.add('on');
-    barWrap && barWrap.classList.add('vis');
-    pvEl    && pvEl.classList.add('vis');
+    vBar && vBar.classList.add('vis');
+    pvEl && pvEl.classList.add('vis');
   } else {
     btn.textContent = '▶ Analys på'; btn.classList.remove('on');
-    barWrap && barWrap.classList.remove('vis');
-    pvEl    && pvEl.classList.remove('vis');
+    vBar && vBar.classList.remove('vis');
+    pvEl && pvEl.classList.remove('vis');
   }
 }
 
@@ -890,13 +900,17 @@ function renderSingle() {
 
   // ── Första render: bygg hela strukturen ──────────────────────────────────
   content.innerHTML =
+    `<div class="board-stack">` +
+    `<div class="sf-vert-bar" id="sf-vert-bar"><div class="sf-vert-fill" id="sf-vert-fill"></div></div>` +
     `<div class="single-board-grid"></div>` +
+    `</div>` +
     `<div class="single-ml-col">
       <div class="single-players">
         <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span><span class="single-p-rating">${w.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span>${res}</div>
         <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span><span class="single-p-rating">${bl.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
       </div>
-      <div class="sf-row" style="display:flex;align-items:center;gap:6px">
+      <div class="single-ml" id="single-ml"></div>
+      <div class="sf-row">
         <div class="ib-nav">
           <button class="ib-nav-btn" id="ib-btn-start" onclick="ibStart()" title="Början (↑)">⏮</button>
           <button class="ib-nav-btn" id="ib-btn-back"  onclick="ibBack()"  title="Föregående (←)">◀</button>
@@ -905,12 +919,7 @@ function renderSingle() {
         </div>
         <button class="sf-btn" id="sf-btn" onclick="sfToggle()">▶ Analys på</button>
       </div>
-      <div class="sf-bar-wrap" id="sf-bar-wrap" style="position:relative">
-        <div class="sf-bar-w" id="sf-bar-w" style="width:50%"></div>
-        <div style="position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 5px;pointer-events:none;font-size:0.55rem;font-weight:800;color:rgba(255,255,255,0.4);letter-spacing:.06em"><span>VIT</span><span>SV</span></div>
-      </div>
       <div class="sf-pv" id="sf-pv"></div>
-      <div class="single-ml" id="single-ml"></div>
     </div>`;
 
   IB.inited = true;
