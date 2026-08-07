@@ -627,6 +627,7 @@ function ibMoves() {
     return;
   }
   let html = '';
+  html += ibVarHTML('0');  // variant från startposition
   for (let i = 0; i < IB.mains.length; i += 2) {
     const n    = i / 2 + 1;
     const wSan = sweSAN(IB.mains[i]);
@@ -679,13 +680,20 @@ function ibClick(sq) {
         // Matchar nästa huvuddrag → navigera framåt
         IB.idx++; IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); ibUpdNav(); return;
       }
-      // Lägg till/fortsätt variant
+      // I slutet av (eller utan) huvudlinje → lägg till i IB.mains direkt
+      if (IB.varBase < 0 && IB.idx >= IB.mains.length) {
+        IB.mains.push(san);
+        IB.idx++;
+        IB.selSq = null; ibBoard(); ibMoves(); if (sfOn) sfRunNow(); ibUpdNav(); return;
+      }
+      // Avvikelse mitt i huvudlinjen → skapa/fortsätt variant
       if (IB.varBase < 0) {
         const vk = String(IB.idx);
-        IB.allVars[vk] = [san];
+        if (!IB.allVars[vk]) IB.allVars[vk] = [];
+        IB.allVars[vk].push(san);
         IB.varBase = IB.idx;
         IB.varMvs  = IB.allVars[vk];
-        IB.varIdx  = 1;
+        IB.varIdx  = IB.allVars[vk].length;
       } else {
         const vk = String(IB.varBase);
         IB.allVars[vk].push(san);
