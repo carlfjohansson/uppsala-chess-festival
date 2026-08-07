@@ -610,11 +610,27 @@ function _ibBoard() {
 function ibVarHTML(vk) {
   const vm = IB.allVars[vk];
   if (!vm || !vm.length) return '';
+  // Spela upp huvudlinjen till greningspunkten för att få rätt dragnummer och tur
+  const tmp = new Chess();
+  const startIdx = parseInt(vk);
+  for (let k = 0; k < startIdx && k < IB.mains.length; k++) {
+    try { tmp.move(IB.mains[k]); } catch(e) { break; }
+  }
+  let moveNum = Math.floor(tmp.history().length / 2) + 1;
+  let isBlack  = tmp.turn() === 'b';
   let h = '<div class="ib-var-line">(';
   vm.forEach((s, mi) => {
     const inV = String(IB.varBase) === vk && IB.varIdx === mi + 1;
-    h += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${vk},${mi+1})">${sweSAN(s)}</span>`;
+    let prefix = '';
+    if (!isBlack) {
+      prefix = moveNum + '.';     // vitts drag → dragnummer + punkt
+    } else if (mi === 0) {
+      prefix = moveNum + '…';    // svarts första drag i varianten → "N…"
+    }
+    h += `<span class="ib-vm${inV ? ' ib-cur' : ''}" onclick="ibGoVar(${vk},${mi+1})">${prefix}${sweSAN(s)}</span>`;
     if (mi < vm.length - 1) h += ' ';
+    isBlack = !isBlack;
+    if (!isBlack) moveNum++;
   });
   return h + ')</div>';
 }
