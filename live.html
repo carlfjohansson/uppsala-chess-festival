@@ -1090,7 +1090,21 @@
     }
 
     /* ── Stadionvy ───────────────────────────────────────── */
-    #stadium-view {
+    #stadium-round-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px 0;
+  max-width: 1200px; margin: 0 auto;
+}
+.srd-label { font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.srd-btn {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-family: 'Lato', sans-serif; font-size: .85rem; font-weight: 700;
+  padding: 5px 14px; cursor: pointer; transition: all .15s;
+}
+.srd-btn:hover { border-color: var(--navy); color: var(--navy); }
+.srd-btn.active { background: var(--navy); color: var(--gold); border-color: var(--navy); }
+
+#stadium-view {
       width: 100%; max-width: 1160px; margin: 0 auto;
       padding: 28px 16px 60px; display: flex; flex-direction: column; gap: 32px;
     }
@@ -1242,6 +1256,16 @@
     </button>
   </div>
 </nav>
+
+<!-- ── Rondväljare ────────────────────────────────────────────── -->
+<div id="stadium-round-bar">
+  <span class="srd-label">Rond:</span>
+  <button class="srd-btn active" onclick="setStadiumRound(1,this)">1</button>
+  <button class="srd-btn" onclick="setStadiumRound(2,this)">2</button>
+  <button class="srd-btn" onclick="setStadiumRound(3,this)">3</button>
+  <button class="srd-btn" onclick="setStadiumRound(4,this)">4</button>
+  <button class="srd-btn" onclick="setStadiumRound(5,this)">5</button>
+</div>
 
 <!-- ── Stadionvy (standardvy) ─────────────────────────────────── -->
 <div id="stadium-view">
@@ -4027,6 +4051,7 @@ let stadiumGameData = {};    // stadiumGameData['grupp-1'][1] = gameJson
 let stadiumPairData = {};    // stadiumPairData['grupp-1'][1] = {white, black}
 let stadiumPollTimer = null;
 let stadiumMode = true;
+let STADIUM_ROUND = 1;
 
 // Bygg startsida — renderar alla grupper med tomma bräden som platshållare
 function initStadium() {
@@ -4086,7 +4111,7 @@ async function fetchStadiumGroup(grp) {
 
   // Pairings
   try {
-    const r = await fetch(`${BASE}/${grp.tid}/round-1/index.json`, { cache: 'no-store' });
+    const r = await fetch(`${BASE}/${grp.tid}/round-${STADIUM_ROUND}/index.json`, { cache: 'no-store' });
     if (r.ok) {
       const idx = await r.json();
       (idx.pairings || []).forEach((p, i) => {
@@ -4099,7 +4124,7 @@ async function fetchStadiumGroup(grp) {
   await Promise.all(
     Array.from({ length: grp.boards }, (_, i) => i + 1).map(async b => {
       try {
-        const r = await fetch(`${BASE}/${grp.tid}/round-1/game-${b}.json`, { cache: 'no-store' });
+        const r = await fetch(`${BASE}/${grp.tid}/round-${STADIUM_ROUND}/game-${b}.json`, { cache: 'no-store' });
         if (r.ok) stadiumGameData[grp.id][b] = await r.json();
       } catch(e) {}
     })
@@ -4129,7 +4154,7 @@ function updateStadiumGroup(grp) {
 
     // Mini-bräde (med fördröjning)
     const mbEl = document.getElementById(`sgmb-${grp.id}-${b}`);
-    if (mbEl) mbEl.innerHTML = mbBoardHTML(applyDelay(data, grp.id, b));
+    if (mbEl) mbEl.innerHTML = mbBoardHTML(applyDelay(data, grp.id + '-R' + STADIUM_ROUND, b));
 
     // Resultat/status
     const resEl = document.getElementById(`sgr-${grp.id}-${b}`);
@@ -4164,6 +4189,18 @@ function updateStadiumGroup(grp) {
   if (stadiumMode && sfWorker && sfReady && !sfSearching && getEnabledStadiumBoards().length > 0) {
     analyzeNextStadiumBoard();
   }
+}
+
+function setStadiumRound(rn, btn) {
+  STADIUM_ROUND = rn;
+  // Uppdatera aktiv knapp
+  document.querySelectorAll('.srd-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Töm data och rita om
+  stadiumGameData = {}; stadiumPairData = {};
+  initStadium();
+  if (stadiumPollTimer) { clearTimeout(stadiumPollTimer); stadiumPollTimer = null; }
+  pollStadium();
 }
 
 async function pollStadium() {
