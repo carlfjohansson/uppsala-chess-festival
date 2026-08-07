@@ -379,6 +379,25 @@ let gameData = {}, pairData = {};
 // {gid: {board: {wSecs, bSecs, whoseTurn, fetchedAt, done}}}
 const clockState = {};
 
+// ── Sändningsfördröjning ──────────────────────────────────────────────────
+const DELAY_MS = 15 * 60 * 1000;  // 15 minuter
+const moveFirstSeen = {};          // key: "gid-board-idx" -> timestamp
+
+function delayedMoves(rawMoves, gid, board) {
+  const now = Date.now();
+  const prefix = gid + '-' + board + '-';
+  const sans = (rawMoves || []).map(mv =>
+    typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
+  ).filter(Boolean);
+  sans.forEach((_, i) => {
+    const k = prefix + i;
+    if (!moveFirstSeen[k]) moveFirstSeen[k] = now;
+  });
+  return DELAY_MS > 0
+    ? sans.filter((_, i) => now - moveFirstSeen[prefix + i] >= DELAY_MS)
+    : sans;
+}
+
 function extractClocks(data) {
   if (!data || !data.moves || !data.moves.length) return null;
   const moves = data.moves;
@@ -772,7 +791,7 @@ function ibUpdNav() {
 
 function ibSync(data) {
   const raw = data && data.moves ? data.moves : [];
-  const newMains = raw.map(mv => typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')).filter(Boolean);
+  const newMains = delayedMoves(raw, SINGLE_GID, SINGLE_BOARD);
   // Don't overwrite good data with empty data (e.g. if a fetch fails mid-game)
   if (newMains.length > 0 || IB.mains.length === 0) {
     const wasEnd = IB.idx === IB.mains.length;
@@ -797,11 +816,9 @@ function sweSAN(san) {
     .replace(/=([KQRBN])/, (_, p) => '=' + (SWE[p] || p));
 }
 
-function moveListHTML(data) {
+function moveListHTML(data, gid, board) {
   const rawMoves = data && data.moves ? data.moves : [];
-  const sans = rawMoves.map(mv =>
-    typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
-  ).filter(Boolean);
+  const sans = delayedMoves(rawMoves, gid, board);
 
   if (!sans.length) return '<div class="ml-row"><span class="ml-num">1.</span><span class="ml-w" style="color:var(--muted)">…</span><span class="ml-b"></span></div>';
 
@@ -824,10 +841,10 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function pLabel(p){ return p?([p.fname,p.lname].filter(Boolean).join(' ')||p.name||null):null; }
 function sqIdx(sq){ return (8-parseInt(sq[1]))*8+(sq.charCodeAt(0)-97); }
 
-function boardHTML(data) {
+function boardHTML(data, gid, board) {
   const c = new Chess(); let lmF=-1,lmT=-1;
-  for (const mv of (data&&data.moves?data.moves:[])) {
-    const san=typeof mv==='string'?mv.split(' ')[0]:(mv.m||mv.san||'');
+  const dMoves = delayedMoves(data&&data.moves?data.moves:[], gid, board);
+  for (const san of dMoves) {
     if(!san)break; try{c.move(san);}catch(e){break;}
   }
   const hist=c.history({verbose:true});
@@ -875,20 +892,21 @@ function updateBoard(g,b) {
   const bR=bl.rating?`<span class="p-rating">${bl.rating}</span>`:'';
   const res=data&&data.result&&data.result!=='*'?`<span class="bc-result">${esc(data.result)}</span>`:'';
 
-  // Spara klockstatus
+  // Spara klockstatus (dölj klockor för pågående partier när fördröjning är aktiv)
   const done = !!(data && data.result && data.result !== '*');
   const clks = extractClocks(data);
   if (!clockState[g.id]) clockState[g.id] = {};
-  clockState[g.id][b] = clks ? { ...clks, fetchedAt: Date.now(), done } : { done };
+  const showClocks = done || DELAY_MS === 0;
+  clockState[g.id][b] = (clks && showClocks) ? { ...clks, fetchedAt: Date.now(), done } : { done };
 
   el.innerHTML=
     `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span>${res}</div>`+
-    `<div class="bw">${boardHTML(data)}<div class="ml-col">` +
+    `<div class="bw">${boardHTML(data,g.id,b)}<div class="ml-col">` +
       `<div class="ml-players">` +
         `<div class="mlp-row"><span class="p-dot w"></span>${wT}<span class="mlp-name">${esc(wN)}</span><span class="mlp-rating">${w.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-w"></span></div>` +
         `<div class="mlp-row"><span class="p-dot b"></span>${bT}<span class="mlp-name">${esc(bN)}</span><span class="mlp-rating">${bl.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-b"></span></div>` +
       `</div>` +
-      `<div class="ml" id="ml-${g.id}-${b}">${moveListHTML(data)}</div>` +
+      `<div class="ml" id="ml-${g.id}-${b}">${moveListHTML(data,g.id,b)}</div>` +
     `</div></div>`;
   const mlEl=document.getElementById(`ml-${g.id}-${b}`);
   if(mlEl) mlEl.scrollTop=mlEl.scrollHeight;
@@ -906,11 +924,12 @@ function renderSingle() {
   const res = data && data.result && data.result !== '*'
     ? `<span class="single-result">${esc(data.result)}</span>` : '';
 
-  // Klockstatus
+  // Klockstatus (dölj klockor för pågående partier när fördröjning är aktiv)
   const done = !!(data && data.result && data.result !== '*');
   const clks = extractClocks(data);
   if (!clockState[SINGLE_GID]) clockState[SINGLE_GID] = {};
-  clockState[SINGLE_GID][SINGLE_BOARD] = clks ? { ...clks, fetchedAt: Date.now(), done } : { done };
+  const showClocks = done || DELAY_MS === 0;
+  clockState[SINGLE_GID][SINGLE_BOARD] = (clks && showClocks) ? { ...clks, fetchedAt: Date.now(), done } : { done };
 
   const content = document.getElementById('single-content');
   if (!content) return;
