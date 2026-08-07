@@ -111,7 +111,7 @@ footer a{color:#f5cb6b}
   .results-header{flex-direction:column;align-items:flex-start}
 }
 
-/* ── Berger-grupper ─────────────────────────────────────── */
+/* ── Grupper ───────────────────────────────────────────── */
 #groups-panel { margin-top: 40px; }
 .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 24px; }
 @media (max-width: 600px) { .groups-grid { grid-template-columns: 1fr; } }
@@ -178,7 +178,7 @@ footer a{color:#f5cb6b}
     <!-- ── Berger-grupper Weekend 1 ────────────────────────────── -->
     <div id="groups-panel" style="display:none">
       <h2 class="groups-heading sv">Bergergrupper – Weekend 1</h2>
-      <h2 class="groups-heading en" style="display:none">Berger Groups – Weekend 1</h2>
+      <h2 class="groups-heading en" style="display:none">Round Robin Groups – Weekend 1</h2>
       <div id="groups-container"></div>
     </div>
   </div>
@@ -201,12 +201,16 @@ const TOURNAMENTS = [
 ];
 const YOUTH_IDS = [18502,18501,18500,18499];
 
-// ── Berger-grupper Weekend 1 ─────────────────────────────────────────
+// ── Grupper Weekend 1 ────────────────────────────────────────────────
 // Fyll i riktiga SSF-turnerings-IDs när de är tilldelade (tätt inpå rond 1).
-// Varje element är ett SSF-turnerings-ID för en Bergergrupp.
+// Varje element är ett objekt: {id, swiss?:true, rounds?:N}
 // Exempel nästa år: const WEEKEND1_GROUPS = [12345, 12346, 12347, 12348];
 // Lämna tomt ([]) tills IDsen är kända — då visas ett väntningsmeddelande.
-const WEEKEND1_GROUPS = [19022, 19023, 19024, 19025, 19026, 19027, 19028, 19029];
+const WEEKEND1_GROUPS = [
+  {id:19022}, {id:19023}, {id:19024}, {id:19025},
+  {id:19026}, {id:19027}, {id:19028},
+  {id:19029, swiss:true, rounds:5}
+];
 const BASE = 'https://member.schack.se/public/api/v1';
 let lang = 'sv';
 let currentId = null;
@@ -508,14 +512,20 @@ async function loadGroups() {
   }
   container.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar grupper…':'Fetching groups…'}</div>`;
   
-  const sections = await Promise.all(WEEKEND1_GROUPS.map((gid, idx) => loadOneGroup(gid, idx)));
+  const sections = await Promise.all(WEEKEND1_GROUPS.map((grp, idx) => loadOneGroup(grp, idx)));
   container.innerHTML = `<div class="groups-grid">${sections.join('')}</div>`;
 }
 
-async function loadOneGroup(gid, idx) {
+async function loadOneGroup(grp, idx) {
+  const gid      = grp.id;
+  const isSwiss  = !!grp.swiss;
   const groupNum = idx + 1;
+  const sv = lang === 'sv';
+  const typeLabel = isSwiss
+    ? `<span style="font-size:.72rem;background:rgba(255,255,255,.15);border-radius:3px;padding:1px 6px;margin-left:4px">${sv?'Schweizer':'Swiss'} · ${grp.rounds||5} ${sv?'ronder':'rounds'}</span>`
+    : `<span style="font-size:.72rem;background:rgba(255,255,255,.15);border-radius:3px;padding:1px 6px;margin-left:4px">${sv?'Berger':'Round Robin'}</span>`;
   const header = `<div class="group-section-header">
-    <h3>${lang==='sv'?'Grupp':'Group'} ${groupNum}</h3>
+    <h3>${sv?'Grupp':'Group'} ${groupNum}${typeLabel}</h3>
     <span class="group-range"><a href="https://member.schack.se/ShowTournamentServlet?id=${gid}&listingtype=1" target="_blank" style="color:#c9bfa8">member.schack.se</a></span>
   </div>`;
   try {
@@ -535,9 +545,8 @@ async function loadOneGroup(gid, idx) {
           rating:pi.elo?.rating||pi.rating||0
         };
       }).sort((a,b)=>b.rating-a.rating);
-      
       if (!players.length) {
-        return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${lang==='sv'?'Inga spelare ännu':'No players yet'}</p></div></div></div>`;
+        return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${sv?'Inga spelare ännu':'No players yet'}</p></div></div></div>`;
       }
       const rows = players.map((p,i)=>`<tr>
         <td class="td-rank">${i+1}</td>
@@ -547,16 +556,27 @@ async function loadOneGroup(gid, idx) {
       </tr>`).join('');
       const tbl = `<table><thead><tr>
         <th class="th-num">#</th>
-        <th class="th-name" style="text-align:left">${lang==='sv'?'Spelare':'Player'}</th>
-        <th class="th-stat">${lang==='sv'?'Klubb':'Club'}</th>
+        <th class="th-name" style="text-align:left">${sv?'Spelare':'Player'}</th>
+        <th class="th-stat">${sv?'Klubb':'Club'}</th>
         <th class="th-stat">Rating</th>
       </tr></thead><tbody>${rows}</tbody></table>`;
       return `<div class="group-section">${header}<div class="group-section-body"><div class="table-wrap">${tbl}</div></div></div>`;
     }
-    
+
     const players = standings(table);
-    const {matrix} = processRounds(players, rounds);
-    return `<div class="group-section">${header}<div class="group-section-body"><div class="table-wrap">${crossTable(players,matrix)}</div></div></div>`;
+    const {roundInfo, matrix} = processRounds(players, rounds);
+    const nR = players.length ? Math.max(0,...Object.values(roundInfo).flatMap(r=>Object.keys(r).map(Number))) : 0;
+
+    let body;
+    if (isSwiss) {
+      // Schweizer: ställningstabell + rond-för-rond
+      body = wrap(standingsTable(players));
+      if (nR) body += `<div style="margin-top:12px">${wrap(roundTable(players,roundInfo,nR))}</div>`;
+    } else {
+      // Berger: korstabell
+      body = wrap(crossTable(players, matrix));
+    }
+    return `<div class="group-section">${header}<div class="group-section-body">${body}</div></div>`;
   } catch(e) {
     return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${esc(String(e))}</p></div></div></div>`;
   }
