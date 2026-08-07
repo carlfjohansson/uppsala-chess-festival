@@ -412,11 +412,19 @@ function parseRes(v) {
 function processRounds(players, rrs) {
   const byId={},roundInfo={},matrix={};
   players.forEach(p=>{byId[p.id]=p;roundInfo[p.id]={};matrix[p.id]={};});
+  // Kommande parningar: spel med giltiga spelar-ID men utan resultat
+  const upcomingByRound = {};
   for (const rr of rrs) {
     const rn=rr.roundNr, pairs=[];
     if (rr.games?.length) {
       for (const g of rr.games) {
-        if (!g.whiteId||!g.blackId||g.result==null||g.result===0) continue;
+        if (!g.whiteId||!g.blackId) continue;
+        if (g.result==null||g.result===0) {
+          // Parning utan resultat → kommande rond
+          if (!upcomingByRound[rn]) upcomingByRound[rn]=[];
+          upcomingByRound[rn].push({wId:g.whiteId,bId:g.blackId});
+          continue;
+        }
         const res=parseRes(g.result);
         if (res) pairs.push({wId:g.whiteId,bId:g.blackId,res});
       }
@@ -435,7 +443,46 @@ function processRounds(players, rrs) {
       matrix[bId][wId]=res.b===1?'win':res.b===0?'loss':'draw';
     }
   }
-  return {roundInfo,matrix};
+  return {roundInfo,matrix,upcomingByRound};
+}
+
+function upcomingTable(players, upcomingByRound, byId) {
+  const sv = lang === 'sv';
+  // Ta den lägsta rondsiffran som har parningar
+  const rounds = Object.keys(upcomingByRound).map(Number).sort((a,b)=>a-b);
+  if (!rounds.length) return '';
+  const rn = rounds[0];
+  const pairs = upcomingByRound[rn];
+  if (!pairs || !pairs.length) return '';
+
+  // Bygg upp en lookup id→spelare
+  const byId2 = {};
+  players.forEach(p => { byId2[p.id] = p; });
+
+  let h = `<div style="margin-top:16px">
+    <div style="font-size:.8rem;font-weight:700;color:var(--navy);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;padding:0 2px">
+      ${sv?'Lottning rond':'Pairings round'} ${rn}
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th class="th-num" style="width:28px">#</th>
+        <th class="th-name" style="text-align:left">${sv?'Vit':'White'}</th>
+        <th class="th-name" style="text-align:left">${sv?'Svart':'Black'}</th>
+      </tr></thead><tbody>`;
+  pairs.forEach((pair, i) => {
+    const wp = byId2[pair.wId];
+    const bp = byId2[pair.bId];
+    const wName = wp ? esc(wp.name) : `ID ${pair.wId}`;
+    const bName = bp ? esc(bp.name) : `ID ${pair.bId}`;
+    const wSub  = wp ? `<span class="td-sub">${wp.club||''}${wp.rating?' · '+wp.rating:''}</span>` : '';
+    const bSub  = bp ? `<span class="td-sub">${bp.club||''}${bp.rating?' · '+bp.rating:''}</span>` : '';
+    h += `<tr>
+      <td class="td-rank">${i+1}</td>
+      <td class="td-name"><span class="td-pname">⬜ ${wName}</span>${wSub}</td>
+      <td class="td-name"><span class="td-pname">⬛ ${bName}</span>${bSub}</td>
+    </tr>`;
+  });
+  return h + '</tbody></table></div></div>';
 }
 
 function fmt(s) { const w=Math.floor(s),h=Math.abs(s-w-.5)<.01; return (w===0&&h)?'½':String(w)+(h?'½':''); }
@@ -564,13 +611,17 @@ async function loadOneGroup(grp, idx) {
     }
 
     const players = standings(table);
-    const {roundInfo, matrix} = processRounds(players, rounds);
+    const {roundInfo, matrix, upcomingByRound} = processRounds(players, rounds);
     const nR = players.length ? Math.max(0,...Object.values(roundInfo).flatMap(r=>Object.keys(r).map(Number))) : 0;
+
+    // Bygg id-lookup för upcomingTable
+    const byId = {}; players.forEach(p => { byId[p.id] = p; });
 
     let body;
     if (isSwiss) {
-      // Schweizer: rond-för-rond med motståndarnummer och resultat per ruta
+      // Schweizer: rond-för-rond + kommande lottning
       body = nR ? wrap(roundTable(players,roundInfo,nR)) : wrap(standingsTable(players));
+      body += upcomingTable(players, upcomingByRound, byId);
     } else {
       // Berger: korstabell
       body = wrap(crossTable(players, matrix));
