@@ -113,6 +113,8 @@ footer a{color:#f5cb6b}
 
 /* ── Berger-grupper ─────────────────────────────────────── */
 #groups-panel { margin-top: 40px; }
+.groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 24px; }
+@media (max-width: 600px) { .groups-grid { grid-template-columns: 1fr; } }
 .groups-heading { font-family: var(--serif); font-size: 1.4rem; color: var(--navy); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--gold); }
 .group-section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 28px; overflow: hidden; }
 .group-section-header { background: var(--navy); color: #fff; padding: 12px 20px; display: flex; align-items: baseline; gap: 12px; }
@@ -204,7 +206,7 @@ const YOUTH_IDS = [18502,18501,18500,18499];
 // Varje element är ett SSF-turnerings-ID för en Bergergrupp.
 // Exempel nästa år: const WEEKEND1_GROUPS = [12345, 12346, 12347, 12348];
 // Lämna tomt ([]) tills IDsen är kända — då visas ett väntningsmeddelande.
-const WEEKEND1_GROUPS = []; // ← Lägg in grupp-IDs här när de är klara
+const WEEKEND1_GROUPS = [19022, 19023, 19024, 19025, 19026, 19027, 19028, 19029];
 const BASE = 'https://member.schack.se/public/api/v1';
 let lang = 'sv';
 let currentId = null;
@@ -234,12 +236,21 @@ buildGrid();
 function selectTourn(id, btn) {
   document.querySelectorAll('.tourn-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const youthTabs = document.getElementById('youth-tabs');
+  const youthTabs   = document.getElementById('youth-tabs');
+  const groupsPanel = document.getElementById('groups-panel');
   if (id==='youth') {
     youthTabs.classList.add('visible');
+    groupsPanel.style.display = 'none';
     selectYouth(YOUTH_IDS[0], document.querySelector('.ytab'));
+  } else if (id==='18485') {
+    // Weekend 1 → visa Berger-grupperna
+    youthTabs.classList.remove('visible');
+    document.getElementById('results-panel').style.display = 'none';
+    groupsPanel.style.display = 'block';
+    loadGroups();
   } else {
     youthTabs.classList.remove('visible');
+    groupsPanel.style.display = 'none';
     load(parseInt(id));
   }
 }
@@ -498,7 +509,7 @@ async function loadGroups() {
   container.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar grupper…':'Fetching groups…'}</div>`;
   
   const sections = await Promise.all(WEEKEND1_GROUPS.map((gid, idx) => loadOneGroup(gid, idx)));
-  container.innerHTML = sections.join('');
+  container.innerHTML = `<div class="groups-grid">${sections.join('')}</div>`;
 }
 
 async function loadOneGroup(gid, idx) {
