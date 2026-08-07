@@ -569,9 +569,8 @@ async function loadOneGroup(grp, idx) {
 
     let body;
     if (isSwiss) {
-      // Schweizer: ställningstabell + rond-för-rond
-      body = wrap(standingsTable(players));
-      if (nR) body += `<div style="margin-top:12px">${wrap(roundTable(players,roundInfo,nR))}</div>`;
+      // Schweizer: rond-för-rond med motståndarnummer och resultat per ruta
+      body = nR ? wrap(roundTable(players,roundInfo,nR)) : wrap(standingsTable(players));
     } else {
       // Berger: korstabell
       body = wrap(crossTable(players, matrix));
