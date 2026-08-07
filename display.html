@@ -611,10 +611,9 @@ function ibVarHTML(vk) {
 
 function ibMoves() {
   const el = document.getElementById('single-ml');
-  console.log('[ibMoves] el:', !!el, 'mains:', IB.mains.length, 'idx:', IB.idx);
   if (!el) return;
   if (!IB.mains.length) {
-    el.innerHTML = '<div class="ib-row"><span class="ml-num">1.</span><span class="ib-w" style="color:var(--muted)">…</span><span class="ib-b"></span></div>';
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:4px 0">Väntar på drag…</div>';
     return;
   }
   let html = '';
@@ -740,14 +739,12 @@ function ibUpdNav() {
 function ibSync(data) {
   const raw = data && data.moves ? data.moves : [];
   const newMains = raw.map(mv => typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')).filter(Boolean);
-  console.log('[ibSync] raw:', raw.length, 'newMains:', newMains.length, 'sample:', JSON.stringify(raw.slice(0,2)));
   // Don't overwrite good data with empty data (e.g. if a fetch fails mid-game)
   if (newMains.length > 0 || IB.mains.length === 0) {
     const wasEnd = IB.idx === IB.mains.length;
     IB.mains = newMains;
     if (wasEnd) IB.idx = Math.min(IB.idx, IB.mains.length);
   }
-  console.log('[ibSync] IB.mains after update:', IB.mains.length, 'IB.idx:', IB.idx);
   if (IB.inited) { ibBoard(); ibMoves(); ibUpdNav(); }
 }
 
