@@ -1324,6 +1324,35 @@ const PIECE_SVG = {
 
 // ── State ────────────────────────────────────────────────────
 const BASE = 'https://1.pool.livechesscloud.com/get';
+
+// ── Sändningsfördröjning (delas med display.html via localStorage) ────────
+const DELAY_MS = 15 * 60 * 1000;
+const MFS_KEY  = 'ucf_mfs';
+let moveFirstSeen = {};
+try { const s = localStorage.getItem(MFS_KEY); if (s) moveFirstSeen = JSON.parse(s); } catch(e) {}
+function _mfsSave() { try { localStorage.setItem(MFS_KEY, JSON.stringify(moveFirstSeen)); } catch(e) {} }
+(function _mfsPrune() {
+  const cut = Date.now() - 2 * 24 * 60 * 60 * 1000; let p = false;
+  for (const k of Object.keys(moveFirstSeen)) { if (moveFirstSeen[k] < cut) { delete moveFirstSeen[k]; p = true; } }
+  if (p) _mfsSave();
+})();
+function delayedMoves(rawMoves, gid, board) {
+  const now = Date.now(), prefix = gid + '-' + board + '-';
+  const sans = (rawMoves || []).map(mv =>
+    typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
+  ).filter(Boolean);
+  let ch = false;
+  sans.forEach((_, i) => { const k = prefix + i; if (!moveFirstSeen[k]) { moveFirstSeen[k] = now; ch = true; } });
+  if (ch) _mfsSave();
+  return DELAY_MS > 0 ? sans.filter((_, i) => now - moveFirstSeen[prefix + i] >= DELAY_MS) : sans;
+}
+// Returnerar en kopia av data med fördröjda drag (eller null om inga drag visas ännu)
+function applyDelay(data, gid, board) {
+  if (!data) return null;
+  const moves = delayedMoves(data.moves, gid, board);
+  return { ...data, moves };
+}
+
 let TID = 'a82c385f-349d-4fae-baf6-44aa6a4df5c2';
 let ROUND = 1, GAME = 1;
 
@@ -1631,7 +1660,7 @@ async function fetchGame() {
 function buildAtPly(ply, lineIdx) {
   if (typeof Chess === 'undefined') return null;
   const c = new Chess();
-  const moves = (gameData && gameData.moves) || [];
+  const moves = delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME);
   const lIdx = (lineIdx !== undefined) ? lineIdx : activeLineIdx;
 
   if (!analysisActive || ply <= branchFromPly) {
@@ -1664,7 +1693,7 @@ function maxPly() {
   if (analysisActive && analysisLines[activeLineIdx]) {
     return branchFromPly + analysisLines[activeLineIdx].moves.length;
   }
-  return (gameData && gameData.moves) ? gameData.moves.length : 0;
+  return delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME).length;
 }
 
 // Convert chess.js piece → PIECE_SVG key ('wP', 'bQ' etc.)
@@ -1675,7 +1704,7 @@ function pieceKey(p) {
 
 // ── Render all ────────────────────────────────────────────────
 function renderAll() {
-  const moves     = (gameData && gameData.moves) || [];
+  const moves     = delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME);
   const total     = moves.length;
   const atEnd     = viewPly >= total;
   const normRes   = normalizeResult(gameData.result);
@@ -3312,8 +3341,9 @@ function renderOverview() {
     const mbOverlay = isDone
       ? `<div class="mb-result-overlay"><span class="mb-result-text">${resultLabel(norm)}</span></div>`
       : '';
-    const boardHTML = data
-      ? mbBoardHTML(data)
+    const _delayed = data ? applyDelay(data, TID + '-R' + ROUND, g) : null;
+    const boardHTML = _delayed
+      ? mbBoardHTML(_delayed)
       : '<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center"><div class="spinner"></div></div>';
 
     const ev = ovEvalData[g];
@@ -3400,9 +3430,10 @@ function analyzeNextOverviewBoard() {
   const idx = boards.indexOf(ovCurrentBoard);
   ovCurrentBoard = boards[(idx + 1) % boards.length];
 
-  const data = overviewData[ovCurrentBoard];
+  const _rawOv = overviewData[ovCurrentBoard];
+  const data = _rawOv ? applyDelay(_rawOv, TID + '-R' + ROUND, ovCurrentBoard) : null;
   if (!data || !(data.moves || []).length) {
-    // Inga drag än – hoppa vidare direkt
+    // Inga drag ännu (eller alla inom fördröjningsfönstret) – hoppa vidare direkt
     setTimeout(analyzeNextOverviewBoard, 200);
     return;
   }
@@ -4096,9 +4127,9 @@ function updateStadiumGroup(grp) {
         <div class="sg-player-row"><span class="sg-color-dot black"></span><span class="sg-player-name">${escHtml(bName)}</span>${bRating}</div>`;
     }
 
-    // Mini-bräde
+    // Mini-bräde (med fördröjning)
     const mbEl = document.getElementById(`sgmb-${grp.id}-${b}`);
-    if (mbEl) mbEl.innerHTML = mbBoardHTML(data);
+    if (mbEl) mbEl.innerHTML = mbBoardHTML(applyDelay(data, grp.id, b));
 
     // Resultat/status
     const resEl = document.getElementById(`sgr-${grp.id}-${b}`);
