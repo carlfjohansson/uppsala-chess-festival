@@ -562,6 +562,9 @@ function ibC() {
 function ibSqN(sq) { return (8 - parseInt(sq[1])) * 8 + (sq.charCodeAt(0) - 97); }
 
 function ibBoard() {
+  try { _ibBoard(); } catch(e) { console.error('ibBoard:', e); }
+}
+function _ibBoard() {
   const el = document.querySelector('.single-board-grid');
   if (!el) return;
   const c = ibC();
@@ -736,9 +739,12 @@ function ibUpdNav() {
 function ibSync(data) {
   const raw = data && data.moves ? data.moves : [];
   const newMains = raw.map(mv => typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')).filter(Boolean);
-  const wasEnd = IB.idx === IB.mains.length;
-  IB.mains = newMains;
-  if (wasEnd) IB.idx = Math.min(IB.idx, IB.mains.length);
+  // Don't overwrite good data with empty data (e.g. if a fetch fails mid-game)
+  if (newMains.length > 0 || IB.mains.length === 0) {
+    const wasEnd = IB.idx === IB.mains.length;
+    IB.mains = newMains;
+    if (wasEnd) IB.idx = Math.min(IB.idx, IB.mains.length);
+  }
   if (IB.inited) { ibBoard(); ibMoves(); ibUpdNav(); }
 }
 
