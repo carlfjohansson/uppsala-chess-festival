@@ -123,6 +123,18 @@
     }
     .p-dot.w { background: #f0f0f0; border: 1px solid #aaa; }
     .p-dot.b { background: #1a1a1a; border: 1px solid #777; }
+
+    /* Spelarrad ovanför/under brädet */
+    .bc-player {
+      display: flex; align-items: center; gap: 0.4em;
+      font-size: clamp(0.58rem, 1.2vh, 0.82rem);
+      font-weight: 700; flex-shrink: 0;
+      padding: 0.1vh 0; overflow: hidden;
+    }
+    .bc-player-name {
+      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bc-player-rating { color: var(--muted); font-size: 0.82em; flex-shrink: 0; }
     .p-clock {
       margin-left: auto; flex-shrink: 0;
       font-size: clamp(0.52rem, 1.05vh, 0.7rem);
@@ -945,26 +957,28 @@ function updateBoard(g,b) {
   const wN=pLabel(w)||'Vit', bN=pLabel(bl)||'Svart';
   const wT=w.title?`<span class="p-title">${esc(w.title)}</span>`:'';
   const bT=bl.title?`<span class="p-title">${esc(bl.title)}</span>`:'';
-  const wR=w.rating?`<span class="p-rating">${w.rating}</span>`:'';
-  const bR=bl.rating?`<span class="p-rating">${bl.rating}</span>`:'';
   const res=data&&data.result&&data.result!=='*'?`<span class="bc-result">${esc(data.result)}</span>`:'';
 
-  // Spara klockstatus (dölj klockor för pågående partier när fördröjning är aktiv)
+  // Klockor: uppdatera fetchedAt bara vid nytt drag (annars blinkar de)
   const done = !!(data && data.result && data.result !== '*');
   const clks = extractClocks(data);
   if (!clockState[g.id]) clockState[g.id] = {};
   const showClocks = done || DELAY_MS === 0;
-  clockState[g.id][b] = (clks && showClocks) ? { ...clks, fetchedAt: Date.now(), done } : { done };
+  if (clks && showClocks) {
+    const prev = clockState[g.id][b];
+    const moveCount = data && data.moves ? data.moves.length : 0;
+    const newMove = !prev || !prev.fetchedAt || prev._moveCount !== moveCount;
+    clockState[g.id][b] = { ...clks, _moveCount: moveCount,
+      fetchedAt: newMove ? Date.now() : prev.fetchedAt, done };
+  } else {
+    clockState[g.id][b] = { done };
+  }
 
   el.innerHTML=
-    `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span>${res}</div>`+
-    `<div class="bw">${boardHTML(data,g.id,b)}<div class="ml-col">` +
-      `<div class="ml-players">` +
-        `<div class="mlp-row"><span class="p-dot w"></span>${wT}<span class="mlp-name">${esc(wN)}</span><span class="mlp-rating">${w.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-w"></span></div>` +
-        `<div class="mlp-row"><span class="p-dot b"></span>${bT}<span class="mlp-name">${esc(bN)}</span><span class="mlp-rating">${bl.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-b"></span></div>` +
-      `</div>` +
-      `<div class="ml" id="ml-${g.id}-${b}">${moveListHTML(data,g.id,b)}</div>` +
-    `</div></div>`;
+    `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span>${res}</div>` +
+    `<div class="bc-player">${bT}<span class="p-dot b"></span><span class="bc-player-name">${esc(bN)}</span><span class="bc-player-rating">${bl.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-b"></span></div>` +
+    `<div class="bw">${boardHTML(data,g.id,b)}<div class="ml" id="ml-${g.id}-${b}">${moveListHTML(data,g.id,b)}</div></div>` +
+    `<div class="bc-player">${wT}<span class="p-dot w"></span><span class="bc-player-name">${esc(wN)}</span><span class="bc-player-rating">${w.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-w"></span></div>`;
   const mlEl=document.getElementById(`ml-${g.id}-${b}`);
   if(mlEl) mlEl.scrollTop=mlEl.scrollHeight;
 }
@@ -986,7 +1000,15 @@ function renderSingle() {
   const clks = extractClocks(data);
   if (!clockState[SINGLE_GID]) clockState[SINGLE_GID] = {};
   const showClocks = done || DELAY_MS === 0;
-  clockState[SINGLE_GID][SINGLE_BOARD] = (clks && showClocks) ? { ...clks, fetchedAt: Date.now(), done } : { done };
+  if (clks && showClocks) {
+    const prev = (clockState[SINGLE_GID] || {})[SINGLE_BOARD];
+    const moveCount = data && data.moves ? data.moves.length : 0;
+    const newMove = !prev || !prev.fetchedAt || prev._moveCount !== moveCount;
+    clockState[SINGLE_GID][SINGLE_BOARD] = { ...clks, _moveCount: moveCount,
+      fetchedAt: newMove ? Date.now() : prev.fetchedAt, done };
+  } else {
+    clockState[SINGLE_GID][SINGLE_BOARD] = { done };
+  }
 
   const content = document.getElementById('single-content');
   if (!content) return;
