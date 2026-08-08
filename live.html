@@ -1545,9 +1545,15 @@ function setBadge(live) {
   }
 }
 
-// ── No-cache fetch helper ─────────────────────────────────────
-function fetchFresh(url) {
-  return fetch(url, { cache: 'no-store' });
+// ── No-cache fetch helper (with local archive fallback) ───────
+async function fetchFresh(url) {
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (r.ok) return r;
+  } catch(e) {}
+  // Fallback: try local archive copy
+  const archUrl = url.replace('https://1.pool.livechesscloud.com/get', '/data/archive/lcc');
+  return fetch(archUrl);
 }
 
 // ── Fetch tournament info ─────────────────────────────────────
@@ -4051,7 +4057,7 @@ let stadiumGameData = {};    // stadiumGameData['grupp-1'][1] = gameJson
 let stadiumPairData = {};    // stadiumPairData['grupp-1'][1] = {white, black}
 let stadiumPollTimer = null;
 let stadiumMode = true;
-let STADIUM_ROUND = 1;
+let STADIUM_ROUND = parseInt(localStorage.getItem('ucf_stadium_round') || '1') || 1;
 
 // Bygg startsida — renderar alla grupper med tomma bräden som platshållare
 function initStadium() {
@@ -4193,10 +4199,9 @@ function updateStadiumGroup(grp) {
 
 function setStadiumRound(rn, btn) {
   STADIUM_ROUND = rn;
-  // Uppdatera aktiv knapp
+  localStorage.setItem('ucf_stadium_round', rn);
   document.querySelectorAll('.srd-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // Töm data och rita om
   stadiumGameData = {}; stadiumPairData = {};
   initStadium();
   if (stadiumPollTimer) { clearTimeout(stadiumPollTimer); stadiumPollTimer = null; }
@@ -4384,7 +4389,8 @@ function updateStadiumEval(gid, board) {
 
 // ── Init ──────────────────────────────────────────────────────
 (async function() {
-  // Starta i stadionvy som standard
+  // Starta i stadionvy som standard — återställ sparad rond
+  document.querySelectorAll('.srd-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === STADIUM_ROUND));
   initStadium();
   pollStadium();
 
