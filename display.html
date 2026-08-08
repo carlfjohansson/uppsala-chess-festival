@@ -31,7 +31,20 @@
     }
 
     /* ── Topplisten ─────────────────────────────────────── */
-    #top {
+    .drd-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px 0;
+  max-width: 1200px; margin: 0 auto;
+}
+.drd-label { font-size: .8rem; font-weight: 700; color: var(--muted,#888); letter-spacing: .06em; text-transform: uppercase; }
+.drd-btn {
+  background: #fff; border: 1px solid #ccc; border-radius: 6px;
+  color: #333; font-family: inherit; font-size: .85rem; font-weight: 700;
+  padding: 5px 14px; cursor: pointer; transition: all .15s;
+}
+.drd-btn:hover { border-color: #1a2744; color: #1a2744; }
+.drd-btn.active { background: #1a2744; color: #c9a84c; border-color: #1a2744; }
+#top {
       height: 4.2vh; min-height: 34px;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 1.2vw;
@@ -348,10 +361,26 @@
   <h1><span class="live-dot"></span>Uppsala Schackfestival 2026</h1>
   <div id="clock"></div>
 </div>
+<div class="drd-bar">
+  <span class="drd-label">Rond</span>
+  <button class="drd-btn active" onclick="setDisplayRound(1,this)">1</button>
+  <button class="drd-btn" onclick="setDisplayRound(2,this)">2</button>
+  <button class="drd-btn" onclick="setDisplayRound(3,this)">3</button>
+  <button class="drd-btn" onclick="setDisplayRound(4,this)">4</button>
+  <button class="drd-btn" onclick="setDisplayRound(5,this)">5</button>
+</div>
 <div id="grid"></div>
 
 <script>
 const BASE = 'https://1.pool.livechesscloud.com/get';
+async function fetchFresh(url) {
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (r.ok) return r;
+  } catch(e) {}
+  const archUrl = url.replace('https://1.pool.livechesscloud.com/get', '/data/archive/lcc');
+  return fetch(archUrl);
+}
 const GROUPS = [
   { id:'grupp-1', label:'Weekend 1 – grupp 1', tid:'b9c6cd2c-e05d-4b1a-a4db-25c98c291b52' },
   { id:'grupp-2', label:'Weekend 1 – grupp 2', tid:'8d579e31-c216-43c4-817e-597ba58db845' },
@@ -451,6 +480,11 @@ const _p = new URLSearchParams(location.search);
 const SINGLE_GID   = _p.get('gid');
 const SINGLE_BOARD = _p.get('board') ? parseInt(_p.get('board')) : null;
 const SINGLE_MODE  = !!(SINGLE_GID && SINGLE_BOARD);
+let DISPLAY_ROUND = parseInt(_p.get('round')) || parseInt(localStorage.getItem('ucf_display_round') || '1') || 1;
+// Sync active button on load (after DOM is ready)
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.drd-btn').forEach((b,i) => b.classList.toggle('active', i+1===DISPLAY_ROUND));
+});
 
 const SWE = { K:'K', Q:'D', R:'T', B:'L', N:'S' };
 
@@ -814,7 +848,7 @@ function ibUpdNav() {
 
 function ibSync(data) {
   const raw = data && data.moves ? data.moves : [];
-  const newMains = delayedMoves(raw, SINGLE_GID, SINGLE_BOARD);
+  const newMains = delayedMoves(raw, SINGLE_GID + '-R' + DISPLAY_ROUND, SINGLE_BOARD);
   // Don't overwrite good data with empty data (e.g. if a fetch fails mid-game)
   if (newMains.length > 0 || IB.mains.length === 0) {
     const wasEnd = IB.idx === IB.mains.length;
@@ -998,12 +1032,22 @@ function renderSingle() {
 async function fetchGroup(g) {
   if(!gameData[g.id])gameData[g.id]={};
   if(!pairData[g.id])pairData[g.id]={};
-  try{const r=await fetch(`${BASE}/${g.tid}/round-1/index.json`,{cache:'no-store'});
+  try{const r=await fetchFresh(`${BASE}/${g.tid}/round-${DISPLAY_ROUND}/index.json`);
     if(r.ok){const idx=await r.json();(idx.pairings||[]).forEach((p,i)=>{if(i<BOARDS)pairData[g.id][i+1]=p;});}}catch(e){}
   for(let b=1;b<=BOARDS;b++){
-    try{const r=await fetch(`${BASE}/${g.tid}/round-1/game-${b}.json`,{cache:'no-store'});
+    try{const r=await fetchFresh(`${BASE}/${g.tid}/round-${DISPLAY_ROUND}/game-${b}.json`);
       if(r.ok)gameData[g.id][b]=await r.json();}catch(e){}
   }
+}
+
+function setDisplayRound(rn, btn) {
+  DISPLAY_ROUND = rn;
+  localStorage.setItem('ucf_display_round', rn);
+  document.querySelectorAll('.drd-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  gameData = {}; pairData = {};
+  if (SINGLE_MODE) { IB.mains = []; IB.idx = 0; IB.inited = false; }
+  poll();
 }
 
 async function poll(){
