@@ -1360,20 +1360,23 @@ function _mfsSave() { try { localStorage.setItem(MFS_KEY, JSON.stringify(moveFir
   for (const k of Object.keys(moveFirstSeen)) { if (moveFirstSeen[k] < cut) { delete moveFirstSeen[k]; p = true; } }
   if (p) _mfsSave();
 })();
-function delayedMoves(rawMoves, gid, board) {
-  const now = Date.now(), prefix = gid + '-' + board + '-';
+function delayedMoves(rawMoves, gid, board, done) {
   const sans = (rawMoves || []).map(mv =>
     typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')
   ).filter(Boolean);
+  // Avslutade partier visas alltid utan fördröjning
+  if (!DELAY_MS || done) return sans;
+  const now = Date.now(), prefix = gid + '-' + board + '-';
   let ch = false;
   sans.forEach((_, i) => { const k = prefix + i; if (!moveFirstSeen[k]) { moveFirstSeen[k] = now; ch = true; } });
   if (ch) _mfsSave();
-  return DELAY_MS > 0 ? sans.filter((_, i) => now - moveFirstSeen[prefix + i] >= DELAY_MS) : sans;
+  return sans.filter((_, i) => now - moveFirstSeen[prefix + i] >= DELAY_MS);
 }
 // Returnerar en kopia av data med fördröjda drag (eller null om inga drag visas ännu)
 function applyDelay(data, gid, board) {
   if (!data) return null;
-  const moves = delayedMoves(data.moves, gid, board);
+  const done = !!(data.result && data.result !== '*');
+  const moves = delayedMoves(data.moves, gid, board, done);
   return { ...data, moves };
 }
 
@@ -1690,7 +1693,8 @@ async function fetchGame() {
 function buildAtPly(ply, lineIdx) {
   if (typeof Chess === 'undefined') return null;
   const c = new Chess();
-  const moves = delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME);
+  const _done = !!(gameData && gameData.result && gameData.result !== '*');
+  const moves = delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME, _done);
   const lIdx = (lineIdx !== undefined) ? lineIdx : activeLineIdx;
 
   if (!analysisActive || ply <= branchFromPly) {
@@ -1723,7 +1727,8 @@ function maxPly() {
   if (analysisActive && analysisLines[activeLineIdx]) {
     return branchFromPly + analysisLines[activeLineIdx].moves.length;
   }
-  return delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME).length;
+  const _d = !!(gameData && gameData.result && gameData.result !== '*');
+  return delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME, _d).length;
 }
 
 // Convert chess.js piece → PIECE_SVG key ('wP', 'bQ' etc.)
@@ -1734,7 +1739,8 @@ function pieceKey(p) {
 
 // ── Render all ────────────────────────────────────────────────
 function renderAll() {
-  const moves     = delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME);
+  const _dn = !!(gameData && gameData.result && gameData.result !== '*');
+  const moves     = delayedMoves((gameData && gameData.moves) || [], TID + '-R' + ROUND, GAME, _dn);
   const total     = moves.length;
   const atEnd     = viewPly >= total;
   const normRes   = normalizeResult(gameData.result);

@@ -928,7 +928,7 @@ function fmtResult(r) {
   if (r === '1-0' || r === 'WHITEWIN') return '1-0';
   if (r === '0-1' || r === 'BLACKWIN') return '0-1';
   if (r === '1/2-1/2' || r === 'DRAW' || r === '½-½') return '½-½';
-  return r;
+  return '';  // NOTPLAYED, okänt format → ingen overlay
 }
 function pLabel(p){ return p?([p.fname,p.lname].filter(Boolean).join(' ')||p.name||null):null; }
 function sqIdx(sq){ return (8-parseInt(sq[1]))*8+(sq.charCodeAt(0)-97); }
