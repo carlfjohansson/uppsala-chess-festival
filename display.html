@@ -36,6 +36,39 @@
   padding: 10px 20px 0;
   max-width: 1200px; margin: 0 auto;
 }
+.cfg-btn {
+  margin-left: auto;
+  background: none; border: 1px solid rgba(200,180,140,0.3);
+  border-radius: 5px; color: rgba(245,203,107,0.6);
+  font-size: .8rem; padding: 4px 10px; cursor: pointer;
+  font-family: inherit;
+}
+.cfg-btn:hover { border-color: var(--gold); color: var(--gold); }
+/* Config overlay */
+#cfg-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.65);
+  align-items: center; justify-content: center;
+}
+#cfg-overlay.open { display: flex; }
+#cfg-panel {
+  background: #fff; border-radius: 10px;
+  padding: 20px 24px; min-width: 360px; max-width: 90vw;
+  font-family: 'Lato', sans-serif;
+}
+#cfg-panel h2 { margin: 0 0 14px; font-size: 1rem; font-weight: 800; color: #1a2744; letter-spacing: .04em; text-transform: uppercase; }
+.cfg-group { margin-bottom: 14px; }
+.cfg-group-name { font-size: .72rem; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.cfg-boards { display: flex; gap: 8px; flex-wrap: wrap; }
+.cfg-cb { display: flex; align-items: center; gap: 5px; font-size: .85rem; cursor: pointer; }
+.cfg-cb input { accent-color: #1a2744; width: 15px; height: 15px; cursor: pointer; }
+.cfg-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.cfg-action-btn {
+  padding: 6px 16px; border-radius: 5px; border: none;
+  font-family: inherit; font-size: .85rem; font-weight: 700; cursor: pointer;
+}
+.cfg-action-btn.primary { background: #1a2744; color: #c9a84c; }
+.cfg-action-btn.secondary { background: #eee; color: #333; }
 .drd-label { font-size: .8rem; font-weight: 700; color: var(--muted,#888); letter-spacing: .06em; text-transform: uppercase; }
 .drd-btn {
   background: #fff; border: 1px solid #ccc; border-radius: 6px;
@@ -396,6 +429,18 @@
   <button class="drd-btn" onclick="setDisplayRound(3,this)">3</button>
   <button class="drd-btn" onclick="setDisplayRound(4,this)">4</button>
   <button class="drd-btn" onclick="setDisplayRound(5,this)">5</button>
+  <button class="cfg-btn" onclick="openCfg()">⚙ Välj bord</button>
+</div>
+
+<div id="cfg-overlay" onclick="if(event.target===this)closeCfg()">
+  <div id="cfg-panel">
+    <h2>Välj vilka bord som visas</h2>
+    <div id="cfg-groups"></div>
+    <div class="cfg-actions">
+      <button class="cfg-action-btn secondary" onclick="cfgSelectAll()">Välj alla</button>
+      <button class="cfg-action-btn primary" onclick="closeCfg()">Stäng</button>
+    </div>
+  </div>
 </div>
 <div id="grid"></div>
 
@@ -968,9 +1013,17 @@ function initGrid() {
     document.body.appendChild(wrap);
   } else {
     let html='';
-    GROUPS.forEach(g=>{ html+=`<div class="g-hdr">${esc(g.label)}</div>`; });
-    for(let b=1;b<=BOARDS;b++) GROUPS.forEach(g=>{ html+=`<div class="bc" id="bc-${g.id}-${b}"></div>`; });
-    document.getElementById('grid').innerHTML=html;
+    // Explicit grid placement so display:none on any cell doesn't shift others
+    GROUPS.forEach((g, gi) => {
+      html += `<div class="g-hdr" id="ghdr-${g.id}" style="grid-column:${gi+1};grid-row:1">${esc(g.label)}</div>`;
+    });
+    for (let b = 1; b <= BOARDS; b++) {
+      GROUPS.forEach((g, gi) => {
+        html += `<div class="bc" id="bc-${g.id}-${b}" style="grid-column:${gi+1};grid-row:${b+1}"></div>`;
+      });
+    }
+    document.getElementById('grid').innerHTML = html;
+    applyVisibility();
   }
 }
 
@@ -1006,6 +1059,7 @@ function updateBoard(g,b) {
     `<div class="bc-player">${wT}<span class="p-dot w"></span><span class="bc-player-name">${esc(wN)}</span><span class="bc-player-rating">${w.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-w"></span></div>`;
   const mlEl=document.getElementById(`ml-${g.id}-${b}`);
   if(mlEl) mlEl.scrollTop=mlEl.scrollHeight;
+  tickClocks();  // populate clocks immediately to avoid blink
 }
 
 function renderSingle() {
@@ -1094,7 +1148,63 @@ function setDisplayRound(rn, btn) {
   btn.classList.add('active');
   gameData = {}; pairData = {};
   if (SINGLE_MODE) { IB.mains = []; IB.idx = 0; IB.inited = false; }
+  applyVisibility();
   poll();
+}
+
+// ── Board visibility config ────────────────────────────────────
+const CFG_KEY = 'ucf_visible_boards';
+function loadVisibility() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null') || {}; } catch { return {}; }
+}
+function saveVisibility(v) { localStorage.setItem(CFG_KEY, JSON.stringify(v)); }
+
+function applyVisibility() {
+  const v = loadVisibility();
+  GROUPS.forEach((g, gi) => {
+    let anyVisible = false;
+    for (let b = 1; b <= BOARDS; b++) {
+      const key = g.id + '-' + b;
+      const visible = !(key in v) || v[key];  // default: visible
+      const el = document.getElementById(`bc-${g.id}-${b}`);
+      if (el) el.style.display = visible ? '' : 'none';
+      if (visible) anyVisible = true;
+    }
+    // Hide group header if all boards hidden
+    const hdr = document.getElementById(`ghdr-${g.id}`);
+    if (hdr) hdr.style.display = anyVisible ? '' : 'none';
+  });
+}
+
+function openCfg() {
+  const v = loadVisibility();
+  const container = document.getElementById('cfg-groups');
+  container.innerHTML = GROUPS.map((g, gi) => {
+    const boards = Array.from({length: BOARDS}, (_, i) => i + 1).map(b => {
+      const key = g.id + '-' + b;
+      const checked = !(key in v) || v[key] ? 'checked' : '';
+      return `<label class="cfg-cb"><input type="checkbox" id="cfgcb-${key}" ${checked} onchange="cfgChange('${key}',this.checked)"> Bord ${b}</label>`;
+    }).join('');
+    return `<div class="cfg-group"><div class="cfg-group-name">${g.label}</div><div class="cfg-boards">${boards}</div></div>`;
+  }).join('');
+  document.getElementById('cfg-overlay').classList.add('open');
+}
+
+function closeCfg() {
+  document.getElementById('cfg-overlay').classList.remove('open');
+}
+
+function cfgChange(key, visible) {
+  const v = loadVisibility();
+  v[key] = visible;
+  saveVisibility(v);
+  applyVisibility();
+}
+
+function cfgSelectAll() {
+  saveVisibility({});
+  document.querySelectorAll('#cfg-panel input[type=checkbox]').forEach(cb => cb.checked = true);
+  applyVisibility();
 }
 
 async function poll(){
