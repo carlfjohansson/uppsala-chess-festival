@@ -1159,8 +1159,11 @@
     .sg-color-dot.black { background: #333; }
     .sg-player-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
     .sg-player-rating { color: var(--muted); font-size: 0.72rem; flex-shrink: 0; }
+    .sg-body {
+      display: flex; gap: 8px; align-items: flex-start;
+    }
     .sg-mini-board {
-      width: 100%; aspect-ratio: 1;
+      flex: 0 0 54%; aspect-ratio: 1; min-width: 0;
     }
     .sg-mini-board .mb-board-grid {
       width: 100%; aspect-ratio: 1;
@@ -1168,6 +1171,25 @@
     }
     .sg-mini-board .mb-sq { position: relative; }
     .sg-mini-board .mb-sq img { width: 100%; height: 100%; object-fit: contain; }
+    .sg-ml-wrap {
+      flex: 1; min-width: 0; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .sg-ml-row {
+      display: grid; grid-template-columns: 1.6em 1fr 1fr;
+      font-size: 0.68rem; line-height: 1.6; color: var(--text);
+    }
+    .sg-ml-num { color: var(--muted); text-align: right; padding-right: 3px; font-size: 0.88em; }
+    .sg-ml-w   { font-weight: 700; white-space: nowrap; overflow: hidden; }
+    .sg-ml-b   { color: rgba(18,32,58,0.68); white-space: nowrap; overflow: hidden; }
+    .sg-ml-last .sg-ml-w,
+    .sg-ml-last .sg-ml-b { color: var(--navy); font-weight: 800; }
+    .sg-pv {
+      font-size: 0.65rem; color: var(--muted); margin-top: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      display: none;
+    }
+    .sg-pv.vis { display: block; }
 
     /* ── Enkelt-spelvy (dark panel, inbäddad i sida) ──── */
     #game-view {
@@ -2679,7 +2701,7 @@ function handleSfLine(line) {
         if (!stadiumEvalData[gid]) stadiumEvalData[gid] = {};
         stadiumEvalData[gid][board] = Object.assign(
           stadiumEvalData[gid][board] || {},
-          { type: scM[1], value: parseInt(scM[2]) }
+          { type: scM[1], value: parseInt(scM[2]), pvRaw: pvM ? pvM[1].trim() : (stadiumEvalData[gid][board] || {}).pvRaw || '' }
         );
         updateStadiumEval(gid, board);
       }
@@ -4096,8 +4118,13 @@ function initStadium() {
             <span class="sg-player-name">Svart</span>
           </div>
         </div>
-        <div class="sg-mini-board" id="sgmb-${grp.id}-${b}">
-          ${mbBoardHTML(null)}
+        <div class="sg-body">
+          <div class="sg-mini-board" id="sgmb-${grp.id}-${b}">
+            ${mbBoardHTML(null)}
+          </div>
+          <div class="sg-ml-wrap">
+            <div id="sgml-${grp.id}-${b}"></div>
+          </div>
         </div>
         <div class="sg-eval-wrap" id="sge-${grp.id}-${b}">
           <div class="sg-eval-bar">
@@ -4106,6 +4133,7 @@ function initStadium() {
           </div>
           <div class="sg-eval-score" id="sges-${grp.id}-${b}">…</div>
         </div>
+        <div class="sg-pv" id="sgpv-${grp.id}-${b}"></div>
         <button class="sg-analysis-btn" id="sgab-${grp.id}-${b}"
           onclick="event.stopPropagation(); toggleStadiumAnalysis('${grp.id}', ${b})">⚡ Analys AV</button>
       </div>`;
@@ -4145,6 +4173,28 @@ async function fetchStadiumGroup(grp) {
   updateStadiumGroup(grp);
 }
 
+function sgMoveListHTML(moves) {
+  if (!moves || !moves.length) return '';
+  const sans = moves.map(mv => typeof mv === 'string' ? mv.split(' ')[0] : (mv.m || mv.san || '')).filter(Boolean);
+  if (!sans.length) return '';
+  let html = '';
+  // Show last 12 half-moves (6 full moves)
+  const startIdx = Math.max(0, sans.length - 12);
+  const startMove = Math.floor(startIdx / 2) + 1;
+  let moveNum = startMove;
+  for (let i = startIdx - (startIdx % 2); i < sans.length; i += 2) {
+    const w = sans[i] ? sweSAN(sans[i]) : '';
+    const b = sans[i+1] ? sweSAN(sans[i+1]) : '';
+    const isLast = i + 2 >= sans.length;
+    html += `<div class="sg-ml-row${isLast ? ' sg-ml-last' : ''}">` +
+      `<span class="sg-ml-num">${moveNum}.</span>` +
+      `<span class="sg-ml-w">${w}</span>` +
+      `<span class="sg-ml-b">${b}</span></div>`;
+    moveNum++;
+  }
+  return html;
+}
+
 function updateStadiumGroup(grp) {
   let liveCount = 0;
 
@@ -4164,9 +4214,12 @@ function updateStadiumGroup(grp) {
         <div class="sg-player-row"><span class="sg-color-dot black"></span><span class="sg-player-name">${escHtml(bName)}</span>${bRating}</div>`;
     }
 
-    // Mini-bräde (med fördröjning)
+    // Mini-bräde + draglista (med fördröjning)
+    const _delayed = applyDelay(data, grp.id + '-R' + STADIUM_ROUND, b);
     const mbEl = document.getElementById(`sgmb-${grp.id}-${b}`);
-    if (mbEl) mbEl.innerHTML = mbBoardHTML(applyDelay(data, grp.id + '-R' + STADIUM_ROUND, b));
+    if (mbEl) mbEl.innerHTML = mbBoardHTML(_delayed);
+    const mlEl = document.getElementById(`sgml-${grp.id}-${b}`);
+    if (mlEl) mlEl.innerHTML = sgMoveListHTML(_delayed && _delayed.moves);
 
     // Resultat/status
     const resEl = document.getElementById(`sgr-${grp.id}-${b}`);
@@ -4388,9 +4441,14 @@ function updateStadiumEval(gid, board) {
   const wEl = document.getElementById(`sgew-${gid}-${board}`);
   const bEl = document.getElementById(`sgeb-${gid}-${board}`);
   const sEl = document.getElementById(`sges-${gid}-${board}`);
+  const pvEl = document.getElementById(`sgpv-${gid}-${board}`);
   if (wEl) wEl.style.flexGrow = wPct.toFixed(1);
   if (bEl) bEl.style.flexGrow = bPct.toFixed(1);
   if (sEl) sEl.textContent = score;
+  if (pvEl && ev.pvRaw) {
+    pvEl.textContent = pvToSwedishSan(ev.pvRaw);
+    pvEl.classList.add('vis');
+  }
 }
 
 // ── Init ──────────────────────────────────────────────────────
