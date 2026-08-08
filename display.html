@@ -214,6 +214,22 @@
     }
     /* Varje ruta tvingas vara kvadratisk — height sätts automatiskt */
     .sq { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+
+    /* Resultatoverlay mitt på brädet */
+    .board-wrap { position: relative; flex-shrink: 0; line-height: 0; }
+    .board-result-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10,20,40,0.42);
+      border-radius: 3px; pointer-events: none;
+    }
+    .board-result-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: min(5.5vw, calc((100vh - 10vh) / 3 * 0.38));
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.6);
+      letter-spacing: 0.04em;
+    }
     .sq.li { background: var(--light-sq); }
     .sq.da { background: var(--dark-sq);  }
     .sq.ll { background: var(--lm-light); }
@@ -907,6 +923,13 @@ function moveListHTML(data, gid, board) {
 }
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtResult(r) {
+  if (!r || r === '*') return '';
+  if (r === '1-0' || r === 'WHITEWIN') return '1-0';
+  if (r === '0-1' || r === 'BLACKWIN') return '0-1';
+  if (r === '1/2-1/2' || r === 'DRAW' || r === '½-½') return '½-½';
+  return r;
+}
 function pLabel(p){ return p?([p.fname,p.lname].filter(Boolean).join(' ')||p.name||null):null; }
 function sqIdx(sq){ return (8-parseInt(sq[1]))*8+(sq.charCodeAt(0)-97); }
 
@@ -926,7 +949,9 @@ function boardHTML(data, gid, board) {
     if(p){const k=p.color+p.type.toUpperCase();if(PIECE_SVG[k])inner=`<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIECE_SVG[k])}" alt="${k}">`;}
     h+=`<div class="sq ${cls}">${inner}</div>`;
   }
-  return `<div class="board-grid">${h}</div>`;
+  const res = fmtResult(data && data.result);
+  const overlay = res ? `<div class="board-result-overlay"><span class="board-result-text">${res}</span></div>` : '';
+  return `<div class="board-wrap"><div class="board-grid">${h}</div>${overlay}</div>`;
 }
 
 function initGrid() {
@@ -957,7 +982,7 @@ function updateBoard(g,b) {
   const wN=pLabel(w)||'Vit', bN=pLabel(bl)||'Svart';
   const wT=w.title?`<span class="p-title">${esc(w.title)}</span>`:'';
   const bT=bl.title?`<span class="p-title">${esc(bl.title)}</span>`:'';
-  const res=data&&data.result&&data.result!=='*'?`<span class="bc-result">${esc(data.result)}</span>`:'';
+  // result now shown as board overlay
 
   // Klockor: uppdatera fetchedAt bara vid nytt drag (annars blinkar de)
   const done = !!(data && data.result && data.result !== '*');
@@ -975,7 +1000,7 @@ function updateBoard(g,b) {
   }
 
   el.innerHTML=
-    `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span>${res}</div>` +
+    `<div class="bc-hdr"><span class="bc-num">Bord ${b}</span></div>` +
     `<div class="bc-player">${bT}<span class="p-dot b"></span><span class="bc-player-name">${esc(bN)}</span><span class="bc-player-rating">${bl.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-b"></span></div>` +
     `<div class="bw">${boardHTML(data,g.id,b)}<div class="ml" id="ml-${g.id}-${b}">${moveListHTML(data,g.id,b)}</div></div>` +
     `<div class="bc-player">${wT}<span class="p-dot w"></span><span class="bc-player-name">${esc(wN)}</span><span class="bc-player-rating">${w.rating||''}</span><span class="p-clock" id="clk-${g.id}-${b}-w"></span></div>`;
