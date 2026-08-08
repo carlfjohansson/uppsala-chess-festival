@@ -296,7 +296,7 @@
     }
     .single-board-grid {
       display: grid; grid-template-columns: repeat(8, 1fr);
-      width: min(calc(72vw - 4vw), calc(100vh - 12.5vh));
+      width: min(calc(58vw - 4vw), calc(100vh - 16vh));
       border-radius: 4px; overflow: hidden;
       box-shadow: 0 4px 24px rgba(0,0,0,.22);
       flex-shrink: 0;
@@ -1112,7 +1112,6 @@ function renderSingle() {
         <div class="single-p-row"><span class="single-p-dot w"></span>${wT}<span>${esc(wN)}</span><span class="single-p-rating">${w.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-w"></span>${res}</div>
         <div class="single-p-row"><span class="single-p-dot b"></span>${bT}<span>${esc(bN)}</span><span class="single-p-rating">${bl.rating||''}</span><span class="p-clock" style="font-size:1em;margin-left:8px" id="clk-${SINGLE_GID}-${SINGLE_BOARD}-b"></span></div>
       </div>
-      <div class="single-ml" id="single-ml"></div>
       <div class="sf-row">
         <div class="ib-nav">
           <button class="ib-nav-btn" id="ib-btn-start" onclick="ibStart()" title="Början (↑)">⏮</button>
@@ -1123,6 +1122,7 @@ function renderSingle() {
         <button class="sf-btn" id="sf-btn" onclick="sfToggle()">▶ Analys på</button>
       </div>
       <div class="sf-pv" id="sf-pv"></div>
+      <div class="single-ml" id="single-ml"></div>
     </div>`;
 
   IB.inited = true;
