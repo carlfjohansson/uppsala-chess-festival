@@ -154,7 +154,25 @@
   .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
   .pay-method { border: 1px solid var(--line-strong); border-radius: 12px; padding: 16px; cursor: pointer; transition: border-color 0.15s; }
   .pay-method:hover { border-color: var(--navy); }
-  .pay-note { font-size: 0.82rem; color: var(--ink-mute); margin: 8px 0 0; }
+  /* PAYMENT */
+  .pay-methods { display: flex; gap: 8px; margin-bottom: 16px; }
+  .pay-btn { flex: 1; padding: 10px 6px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel); cursor: pointer; font-family: var(--sans); font-size: 0.82rem; font-weight: 600; color: var(--ink-dim); text-align: center; transition: all 0.15s; }
+  .pay-btn:hover { border-color: var(--navy); color: var(--navy); }
+  .pay-btn.active { border-color: var(--navy); background: rgba(13,58,110,0.06); color: var(--navy); }
+  .pay-btn .pay-sub { font-size: 0.72rem; font-weight: 400; color: var(--ink-mute); display: block; margin-top: 2px; }
+  .pay-panel { display: none; background: var(--bg-soft); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  .pay-panel.active { display: block; }
+  .pay-detail-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 0.88rem; }
+  .pay-detail-row:last-of-type { border-bottom: none; }
+  .pay-detail-row .lbl { color: var(--ink-mute); }
+  .pay-detail-row .val { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .pay-note { font-size: 0.82rem; color: var(--ink-mute); margin: 10px 0 0; line-height: 1.5; }
+  .cart-total-row { display: flex; justify-content: space-between; padding: 10px 0 0; margin-top: 8px; border-top: 2px solid var(--line-strong); font-weight: 700; font-size: 0.95rem; }
+  .btn-pay { display: block; width: 100%; padding: 14px; border: none; border-radius: 999px; font-family: var(--sans); font-weight: 700; font-size: 0.95rem; cursor: pointer; margin-top: 16px; transition: all 0.2s; }
+  .btn-pay-card { background: linear-gradient(135deg, #f5cb6b, var(--orange)); color: #0f1722; }
+  .btn-pay-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,181,82,0.4); }
+  .btn-pay-manual { background: var(--navy); color: #fff; }
+  .btn-pay-manual:hover { background: #0a2e59; transform: translateY(-1px); }
 
   @media (max-width: 860px) {
     .checkout-wrap { grid-template-columns: 1fr; }
@@ -469,40 +487,25 @@
             <span id="cart-total-val"></span>
           </div>
         </div>
-        <h3 style="margin-bottom:8px;" data-sv>Betalning</h3><h3 style="margin-bottom:8px;" data-en>Payment</h3>
-        <p style="font-size:0.88rem;color:var(--ink-mute);margin-bottom:20px;" data-sv>Betala direkt med kort, via Swish eller Plusgiro.</p>
-        <p style="font-size:0.88rem;color:var(--ink-mute);margin-bottom:20px;" data-en>Pay by card, Swish, or bank transfer.</p>
-        <div class="payment-options">
-          <div class="pay-option" id="opt-card" onclick="selectPayment('card')">
-            <div class="pay-icon">
-              <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="28" height="20" rx="3" fill="#1a3a6e" opacity="0.12"/>
-                <rect x="0" y="6" width="28" height="5" fill="#1a3a6e" opacity="0.18"/>
-                <rect x="3" y="13" width="6" height="3" rx="1" fill="#1a3a6e" opacity="0.35"/>
-              </svg>
-            </div>
-            <div class="pay-name"><span data-sv>Kort</span><span data-en>Card</span></div>
-            <div class="pay-desc">Visa &middot; Mastercard</div>
-          </div>
-          <div class="pay-option" id="opt-swish" onclick="selectPayment('swish')">
-            <div class="pay-icon"><img src="/Swish_Logo_Primary_Dark-BG_P3.png" alt="Swish" style="height:34px;width:auto;border-radius:5px;"></div>
-            <div class="pay-name">Swish</div>
-            <div class="pay-desc"><span data-sv>Direkt</span><span data-en>Instant</span></div>
-          </div>
-          <div class="pay-option" id="opt-pg" onclick="selectPayment('pg')">
-            <div class="pay-icon"><img src="/Plusgirot.png" alt="PlusGirot" style="height:28px;width:auto;border-radius:4px;background:#fff;padding:3px 6px;"></div>
-            <div class="pay-name">Plusgiro</div>
-            <div class="pay-desc"><span data-sv>Bankbetalning</span><span data-en>Bank transfer</span></div>
-          </div>
+        <h3 style="margin-bottom:14px;" data-sv>Betalning</h3><h3 style="margin-bottom:14px;" data-en>Payment</h3>
+        <div class="pay-methods">
+          <button class="pay-btn active" id="opt-card" onclick="selectPayment('card')">
+            <span data-sv>Kort</span><span data-en>Card</span>
+            <span class="pay-sub">Visa · Mastercard</span>
+          </button>
+          <button class="pay-btn" id="opt-swish" onclick="selectPayment('swish')">
+            Swish
+            <span class="pay-sub" data-sv>Direkt</span><span class="pay-sub" data-en>Instant</span>
+          </button>
+          <button class="pay-btn" id="opt-pg" onclick="selectPayment('pg')">
+            Plusgiro
+            <span class="pay-sub" data-sv>Bankgiro</span><span class="pay-sub" data-en>Bank transfer</span>
+          </button>
         </div>
 
-        <div class="pay-panel" id="panel-card">
-          <div class="pay-chips">
-            <span data-sv>Säker betalning via</span><span data-en>Secure payment via</span>
-            <span class="chip">Stripe</span><span class="chip">VISA</span><span class="chip">Mastercard</span>
-          </div>
-          <p style="font-size:0.82rem;color:var(--ink-mute);margin:10px 0 0;" data-sv>Du skickas till Stripes betalningssida och återvänder hit när betalningen är klar.</p>
-          <p style="font-size:0.82rem;color:var(--ink-mute);margin:10px 0 0;" data-en>You will be redirected to Stripe and returned here when payment is complete.</p>
+        <div class="pay-panel active" id="panel-card">
+          <p class="pay-note" data-sv>Du skickas till Stripes betalningssida och återvänder hit direkt när betalningen är klar.</p>
+          <p class="pay-note" data-en>You will be redirected to Stripe's payment page and returned here when complete.</p>
         </div>
 
         <div class="pay-panel" id="panel-swish">
@@ -511,8 +514,8 @@
             <div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div>
             <div class="val" id="swish-amount-val">—</div>
           </div>
-          <p class="pay-note" data-sv>Ange ditt namn och tävlingarna som meddelande. Klicka sedan "Bekräfta anmälan".</p>
-          <p class="pay-note" data-en>Enter your name and the tournament(s) as the message. Then click "Confirm registration".</p>
+          <p class="pay-note" data-sv>Ange ditt namn och tävlingarna som meddelande. Klicka sedan på knappen nedan.</p>
+          <p class="pay-note" data-en>Enter your name and tournament(s) as the message. Then click the button below.</p>
         </div>
 
         <div class="pay-panel" id="panel-pg">
@@ -521,8 +524,8 @@
             <div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div>
             <div class="val" id="pg-amount-val">—</div>
           </div>
-          <p class="pay-note" data-sv>Ange ditt namn och tävlingarna som referens. Klicka sedan "Bekräfta anmälan".</p>
-          <p class="pay-note" data-en>Enter your name and the tournament(s) as reference. Then click "Confirm registration".</p>
+          <p class="pay-note" data-sv>Ange ditt namn och tävlingarna som referens. Klicka sedan på knappen nedan.</p>
+          <p class="pay-note" data-en>Enter your name and tournament(s) as reference. Then click the button below.</p>
         </div>
 
         <button id="btn-pay-card" class="btn-pay btn-pay-card" style="display:none;" onclick="payWithCard()">
@@ -690,16 +693,18 @@
   }
 
   // ─── Payment ─────────────────────────────────────────────────
-  let selectedPayment = '';
+  let selectedPayment = 'card';
   function selectPayment(m) {
     selectedPayment = m;
     ['card','swish','pg'].forEach(x => {
-      document.getElementById('opt-' + x).classList.toggle('selected', x === m);
-      document.getElementById('panel-' + x).classList.toggle('show', x === m);
+      document.getElementById('opt-' + x).classList.toggle('active', x === m);
+      document.getElementById('panel-' + x).classList.toggle('active', x === m);
     });
     document.getElementById('btn-pay-card').style.display = m === 'card' ? 'block' : 'none';
     document.getElementById('btn-pay-manual').style.display = (m === 'swish' || m === 'pg') ? 'block' : 'none';
   }
+  // Show card button by default on load
+  document.addEventListener('DOMContentLoaded', () => selectPayment('card'));
 
   // ─── Validation ──────────────────────────────────────────────
   function clearFieldError(id) { document.getElementById(id).classList.remove('field-error'); }
