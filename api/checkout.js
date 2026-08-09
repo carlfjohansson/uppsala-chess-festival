@@ -2,13 +2,18 @@ const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const TOURNAMENTS = {
-  'Weekend 1':   { name: 'Weekend 1 — 7–9 augusti',   amount: 40000 },
-  'Weekend 2':   { name: 'Weekend 2 — 14–16 augusti', amount: 40000 },
-  'Snabbschack': { name: 'Snabbschack — 10 augusti',  amount: 20000 },
-  'Chess960':    { name: 'Chess960 — 11 augusti',     amount: 20000 },
-  'Blixt':       { name: 'Blixt — 12 augusti',        amount: 20000 },
-  'Amatör':      { name: 'Amatör — 13 augusti',       amount: 20000 },
-  'Ungdom':      { name: 'Ungdom — 16 augusti',       amount: 10000 }
+  // Uppsala Chess Festival 2026
+  'Weekend 1':        { name: 'Weekend 1 — 7–9 augusti',                         amount: 40000 },
+  'Weekend 2':        { name: 'Weekend 2 — 14–16 augusti',                        amount: 40000 },
+  'Snabbschack':      { name: 'Snabbschack — 10 augusti',                         amount: 20000 },
+  'Chess960':         { name: 'Chess960 — 11 augusti',                            amount: 20000 },
+  'Blixt':            { name: 'Blixt — 12 augusti',                               amount: 20000 },
+  'Amatör':           { name: 'Amatör — 13 augusti',                              amount: 20000 },
+  'Ungdom':           { name: 'Ungdom — 16 augusti',                              amount: 10000 },
+  // Uppsala Weekend Schack 2026
+  'Sep Weekend 2026': { name: 'Uppsala September Weekend 2026 — 11–13 september', amount: 40000 },
+  'Okt Weekend 2026': { name: 'Uppsala Oktober Weekend 2026 — 23–25 oktober',     amount: 40000 },
+  'Dec Weekend 2026': { name: 'Uppsala December Weekend 2026 — 11–13 december',   amount: 40000 },
 };
 
 module.exports = async (req, res) => {

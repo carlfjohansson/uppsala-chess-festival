@@ -118,10 +118,6 @@
   .btn-ghost { background: transparent; color: #f5ecd9; border: 1px solid rgba(232, 181, 82, 0.4); }
   .btn-ghost:hover { background: rgba(245, 203, 107, 0.1); color: #f5cb6b; }
   .btn[disabled] { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-  .countdown { margin-top: 48px; display: flex; gap: 18px; flex-wrap: wrap; }
-  .countdown .unit { background: rgba(245, 236, 217, 0.07); border: 1px solid rgba(232, 181, 82, 0.18); border-radius: 12px; padding: 14px 20px; min-width: 78px; text-align: center; backdrop-filter: blur(8px); }
-  .countdown .num { font-family: var(--serif); font-size: 2rem; color: #f5cb6b; line-height: 1; }
-  .countdown .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #8e8674; margin-top: 6px; }
 
   /* SECTIONS */
   section.section { padding: 90px 0; position: relative; }
@@ -317,12 +313,7 @@
           ↓ Invitation PDF
         </a>
       </div>
-      <div class="countdown" id="countdown">
-        <div class="unit"><div class="num" id="cd-d">—</div><div class="lbl" data-sv>Dagar</div><div class="lbl" data-en>Days</div></div>
-        <div class="unit"><div class="num" id="cd-h">—</div><div class="lbl" data-sv>Timmar</div><div class="lbl" data-en>Hours</div></div>
-        <div class="unit"><div class="num" id="cd-m">—</div><div class="lbl" data-sv>Minuter</div><div class="lbl" data-en>Minutes</div></div>
-        <div class="unit"><div class="num" id="cd-s">—</div><div class="lbl" data-sv>Sekunder</div><div class="lbl" data-en>Seconds</div></div>
-      </div>
+
     </div>
   </div>
 </header>
@@ -702,22 +693,6 @@
       document.title = lang === 'en' ? 'Uppsala Chess Festival 7–16 August 2026' : 'Uppsala Schackfestival 7–16 augusti 2026';
     });
   });
-
-  // COUNTDOWN
-  function updateCountdown() {
-    const target = new Date('2026-08-07T16:00:00+02:00').getTime();
-    let diff = Math.max(0, target - Date.now());
-    const d = Math.floor(diff / 86400000); diff -= d * 86400000;
-    const h = Math.floor(diff / 3600000); diff -= h * 3600000;
-    const m = Math.floor(diff / 60000); diff -= m * 60000;
-    const s = Math.floor(diff / 1000);
-    document.getElementById('cd-d').textContent = d;
-    document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
-    document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
-    document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
 
 
   // CURRENCY HELPER
