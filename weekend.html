@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uppsala Weekend</title>
+<meta name="description" content="Uppsala Weekend – helgturneringar i schack. 5 ronder, bergergrupper, FIDE-registrerat. Uppsala Schackcentrum.">
+<style>
+  :root {
+    --bg: #f8f6f2; --bg-soft: #edeae4; --panel: #ffffff; --panel-2: #f4f1eb;
+    --navy: #0d3a6e; --ink: #12203a; --ink-dim: #3d4a5f; --ink-mute: #7a8898;
+    --gold: #c07010; --gold-bright: #e8a820; --orange: #d96b2a;
+    --green: #4caf7d; --line: rgba(18,32,58,0.10); --line-strong: rgba(18,32,58,0.22);
+    --serif: "Lato", system-ui, sans-serif;
+    --sans: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --shadow: 0 4px 24px rgba(0,0,0,0.09);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; padding-bottom: 80px; }
+  a { color: var(--navy); text-decoration: none; }
+  a:hover { color: var(--gold); }
+  h1, h2, h3, h4 { font-family: var(--serif); font-weight: 700; line-height: 1.15; margin: 0 0 0.5em; color: var(--ink); }
+  h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
+  h3 { font-size: 1.35rem; color: var(--navy); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* NAV */
+  nav.top { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); background: rgba(13,30,50,0.93); border-bottom: 1px solid rgba(232,181,82,0.18); }
+  nav.top .inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; max-width: 1100px; margin: 0 auto; gap: 16px; }
+  nav.top .brand { font-family: var(--serif); font-size: 1.05rem; color: #f5cb6b; letter-spacing: 0.03em; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+  .nav-logo { height: 34px; width: auto; }
+  nav.top ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; font-size: 0.9rem; }
+  nav.top ul a { color: #c9bfa8; transition: color 0.2s; }
+  nav.top ul a:hover { color: #f5cb6b; }
+  .lang-toggle { display: flex; border: 1px solid rgba(232,181,82,0.4); border-radius: 999px; overflow: hidden; font-size: 0.8rem; }
+  .lang-toggle button { background: transparent; border: 0; color: #c9bfa8; padding: 6px 12px; cursor: pointer; font-family: var(--sans); font-weight: 600; letter-spacing: 0.05em; }
+  .lang-toggle button.active { background: #e8b552; color: #0f1722; }
+  .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-hamburger span { display: block; width: 22px; height: 2px; background: #c9bfa8; margin: 5px 0; border-radius: 2px; }
+  @media (max-width: 720px) {
+    nav.top ul { display: none; }
+    nav.top ul.open { display: flex; flex-direction: column; gap: 0; position: absolute; top: 56px; left: 0; right: 0; background: var(--navy); padding: 8px 0; z-index: 999; }
+    nav.top ul.open li a { display: block; padding: 12px 24px; color: #c9bfa8; }
+    nav.top ul.open li a:hover { color: #f5cb6b; }
+    .nav-hamburger { display: flex !important; }
+  }
+
+  /* HERO */
+  .hero { position: relative; min-height: 60vh; display: flex; align-items: center; overflow: hidden;
+    background-image: url('/nattsol.jpg'); background-size: cover; background-position: center 60%; }
+  .hero::before { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to bottom,
+      rgba(10,15,25,0.70) 0%,
+      rgba(10,15,25,0.65) 40%,
+      rgba(10,15,25,0.60) 65%,
+      rgba(248,246,242,0.55) 88%,
+      rgba(248,246,242,1.00) 100%);
+    pointer-events: none; }
+  .hero-content { position: relative; z-index: 2; width: 100%; padding: 70px 0 100px; }
+  .hero .eyebrow { font-family: var(--serif); font-style: italic; font-weight: 300; color: #f0e8d8; font-size: 1.05rem; letter-spacing: 0.04em; margin-bottom: 12px; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
+  .hero h1 { font-size: clamp(2.6rem, 7vw, 5.5rem); margin: 0 0 14px; color: #f5ecd9; font-weight: 900; letter-spacing: -0.01em; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+  .hero p.tagline { font-size: clamp(1rem, 1.4vw, 1.18rem); max-width: 560px; color: #e0d8cc; margin: 20px 0 32px; }
+  .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 13px 26px; border-radius: 999px; font-weight: 600; font-size: 0.92rem; letter-spacing: 0.04em; transition: all 0.2s; cursor: pointer; border: 0; font-family: var(--sans); }
+  .btn-primary { background: linear-gradient(135deg, #f5cb6b, var(--orange)); color: #0f1722; box-shadow: 0 6px 24px rgba(232,181,82,0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232,181,82,0.5); color: #0f1722; }
+  .btn-ghost { background: transparent; color: #f5ecd9; border: 1px solid rgba(232,181,82,0.4); }
+  .btn-ghost:hover { background: rgba(245,203,107,0.1); color: #f5cb6b; }
+
+  /* SECTION */
+  .section { padding: 72px 0; }
+  .section-alt { background: var(--bg-soft); }
+  .section-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+
+  /* FORMAT */
+  .format-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .fmt-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .fmt-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 4px; }
+  .fmt-value { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+  .fmt-sub { font-size: 0.82rem; color: var(--ink-mute); margin-top: 3px; }
+
+  /* TOURNAMENT CARDS */
+  .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 24px; }
+  .t-card { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 28px 26px; display: flex; flex-direction: column; transition: border-color 0.2s, box-shadow 0.2s; }
+  .t-card:hover { border-color: rgba(13,58,110,0.25); box-shadow: var(--shadow); }
+  .t-card.selected { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(13,58,110,0.12); }
+  .t-card h3 { font-size: 1.5rem; margin: 0 0 4px; }
+  .t-card .t-dates { font-size: 0.9rem; color: var(--ink-dim); margin-bottom: 18px; font-weight: 500; }
+  .t-schedule { background: var(--bg-soft); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 0.85rem; color: var(--ink-dim); }
+  .t-schedule .sch-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--line); gap: 12px; }
+  .t-schedule .sch-row:last-child { border-bottom: none; }
+  .t-schedule .sch-day { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .t-prizes { font-size: 0.88rem; color: var(--ink-dim); margin-bottom: 18px; }
+  .t-prizes strong { color: var(--ink); }
+  .t-card .t-actions { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+  .btn-register { display: block; text-align: center; padding: 13px 20px; background: var(--navy); color: #fff; border: none; border-radius: 999px; font-weight: 600; font-size: 0.92rem; cursor: pointer; font-family: var(--sans); transition: all 0.2s; }
+  .btn-register:hover { background: #0a2e59; transform: translateY(-1px); }
+  .t-links { display: flex; gap: 8px; }
+  .t-link { flex: 1; text-align: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: var(--ink-mute); cursor: default; }
+  .t-link.active { color: var(--navy); border-color: rgba(13,58,110,0.3); cursor: pointer; }
+  .t-link.active:hover { background: rgba(13,58,110,0.05); border-color: var(--navy); }
+
+
+
+  /* FOOTER */
+  .site-footer { background: var(--navy); color: #c9bfa8; padding: 36px 24px; margin-top: 0; }
+  .footer-inner { max-width: 900px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px 48px; align-items: flex-start; }
+  .footer-col { font-size: 0.88rem; line-height: 1.7; }
+  .footer-col strong { color: #e8dfc8; }
+  .footer-col a { color: #c9bfa8; text-decoration: underline; text-underline-offset: 3px; }
+  .footer-col a:hover { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .payment-options { grid-template-columns: 1fr; }
+    .tournaments-grid { grid-template-columns: 1fr; }
+    .format-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top">
+  <div class="inner">
+    <a href="/weekendschack.html" class="brand">
+      <img src="/logo.png" class="nav-logo" alt="USSS">
+      Uppsala Weekend
+    </a>
+    <button class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Meny">
+      <span></span><span></span><span></span>
+    </button>
+    <ul>
+      <li><a href="/index.html"><span data-sv>Uppsala Chess Festival</span><span data-en>Uppsala Chess Festival</span></a></li>
+      <li><a href="#turneringar"><span data-sv>Turneringar</span><span data-en>Tournaments</span></a></li>
+      <li><a href="#anmalan"><span data-sv>Anmälan</span><span data-en>Registration</span></a></li>
+      <li><a href="#regler"><span data-sv>Regler</span><span data-en>Rules</span></a></li>
+      <li><a href="/live.html" style="color:#f5cb6b;font-weight:700;">Live</a></li>
+    </ul>
+    <div class="lang-toggle">
+      <button id="btn-sv" class="active" onclick="setLang('sv')">SV</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-content">
+    <div class="container">
+      <div class="eyebrow" data-sv>Uppsala SSS bjuder in till</div>
+      <div class="eyebrow" data-en>Uppsala SSS invites you to</div>
+      <h1>Uppsala Weekend</h1>
+      <p class="tagline" data-sv>Jämnt motstånd i varje rond. 5 ronder, bergergrupper efter rating, FIDE-registrerat.</p>
+      <p class="tagline" data-en>Well-matched opposition every round. 5 rounds, Berger groups by rating, FIDE registered.</p>
+      <div class="ctas">
+        <a href="#anmalan" class="btn btn-primary" data-sv>Anmäl dig</a>
+        <a href="#anmalan" class="btn btn-primary" data-en>Register</a>
+        <a href="#turneringar" class="btn btn-ghost" data-sv>Datum och tider</a>
+        <a href="#turneringar" class="btn btn-ghost" data-en>Dates and times</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- FORMAT STRIP -->
+<div style="background:var(--bg-soft);border-bottom:1px solid var(--line);padding:10px 0;">
+  <div class="container">
+    <p style="margin:0;font-size:0.78rem;color:var(--ink-mute);text-align:center;" data-sv>
+      5 ronder &middot; bergergrupper efter rating &middot; 90 min + 30 sek/drag &middot; FIDE-registrerat &middot; 400 kr &middot; priser per grupp: 1:a 999 kr, 2:a 500 kr &middot; Uppsala Schackcentrum, Ekeby Bruk 6L
+    </p>
+    <p style="margin:0;font-size:0.78rem;color:var(--ink-mute);text-align:center;" data-en>
+      5 rounds &middot; Berger groups by rating &middot; 90 min + 30 sec/move &middot; FIDE ELO rated &middot; 400 SEK &middot; prizes per group: 1st 999 SEK, 2nd 500 SEK &middot; Uppsala Schackcentrum, Ekeby Bruk 6L
+    </p>
+  </div>
+</div>
+
+<!-- TURNERINGAR -->
+<section class="section section-alt" id="turneringar">
+  <div class="container">
+    <div class="tournaments-grid">
+
+      <!-- SEPTEMBER -->
+      <div class="t-card" id="card-sep">
+        <h3>September</h3>
+        <div class="t-dates">11–13 september 2026</div>
+        <div class="t-schedule">
+          <div class="sch-row"><span class="sch-day" data-sv>Fre 11 sep</span><span class="sch-day" data-en>Fri 11 Sep</span><span data-sv>Rond 1, 16:00–20:00</span><span data-en>Round 1, 16:00–20:00</span></div>
+          <div class="sch-row"><span class="sch-day" data-sv>Lör 12 sep</span><span class="sch-day" data-en>Sat 12 Sep</span><span data-sv>Rond 2, 10:00–14:00</span><span data-en>Round 2, 10:00–14:00</span></div>
+          <div class="sch-row"><span class="sch-day"></span><span data-sv>Rond 3, 16:00–20:00</span><span data-en>Round 3, 16:00–20:00</span></div>
+          <div class="sch-row"><span class="sch-day" data-sv>Sön 13 sep</span><span class="sch-day" data-en>Sun 13 Sep</span><span data-sv>Rond 4, 10:00–14:00</span><span data-en>Round 4, 10:00–14:00</span></div>
+          <div class="sch-row"><span class="sch-day"></span><span data-sv>Rond 5, 16:00–20:00</span><span data-en>Round 5, 16:00–20:00</span></div>
+        </div>
+        <div class="t-prizes" data-sv><strong>Priser per grupp:</strong> 1:a 999 kr &middot; 2:a 500 kr</div>
+        <div class="t-prizes" data-en><strong>Prizes per group:</strong> 1st 999 SEK &middot; 2nd 500 SEK</div>
+        <div class="t-actions" style="margin-top:16px;">
+          <button class="btn-register" onclick="selectAndScroll('Sep Weekend 2026', 'card-sep')" data-sv>Anmäl dig</button>
+          <button class="btn-register" onclick="selectAndScroll('Sep Weekend 2026', 'card-sep')" data-en>Register</button>
+          <div class="t-links">
+            <a class="t-link active" href="#anmälda-sep" data-sv>Anmälda</a>
+            <a class="t-link active" href="#anmälda-sep" data-en>Registered players</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- OKTOBER -->
+      <div class="t-card" id="card-okt">
+        <h3>Oktober</h3>
+        <div class="t-dates">23–25 oktober 2026</div>
+        <div class="t-schedule">
+          <div class="sch-row"><span class="sch-day" data-sv>Fre 23 okt</span><span class="sch-day" data-en>Fri 23 Oct</span><span data-sv>Rond 1, 16:00–20:00</span><span data-en>Round 1, 16:00–20:00</span></div>
+          <div class="sch-row"><span class="sch-day" data-sv>Lör 24 okt</span><span class="sch-day" data-en>Sat 24 Oct</span><span data-sv>Rond 2, 10:00–14:00</span><span data-en>Round 2, 10:00–14:00</span></div>
+          <div class="sch-row"><span class="sch-day"></span><span data-sv>Rond 3, 16:00–20:00</span><span data-en>Round 3, 16:00–20:00</span></div>
+          <div class="sch-row"><span class="sch-day" data-sv>Sön 25 okt</span><span class="sch-day" data-en>Sun 25 Oct</span><span data-sv>Rond 4, 10:00–14:00</span><span data-en>Round 4, 10:00–14:00</span></div>
+          <div class="sch-row"><span class="sch-day"></span><span data-sv>Rond 5, 16:00–20:00</span><span data-en>Round 5, 16:00–20:00</span></div>
+        </div>
+        <div class="t-prizes" data-sv><strong>Priser per grupp:</strong> 1:a 999 kr &middot; 2:a 500 kr</div>
+        <div class="t-prizes" data-en><strong>Prizes per group:</strong> 1st 999 SEK &middot; 2nd 500 SEK</div>
+        <div class="t-actions" style="margin-top:16px;">
+          <button class="btn-register" onclick="selectAndScroll('Okt Weekend 2026', 'card-okt')" data-sv>Anmäl dig</button>
+          <button class="btn-register" onclick="selectAndScroll('Okt Weekend 2026', 'card-okt')" data-en>Register</button>
+          <div class="t-links">
+            <a class="t-link active" href="#anmälda-okt" data-sv>Anmälda</a>
+            <a class="t-link active" href="#anmälda-okt" data-en>Registered players</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- DECEMBER -->
+      <div class="t-card" id="card-dec">
+        <h3>December</h3>
+        <div class="t-dates">11–13 december 2026</div>
+        <div class="t-schedule">
+          <div class="sch-row"><span class="sch-day" data-sv>Fre 11 dec</span><span class="sch-day" data-en>Fri 11 Dec</span><span data-sv>Rond 1, 16:00–20:00</span><span data-en>Round 1, 16:00–20:00</span></div>
+          <div class="sch-row"><span class="sch-day" data-sv>Lör 12 dec</span><span class="sch-day" data-en>Sat 12 Dec</span><span data-sv>Rond 2, 10:00–14:00</span><span data-en>Round 2, 10:00–14:00</span></div>
+          <div class="sch-row"><span class="sch-day"></span><span data-sv>Rond 3, 16:00–20:00</span><span data-en>Round 3, 16:00–20:00</span></div>
+          <div class="sch-row"><span class="sch-day" data-sv>Sön 13 dec</span><span class="sch-day" data-en>Sun 13 Dec</span><span data-sv>Rond 4, 10:00–14:00</span><span data-en>Round 4, 10:00–14:00</span></div>
+          <div class="sch-row"><span class="sch-day"></span><span data-sv>Rond 5, 16:00–20:00</span><span data-en>Round 5, 16:00–20:00</span></div>
+        </div>
+        <div class="t-prizes" data-sv><strong>Priser per grupp:</strong> 1:a 999 kr &middot; 2:a 500 kr</div>
+        <div class="t-prizes" data-en><strong>Prizes per group:</strong> 1st 999 SEK &middot; 2nd 500 SEK</div>
+        <div class="t-actions" style="margin-top:16px;">
+          <button class="btn-register" onclick="selectAndScroll('Dec Weekend 2026', 'card-dec')" data-sv>Anmäl dig</button>
+          <button class="btn-register" onclick="selectAndScroll('Dec Weekend 2026', 'card-dec')" data-en>Register</button>
+          <div class="t-links">
+            <a class="t-link active" href="#anmälda-dec" data-sv>Anmälda</a>
+            <a class="t-link active" href="#anmälda-dec" data-en>Registered players</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- REGLER -->
+<section class="section" id="regler" style="background-image:url('/jordynkim1998-uppsala-4960925.jpg');background-size:cover;background-position:center 40%;position:relative;">
+  <div style="position:absolute;inset:0;background:rgba(248,246,242,0.88);pointer-events:none;z-index:0;"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <div style="margin-bottom:28px;">
+      <div class="section-label" data-sv>Tävlingsregler</div>
+      <div class="section-label" data-en>Rules</div>
+      <h2 data-sv>Regler</h2>
+      <h2 data-en>Rules</h2>
+    </div>
+    <ul class="regler-list">
+      <li>
+        <strong data-sv>Betänketid</strong><strong data-en>Time control</strong>
+        <span data-sv>90 minuter + 30 sekunder per drag.</span>
+        <span data-en>90 minutes + 30 seconds per move.</span>
+      </li>
+      <li>
+        <strong data-sv>Grupper och lottning</strong><strong data-en>Groups and pairings</strong>
+        <span data-sv>Spelarna delas in i bergergrupper efter rating vid tävlingens start. Den lägsta gruppen kan avgöras som schweizerturnering.</span>
+        <span data-en>Players are divided into Berger groups by rating at the start. The lowest group may be run as a Swiss tournament.</span>
+      </li>
+      <li>
+        <strong data-sv>Priser</strong><strong data-en>Prizes</strong>
+        <span data-sv>Alla priser delas vid samma poäng. Pengarna betalas till bankkonto.</span>
+        <span data-en>All prizes are split on tied scores. Payment is made by bank transfer.</span>
+      </li>
+      <li>
+        <strong data-sv>Anmälningsdeadline</strong><strong data-en>Registration deadline</strong>
+        <span data-sv>Anmälan stänger dagen innan tävlingens start.</span>
+        <span data-en>Registration closes the day before the tournament starts.</span>
+      </li>
+      <li>
+        <strong>FIDE-registrering</strong>
+        <span data-sv>SSF-ID (svenska spelare) eller FIDE-ID (utländska spelare) är obligatoriskt vid anmälan.</span>
+        <span data-en>SSF ID (Swedish players) or FIDE ID (foreign players) is required at registration.</span>
+      </li>
+      <li>
+        <strong data-sv>FIDE-regler</strong><strong data-en>FIDE rules</strong>
+        <span data-sv>Tävlingen spelas enligt FIDE:s regler. Alla partier är ELO-rankade.</span>
+        <span data-en>The tournament follows FIDE rules. All games are ELO rated.</span>
+      </li>
+      <li>
+        <strong data-sv>Frågor</strong><strong data-en>Questions</strong>
+        <span data-sv>Kontakta oss på <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>.</span>
+        <span data-en>Contact us at <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ANMÄLAN -->
+<section class="section section-alt" id="anmalan"
+  style="background-image:url('/domkyrkan.jpg');background-size:cover;background-position:center 30%;position:relative;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,17,28,0.82) 0%,rgba(10,17,28,0.75) 60%,rgba(15,23,34,0.92) 100%);pointer-events:none;z-index:0;"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div class="section-label" data-sv>Anmälan</div><div class="section-label" data-en>Registration</div>
+      <h2 style="color:#f5ecd9;" data-sv>Anmäl dig</h2><h2 style="color:#f5ecd9;" data-en>Register</h2>
+      <p style="color:#c9bfa8;max-width:520px;margin:10px auto 0;" data-sv>Välj turnering, fyll i dina uppgifter och betala. SSF-ID eller FIDE-ID är obligatoriskt.</p>
+      <p style="color:#c9bfa8;max-width:520px;margin:10px auto 0;" data-en>Select a tournament, fill in your details and pay. SSF ID or FIDE ID is required.</p>
+    </div>
+    <div class="checkout-wrap">
+
+      <!-- VÄNSTER: turnering + uppgifter -->
+      <div class="checkout-panel">
+        <h3 data-sv>Välj turneringar</h3><h3 data-en>Select tournaments</h3>
+        <div class="t-check-group" id="t-check-group">
+          <label class="t-check-item" id="chk-sep" onclick="toggleCart('Sep Weekend 2026','chk-sep')">
+            <input type="checkbox" id="cb-sep" value="Sep Weekend 2026" onchange="updateCart()">
+            <div>
+              <div class="t-check-label" data-sv>September</div><div class="t-check-label" data-en>September</div>
+              <div class="t-check-sub">11–13 september 2026 &middot; 400 kr</div>
+            </div>
+          </label>
+          <label class="t-check-item" id="chk-okt" onclick="toggleCart('Okt Weekend 2026','chk-okt')">
+            <input type="checkbox" id="cb-okt" value="Okt Weekend 2026" onchange="updateCart()">
+            <div>
+              <div class="t-check-label" data-sv>Oktober</div><div class="t-check-label" data-en>October</div>
+              <div class="t-check-sub">23–25 oktober 2026 &middot; 400 kr</div>
+            </div>
+          </label>
+          <label class="t-check-item" id="chk-dec" onclick="toggleCart('Dec Weekend 2026','chk-dec')">
+            <input type="checkbox" id="cb-dec" value="Dec Weekend 2026" onchange="updateCart()">
+            <div>
+              <div class="t-check-label" data-sv>December</div><div class="t-check-label" data-en>December</div>
+              <div class="t-check-sub">11–13 december 2026 &middot; 400 kr</div>
+            </div>
+          </label>
+        </div>
+
+        <h3 data-sv>Dina uppgifter</h3><h3 data-en>Your details</h3>
+        <div class="form-field">
+          <label for="f-name"><span data-sv>Namn</span><span data-en>Name</span> *</label>
+          <input id="f-name" required oninput="clearFieldError('f-name')">
+        </div>
+        <div class="form-field">
+          <label for="f-email">E-post *</label>
+          <input id="f-email" type="email" required oninput="clearFieldError('f-email')">
+        </div>
+        <div class="form-field">
+          <label for="f-club"><span data-sv>Klubb</span><span data-en>Club</span></label>
+          <input id="f-club">
+        </div>
+        <div class="form-field">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;flex-wrap:wrap;gap:8px;">
+            <label for="f-rating" style="margin-bottom:0;">
+              <span id="id-lbl">SSF-ID</span>
+              <span style="color:#c03020;font-size:0.85em;font-weight:600;"> *</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;color:#c9bfa8;cursor:pointer;user-select:none;font-weight:400;">
+              <input type="checkbox" id="cb-foreign" onchange="toggleForeign()" style="cursor:pointer;width:14px;height:14px;">
+              <span data-sv>Utländsk spelare (FIDE-ID)</span><span data-en>Foreign player (FIDE ID)</span>
+            </label>
+          </div>
+          <input id="f-rating" placeholder="t.ex. 123456" oninput="clearFieldError('f-rating')">
+          <div id="ssf-search-wrap" style="margin-top:10px;">
+            <button type="button" onclick="togglePlayerSearch()"
+              style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid rgba(200,191,168,0.4);border-radius:20px;padding:5px 12px;color:#c9bfa8;font-size:0.82rem;cursor:pointer;font-family:var(--sans);font-weight:500;">
+              <span data-sv>Sök SSF-ID</span><span data-en>Look up SSF ID</span>
+            </button>
+            <div id="player-search-box" style="display:none;margin-top:12px;padding:16px;background:var(--bg-soft);border:1px solid var(--line-strong);border-radius:10px;">
+              <p style="margin:0 0 10px;font-size:0.82rem;color:var(--ink-mute);">
+                <span data-sv>Ange efternamn (och valfritt förnamn).</span><span data-en>Enter last name (and optionally first name).</span>
+              </p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div>
+                  <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;"><span data-sv>Efternamn *</span><span data-en>Last name *</span></label>
+                  <input id="ps-efternamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.8rem;color:var(--ink-mute);margin-bottom:5px;"><span data-sv>Förnamn (valfritt)</span><span data-en>First name (optional)</span></label>
+                  <input id="ps-fornamn" style="width:100%;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--ink);font-family:var(--sans);font-size:0.9rem;" onkeydown="if(event.key==='Enter')searchSSFPlayer()">
+                </div>
+              </div>
+              <button type="button" onclick="searchSSFPlayer()" style="width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:0.9rem;cursor:pointer;">
+                <span data-sv>Sök</span><span data-en>Search</span>
+              </button>
+              <div id="ps-results" style="margin-top:12px;"></div>
+            </div>
+          </div>
+          <p id="foreign-note" style="display:none;margin:8px 0 0;font-size:0.85rem;color:#c9bfa8;font-style:italic;">
+            <span data-sv>Ange ditt FIDE-ID (7 siffror). Obligatoriskt.</span>
+            <span data-en>Enter your FIDE ID (7 digits). Required.</span>
+          </p>
+        </div>
+        <div class="form-field">
+          <label for="f-msg">
+            <span data-sv>Övrigt</span><span data-en>Other</span>
+            <span style="color:var(--ink-mute);font-size:0.85em;"> (<span data-sv>valfritt</span><span data-en>optional</span>)</span>
+          </label>
+          <textarea id="f-msg"></textarea>
+        </div>
+      </div>
+
+      <!-- HÖGER: betalning -->
+      <div class="checkout-panel">
+        <h3 data-sv>Din anmälan</h3><h3 data-en>Your registration</h3>
+        <div class="cart-summary-box" id="cart-box">
+          <p class="cart-empty" data-sv id="cart-empty-sv">Ingen turnering vald ännu — välj en eller flera till vänster.</p>
+          <p class="cart-empty" data-en id="cart-empty-en">No tournament selected yet — pick one or more on the left.</p>
+          <div id="cart-items" style="display:none;"></div>
+          <div id="cart-total-row" class="cart-total-row" style="display:none;">
+            <span data-sv>Totalt</span><span data-en>Total</span>
+            <span id="cart-total-val"></span>
+          </div>
+        </div>
+        <h3 style="margin-bottom:8px;" data-sv>Betalning</h3><h3 style="margin-bottom:8px;" data-en>Payment</h3>
+        <p style="font-size:0.88rem;color:var(--ink-mute);margin-bottom:20px;" data-sv>Betala direkt med kort, via Swish eller Plusgiro.</p>
+        <p style="font-size:0.88rem;color:var(--ink-mute);margin-bottom:20px;" data-en>Pay by card, Swish, or bank transfer.</p>
+        <div class="payment-options">
+          <div class="pay-option" id="opt-card" onclick="selectPayment('card')">
+            <div class="pay-icon">
+              <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="28" height="20" rx="3" fill="#1a3a6e" opacity="0.12"/>
+                <rect x="0" y="6" width="28" height="5" fill="#1a3a6e" opacity="0.18"/>
+                <rect x="3" y="13" width="6" height="3" rx="1" fill="#1a3a6e" opacity="0.35"/>
+              </svg>
+            </div>
+            <div class="pay-name"><span data-sv>Kort</span><span data-en>Card</span></div>
+            <div class="pay-desc">Visa &middot; Mastercard</div>
+          </div>
+          <div class="pay-option" id="opt-swish" onclick="selectPayment('swish')">
+            <div class="pay-icon"><img src="/Swish_Logo_Primary_Dark-BG_P3.png" alt="Swish" style="height:34px;width:auto;border-radius:5px;"></div>
+            <div class="pay-name">Swish</div>
+            <div class="pay-desc"><span data-sv>Direkt</span><span data-en>Instant</span></div>
+          </div>
+          <div class="pay-option" id="opt-pg" onclick="selectPayment('pg')">
+            <div class="pay-icon"><img src="/Plusgirot.png" alt="PlusGirot" style="height:28px;width:auto;border-radius:4px;background:#fff;padding:3px 6px;"></div>
+            <div class="pay-name">Plusgiro</div>
+            <div class="pay-desc"><span data-sv>Bankbetalning</span><span data-en>Bank transfer</span></div>
+          </div>
+        </div>
+
+        <div class="pay-panel" id="panel-card">
+          <div class="pay-chips">
+            <span data-sv>Säker betalning via</span><span data-en>Secure payment via</span>
+            <span class="chip">Stripe</span><span class="chip">VISA</span><span class="chip">Mastercard</span>
+          </div>
+          <p style="font-size:0.82rem;color:var(--ink-mute);margin:10px 0 0;" data-sv>Du skickas till Stripes betalningssida och återvänder hit när betalningen är klar.</p>
+          <p style="font-size:0.82rem;color:var(--ink-mute);margin:10px 0 0;" data-en>You will be redirected to Stripe and returned here when payment is complete.</p>
+        </div>
+
+        <div class="pay-panel" id="panel-swish">
+          <div class="pay-detail-row"><div class="lbl">Swish</div><div class="val">123 138 89 09</div></div>
+          <div class="pay-detail-row">
+            <div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div>
+            <div class="val" id="swish-amount-val">—</div>
+          </div>
+          <p class="pay-note" data-sv>Ange ditt namn och tävlingarna som meddelande. Klicka sedan "Bekräfta anmälan".</p>
+          <p class="pay-note" data-en>Enter your name and the tournament(s) as the message. Then click "Confirm registration".</p>
+        </div>
+
+        <div class="pay-panel" id="panel-pg">
+          <div class="pay-detail-row"><div class="lbl">Plusgiro</div><div class="val">16 13 539-4</div></div>
+          <div class="pay-detail-row">
+            <div class="lbl"><span data-sv>Belopp</span><span data-en>Amount</span></div>
+            <div class="val" id="pg-amount-val">—</div>
+          </div>
+          <p class="pay-note" data-sv>Ange ditt namn och tävlingarna som referens. Klicka sedan "Bekräfta anmälan".</p>
+          <p class="pay-note" data-en>Enter your name and the tournament(s) as reference. Then click "Confirm registration".</p>
+        </div>
+
+        <button id="btn-pay-card" class="btn-pay btn-pay-card" style="display:none;" onclick="payWithCard()">
+          <span id="btn-card-label" data-sv>Betala med kort</span><span id="btn-card-label-en" data-en>Pay by card</span>
+        </button>
+        <button id="btn-pay-manual" class="btn-pay btn-pay-manual" style="display:none;" onclick="submitManualPayment(selectedPayment)">
+          <span data-sv>Bekräfta anmälan</span><span data-en>Confirm registration</span>
+        </button>
+
+        <div id="form-msg"></div>
+
+        <p style="margin-top:20px;font-size:0.8rem;color:var(--ink-mute);text-align:center;" data-sv>
+          Frågor? <a href="mailto:info@uppsalachessfestival.se" style="color:#f5cb6b;">info@uppsalachessfestival.se</a>
+        </p>
+        <p style="margin-top:20px;font-size:0.8rem;color:var(--ink-mute);text-align:center;" data-en>
+          Questions? <a href="mailto:info@uppsalachessfestival.se" style="color:#f5cb6b;">info@uppsalachessfestival.se</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <strong>Uppsala Schackcentrum</strong><br>
+      Ekeby Bruk 6L, Uppsala<br>
+      <a href="https://maps.google.com/?q=Ekeby+Bruk+6L+Uppsala" target="_blank" rel="noopener" data-sv>Visa på karta</a>
+      <a href="https://maps.google.com/?q=Ekeby+Bruk+6L+Uppsala" target="_blank" rel="noopener" data-en>Show on map</a>
+    </div>
+    <div class="footer-col">
+      Uppsala Schackstadssällskap (USSS)<br>
+      <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>
+    </div>
+    <div class="footer-col">
+      <a href="/index.html" data-sv>Uppsala Chess Festival 2026</a>
+      <a href="/index.html" data-en>Uppsala Chess Festival 2026</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── Language ────────────────────────────────────────────────
+  let lang = localStorage.getItem('ucf_lang') || 'sv';
+  function setLang(l) {
+    lang = l;
+    localStorage.setItem('ucf_lang', l);
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-sv]').forEach(el => el.style.display = l === 'sv' ? '' : 'none');
+    document.querySelectorAll('[data-en]').forEach(el => el.style.display = l === 'en' ? '' : 'none');
+    document.getElementById('btn-sv').classList.toggle('active', l === 'sv');
+    document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  }
+  setLang(lang);
+
+  // ─── Nav ────────────────────────────────────────────────────
+  function toggleMobileMenu() {
+    document.querySelector('nav.top ul').classList.toggle('open');
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('nav.top ul a').forEach(a => a.addEventListener('click', () => {
+      document.querySelector('nav.top ul').classList.remove('open');
+    }));
+  });
+
+  // ─── Cart ────────────────────────────────────────────────────
+  const PRICE = 400;
+  const T_LABELS_SV = {
+    'Sep Weekend 2026': 'September · 11–13 sep',
+    'Okt Weekend 2026': 'Oktober · 23–25 okt',
+    'Dec Weekend 2026': 'December · 11–13 dec'
+  };
+  const T_LABELS_EN = {
+    'Sep Weekend 2026': 'September · 11–13 Sep',
+    'Okt Weekend 2026': 'October · 23–25 Oct',
+    'Dec Weekend 2026': 'December · 11–13 Dec'
+  };
+  const CHK_MAP = {
+    'Sep Weekend 2026': 'cb-sep',
+    'Okt Weekend 2026': 'cb-okt',
+    'Dec Weekend 2026': 'cb-dec'
+  };
+  const ITEM_MAP = {
+    'Sep Weekend 2026': 'chk-sep',
+    'Okt Weekend 2026': 'chk-okt',
+    'Dec Weekend 2026': 'chk-dec'
+  };
+
+  function getSelected() {
+    return ['Sep Weekend 2026','Okt Weekend 2026','Dec Weekend 2026']
+      .filter(k => document.getElementById(CHK_MAP[k]) && document.getElementById(CHK_MAP[k]).checked);
+  }
+
+  function toggleCart(key, itemId) {
+    // The click on the label fires before the checkbox changes, so let the
+    // checkbox handle state via its onchange; just update the border style here.
+    setTimeout(updateCart, 0);
+  }
+
+  function updateCart() {
+    const selected = getSelected();
+    const total = selected.length * PRICE;
+    const labels = lang === 'en' ? T_LABELS_EN : T_LABELS_SV;
+
+    // Update item borders
+    Object.keys(ITEM_MAP).forEach(k => {
+      const el = document.getElementById(ITEM_MAP[k]);
+      if (el) el.classList.toggle('added', document.getElementById(CHK_MAP[k]).checked);
+    });
+
+    // Update right panel
+    const emptyEl_sv = document.getElementById('cart-empty-sv');
+    const emptyEl_en = document.getElementById('cart-empty-en');
+    const itemsEl = document.getElementById('cart-items');
+    const totalRowEl = document.getElementById('cart-total-row');
+    const totalValEl = document.getElementById('cart-total-val');
+
+    if (selected.length === 0) {
+      emptyEl_sv.style.display = '';
+      emptyEl_en.style.display = '';
+      itemsEl.style.display = 'none';
+      totalRowEl.style.display = 'none';
+    } else {
+      emptyEl_sv.style.display = 'none';
+      emptyEl_en.style.display = 'none';
+      itemsEl.style.display = 'block';
+      itemsEl.innerHTML = selected.map(k =>
+        `<div class="cart-item-row"><span>${labels[k]}</span><span>${PRICE} kr</span></div>`
+      ).join('');
+      totalRowEl.style.display = 'flex';
+      totalValEl.textContent = total + ' kr';
+    }
+
+    // Update pay button label and manual payment amounts
+    const amountStr = total > 0 ? total + ' kr' : '—';
+    const swishEl = document.getElementById('swish-amount-val');
+    const pgEl = document.getElementById('pg-amount-val');
+    if (swishEl) swishEl.textContent = amountStr;
+    if (pgEl) pgEl.textContent = amountStr;
+    const cardLbl = document.getElementById('btn-card-label');
+    const cardLblEn = document.getElementById('btn-card-label-en');
+    if (cardLbl) cardLbl.textContent = total > 0 ? 'Betala ' + amountStr + ' med kort' : 'Betala med kort';
+    if (cardLblEn) cardLblEn.textContent = total > 0 ? 'Pay ' + total + ' SEK by card' : 'Pay by card';
+  }
+
+  function selectAndScroll(key, cardId) {
+    const cb = document.getElementById(CHK_MAP[key]);
+    if (cb && !cb.checked) { cb.checked = true; }
+    updateCart();
+    document.querySelectorAll('.t-card').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById(cardId);
+    if (card) card.classList.add('selected');
+    setTimeout(() => {
+      document.getElementById('anmalan').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  // ─── Payment ─────────────────────────────────────────────────
+  let selectedPayment = '';
+  function selectPayment(m) {
+    selectedPayment = m;
+    ['card','swish','pg'].forEach(x => {
+      document.getElementById('opt-' + x).classList.toggle('selected', x === m);
+      document.getElementById('panel-' + x).classList.toggle('show', x === m);
+    });
+    document.getElementById('btn-pay-card').style.display = m === 'card' ? 'block' : 'none';
+    document.getElementById('btn-pay-manual').style.display = (m === 'swish' || m === 'pg') ? 'block' : 'none';
+  }
+
+  // ─── Validation ──────────────────────────────────────────────
+  function clearFieldError(id) { document.getElementById(id).classList.remove('field-error'); }
+
+  function validate() {
+    const m = document.getElementById('form-msg');
+    m.className = ''; m.textContent = '';
+    const selected = getSelected();
+    if (selected.length === 0) {
+      m.textContent = lang === 'en' ? 'Please select at least one tournament.' : 'Välj minst en turnering.';
+      m.classList.add('show','error');
+      document.getElementById('t-check-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    if (!selectedPayment) {
+      m.textContent = lang === 'en' ? 'Please choose a payment method.' : 'Välj ett betalningssätt.';
+      m.classList.add('show','error'); return false;
+    }
+    const name = document.getElementById('f-name').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const rating = document.getElementById('f-rating').value.trim();
+    if (!name) {
+      document.getElementById('f-name').classList.add('field-error');
+      m.textContent = lang === 'en' ? 'Please fill in your name.' : 'Fyll i ditt namn.';
+      m.classList.add('show','error'); document.getElementById('f-name').focus(); return false;
+    }
+    if (!email) {
+      document.getElementById('f-email').classList.add('field-error');
+      m.textContent = lang === 'en' ? 'Please fill in your email.' : 'Fyll i din e-postadress.';
+      m.classList.add('show','error'); document.getElementById('f-email').focus(); return false;
+    }
+    if (!rating) {
+      document.getElementById('f-rating').classList.add('field-error');
+      const isForeign = document.getElementById('cb-foreign').checked;
+      m.textContent = lang === 'en'
+        ? (isForeign ? 'FIDE ID is required.' : 'SSF ID is required.')
+        : (isForeign ? 'FIDE-ID är obligatoriskt.' : 'SSF-ID är obligatoriskt.');
+      m.classList.add('show','error'); document.getElementById('f-rating').focus(); return false;
+    }
+    return true;
+  }
+
+  function getFormData() {
+    return {
+      name: document.getElementById('f-name').value.trim(),
+      email: document.getElementById('f-email').value.trim(),
+      club: document.getElementById('f-club').value.trim(),
+      rating: document.getElementById('f-rating').value.trim(),
+      idType: document.getElementById('cb-foreign').checked ? 'fide' : 'ssf',
+      message: document.getElementById('f-msg').value.trim(),
+      tournaments: getSelected(),
+      lang: lang
+    };
+  }
+
+  // ─── Stripe ──────────────────────────────────────────────────
+  async function payWithCard() {
+    if (!validate()) return;
+    const btn = document.getElementById('btn-pay-card');
+    const m = document.getElementById('form-msg');
+    btn.disabled = true;
+    btn.textContent = lang === 'en' ? 'Loading...' : 'Laddar...';
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(getFormData())
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Server error');
+      window.location.href = data.url;
+    } catch (err) {
+      m.innerHTML = lang === 'en'
+        ? 'Card payment unavailable. Please try Swish or Plusgiro, or email <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>.'
+        : 'Kortbetalning är inte tillgänglig. Prova Swish eller Plusgiro, eller hör av dig till <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>.';
+      m.classList.add('show','error');
+      btn.disabled = false;
+      btn.innerHTML = '<span data-sv>Betala 400 kr med kort</span><span data-en>Pay 400 SEK by card</span>';
+      setLang(lang);
+    }
+  }
+
+  // ─── Swish / Plusgiro ────────────────────────────────────────
+  async function submitManualPayment(method) {
+    if (!validate()) return;
+    const m = document.getElementById('form-msg');
+    const btn = document.getElementById('btn-pay-manual');
+    btn.disabled = true;
+    try {
+      const data = { ...getFormData(), paymentMethod: method };
+      const res = await fetch('/api/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Server error');
+      const payInfo = method === 'swish' ? 'Swish: 123 138 89 09' : 'Plusgiro: 16 13 539-4';
+      m.innerHTML = lang === 'en'
+        ? `Registration received! A confirmation has been sent to ${data.email}. Please pay <strong>${getSelected().length * 400} SEK</strong> to: <strong>${payInfo}</strong>`
+        : `Anmälan mottagen! En bekräftelse har skickats till ${data.email}. Kom ihåg att betala <strong>${getSelected().length * 400} kr</strong> till: <strong>${payInfo}</strong>`;
+      m.classList.add('show','success');
+    } catch (err) {
+      m.innerHTML = lang === 'en'
+        ? 'Something went wrong. Please email <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>.'
+        : 'Något gick fel. Hör av dig till <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>.';
+      m.classList.add('show','error');
+      btn.disabled = false;
+    }
+  }
+
+  // ─── Foreign player toggle ───────────────────────────────────
+  function toggleForeign() {
+    const isForeign = document.getElementById('cb-foreign').checked;
+    document.getElementById('id-lbl').textContent = isForeign ? 'FIDE-ID' : 'SSF-ID';
+    document.getElementById('ssf-search-wrap').style.display = isForeign ? 'none' : 'block';
+    document.getElementById('foreign-note').style.display = isForeign ? 'block' : 'none';
+    document.getElementById('player-search-box').style.display = 'none';
+    document.getElementById('f-rating').value = '';
+  }
+
+  // ─── SSF player search ───────────────────────────────────────
+  function togglePlayerSearch() {
+    const box = document.getElementById('player-search-box');
+    const isHidden = box.style.display === 'none';
+    box.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+      const parts = document.getElementById('f-name').value.trim().split(' ');
+      if (parts.length >= 2) {
+        document.getElementById('ps-efternamn').value = parts[parts.length - 1];
+        document.getElementById('ps-fornamn').value = parts.slice(0, -1).join(' ');
+      } else if (parts.length === 1 && parts[0]) {
+        document.getElementById('ps-efternamn').value = parts[0];
+      }
+      document.getElementById('ps-efternamn').focus();
+    }
+  }
+
+  async function searchSSFPlayer() {
+    const fornamn = document.getElementById('ps-fornamn').value.trim();
+    const efternamn = document.getElementById('ps-efternamn').value.trim();
+    const resultsEl = document.getElementById('ps-results');
+    if (!efternamn) {
+      resultsEl.innerHTML = `<p style="color:var(--ink-mute);font-size:0.85rem;margin:0;">${lang === 'en' ? 'Please enter a last name.' : 'Ange ett efternamn.'}</p>`;
+      return;
+    }
+    resultsEl.innerHTML = `<p style="color:var(--ink-mute);font-size:0.85rem;margin:0;">${lang === 'en' ? 'Searching...' : 'Soker...'}</p>`;
+    try {
+      const params = 'efternamn=' + encodeURIComponent(efternamn) + (fornamn ? '&fornamn=' + encodeURIComponent(fornamn) : '');
+      const res = await fetch('/api/search-player?' + params);
+      if (!res.ok) throw new Error('API error');
+      const players = await res.json();
+      if (!Array.isArray(players) || players.length === 0) {
+        resultsEl.innerHTML = `<p style="color:var(--ink-mute);font-size:0.85rem;margin:0;">${lang === 'en' ? 'No player found.' : 'Ingen spelare hittades.'}</p>`;
+        return;
+      }
+      const TITLED = new Set(['GM','IM','WGM','WIM']);
+      resultsEl.innerHTML = players.slice(0, 8).map(p => {
+        const rating = p.elo && p.elo.rating ? ' &middot; Rating: ' + p.elo.rating : '';
+        const title = p.title || '';
+        const badge = TITLED.has(title.toUpperCase()) ? `<span style="background:var(--gold);color:#fff;font-size:0.72rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px;">${title}</span>` : '';
+        return `<div onclick="useSSFPlayer(${p.id}, '${(p.firstName + ' ' + p.lastName).replace(/'/g, "\\'")}')"
+          style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-top:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:all 0.15s;"
+          onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor='var(--line)'">
+          <div>
+            <div style="font-weight:600;color:var(--ink);font-size:0.92rem;">${p.firstName} ${p.lastName}${badge}</div>
+            <div style="font-size:0.78rem;color:var(--ink-mute);margin-top:2px;">${p.club || ''}${rating}</div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--navy);font-weight:700;">ID: ${p.id}</div>
+        </div>`;
+      }).join('');
+    } catch(err) {
+      resultsEl.innerHTML = `<p style="color:#c03020;font-size:0.85rem;margin:0;">${lang === 'en' ? 'Search failed.' : 'Sokning misslyckades.'}</p>`;
+    }
+  }
+
+  function useSSFPlayer(id, fullName) {
+    document.getElementById('f-rating').value = id;
+    const nameField = document.getElementById('f-name');
+    if (!nameField.value.trim()) nameField.value = fullName;
+    document.getElementById('player-search-box').style.display = 'none';
+  }
+</script>
+</body>
+</html>
