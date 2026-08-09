@@ -115,6 +115,16 @@
   .footer-col a { color: #c9bfa8; text-decoration: underline; text-underline-offset: 3px; }
   .footer-col a:hover { color: var(--gold); }
 
+  /* STARTLIST MODAL TABLE */
+  .sl-table { width:100%;border-collapse:collapse;font-size:0.88rem; }
+  .sl-table th { text-align:left;padding:8px 10px;font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-mute);border-bottom:2px solid var(--line-strong); }
+  .sl-table td { padding:9px 10px;border-bottom:1px solid var(--line);color:var(--ink); }
+  .sl-table tr:last-child td { border-bottom:none; }
+  .sl-table tr:hover td { background:var(--bg-soft); }
+  .sl-table .td-nr { width:36px;color:var(--ink-mute);text-align:center; }
+  .sl-table .td-name { font-weight:600; }
+  .sl-table .td-rating { text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-dim); }
+
   /* CHECKOUT / REGISTRATION */
   .checkout-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
   .checkout-panel { background: rgba(248,246,242,0.97); border-radius: 18px; padding: 32px 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
@@ -236,8 +246,8 @@
           <button class="btn-register" onclick="selectAndScroll('Sep Weekend 2026', 'card-sep')" data-sv>Anmäl dig</button>
           <button class="btn-register" onclick="selectAndScroll('Sep Weekend 2026', 'card-sep')" data-en>Register</button>
           <div class="t-links">
-            <a class="t-link active" href="#anmälda-sep" data-sv>Anmälda</a>
-            <a class="t-link active" href="#anmälda-sep" data-en>Registered players</a>
+            <button class="t-link active" onclick="openStartlist(19041,'September · 11–13 sep 2026')" data-sv>Anmälda</button>
+            <button class="t-link active" onclick="openStartlist(19041,'September · 11–13 Sep 2026')" data-en>Registered players</button>
           </div>
         </div>
       </div>
@@ -259,8 +269,8 @@
           <button class="btn-register" onclick="selectAndScroll('Okt Weekend 2026', 'card-okt')" data-sv>Anmäl dig</button>
           <button class="btn-register" onclick="selectAndScroll('Okt Weekend 2026', 'card-okt')" data-en>Register</button>
           <div class="t-links">
-            <a class="t-link active" href="#anmälda-okt" data-sv>Anmälda</a>
-            <a class="t-link active" href="#anmälda-okt" data-en>Registered players</a>
+            <button class="t-link active" onclick="openStartlist(19042,'Oktober · 23–25 okt 2026')" data-sv>Anmälda</button>
+            <button class="t-link active" onclick="openStartlist(19042,'October · 23–25 Oct 2026')" data-en>Registered players</button>
           </div>
         </div>
       </div>
@@ -282,8 +292,8 @@
           <button class="btn-register" onclick="selectAndScroll('Dec Weekend 2026', 'card-dec')" data-sv>Anmäl dig</button>
           <button class="btn-register" onclick="selectAndScroll('Dec Weekend 2026', 'card-dec')" data-en>Register</button>
           <div class="t-links">
-            <a class="t-link active" href="#anmälda-dec" data-sv>Anmälda</a>
-            <a class="t-link active" href="#anmälda-dec" data-en>Registered players</a>
+            <button class="t-link active" onclick="openStartlist(19043,'December · 11–13 dec 2026')" data-sv>Anmälda</button>
+            <button class="t-link active" onclick="openStartlist(19043,'December · 11–13 Dec 2026')" data-en>Registered players</button>
           </div>
         </div>
       </div>
@@ -870,6 +880,73 @@
     if (!nameField.value.trim()) nameField.value = fullName;
     document.getElementById('player-search-box').style.display = 'none';
   }
+
+  // ─── Startlist modal ─────────────────────────────────────────
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  async function openStartlist(id, title) {
+    document.getElementById('sl-modal-label').textContent = lang === 'sv' ? 'Anmälda spelare' : 'Registered players';
+    document.getElementById('sl-modal-title').textContent = title;
+    document.getElementById('sl-modal-body').innerHTML = '<p style="color:var(--ink-mute);font-style:italic;">' + (lang==='sv'?'Hämtar lista...':'Loading...') + '</p>';
+    document.getElementById('sl-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    try {
+      const res = await fetch('https://member.schack.se/public/api/v1/tournament/group/id/' + id);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const raw = data.players || data.contenders || data.participants || [];
+      if (!raw.length) {
+        document.getElementById('sl-modal-body').innerHTML = '<p style="color:var(--ink-mute);">' + (lang==='sv'?'Inga anmälda ännu.':'No registrations yet.') + '</p>';
+        return;
+      }
+      const sorted = raw.map(p => {
+        const pi = p.playerInfo || p;
+        return { pi, rating: pi.elo?.rating || pi.rating || 0 };
+      }).sort((a,b) => {
+        if (a.rating && b.rating) return b.rating - a.rating;
+        if (a.rating) return -1; if (b.rating) return 1;
+        return (a.pi.lastName||'').localeCompare(b.pi.lastName||'','sv');
+      });
+      const sv = lang === 'sv';
+      let h = '<div style="overflow-x:auto"><table class="sl-table"><thead><tr>'
+        + '<th class="td-nr">#</th>'
+        + '<th>' + (sv?'Namn':'Name') + '</th>'
+        + '<th>' + (sv?'Klubb':'Club') + '</th>'
+        + '<th class="td-rating">Rating</th>'
+        + '</tr></thead><tbody>';
+      sorted.forEach(({pi,rating},i) => {
+        const name = [pi.firstName,pi.lastName].filter(Boolean).join(' ')||'–';
+        h += '<tr><td class="td-nr">'+(i+1)+'</td><td class="td-name">'+esc(name)+'</td><td>'+esc(String(pi.club||'–'))+'</td><td class="td-rating">'+(rating||'–')+'</td></tr>';
+      });
+      h += '</tbody></table></div><p style="font-size:0.8rem;color:var(--ink-mute);margin:12px 0 0;">'
+        + sorted.length + (sv?' anmälda':' registered')
+        + ' · <a href="https://member.schack.se/ShowTournamentServlet?id='+id+'&listingtype=1" target="_blank" rel="noopener">'
+        + (sv?'Öppna på member.schack.se':'Open on member.schack.se')+'</a></p>';
+      document.getElementById('sl-modal-body').innerHTML = h;
+    } catch(e) {
+      document.getElementById('sl-modal-body').innerHTML = '<p style="color:var(--ink-mute);">'
+        + (lang==='sv'?'Kunde inte hämta data.':'Could not load data.')
+        + ' <a href="https://member.schack.se/ShowTournamentServlet?id='+id+'&listingtype=1" target="_blank">member.schack.se</a></p>';
+    }
+  }
+
+  function closeStartlist() {
+    document.getElementById('sl-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeStartlist(); });
+
 </script>
+
+<!-- STARTLIST MODAL -->
+<div id="sl-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,17,28,0.72);backdrop-filter:blur(4px);overflow-y:auto;padding:40px 16px;" onclick="if(event.target===this)closeStartlist()">
+  <div style="background:var(--panel);border-radius:18px;max-width:640px;margin:0 auto;padding:32px 28px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <button onclick="closeStartlist()" style="position:absolute;top:16px;right:18px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink-mute);line-height:1;">&#x2715;</button>
+    <div class="section-label" id="sl-modal-label" style="margin-bottom:8px;"></div>
+    <h3 id="sl-modal-title" style="margin:0 0 20px;"></h3>
+    <div id="sl-modal-body"></div>
+  </div>
+</div>
+
 </body>
 </html>
