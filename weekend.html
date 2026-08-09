@@ -172,7 +172,7 @@
 <!-- NAV -->
 <nav class="top">
   <div class="inner">
-    <a href="/weekendschack.html" class="brand">
+    <a href="/weekend.html" class="brand">
       <img src="/logo.png" class="nav-logo" alt="USSS">
       Uppsala Weekend
     </a>
@@ -891,21 +891,18 @@
     document.getElementById('sl-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
     try {
-      const res = await fetch('https://member.schack.se/public/api/v1/tournament/group/id/' + id);
+      const res = await fetch('/api/startlist?id=' + id);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      const raw = data.players || data.contenders || data.participants || [];
+      const raw = data.players || [];
       if (!raw.length) {
         document.getElementById('sl-modal-body').innerHTML = '<p style="color:var(--ink-mute);">' + (lang==='sv'?'Inga anmälda ännu.':'No registrations yet.') + '</p>';
         return;
       }
-      const sorted = raw.map(p => {
-        const pi = p.playerInfo || p;
-        return { pi, rating: pi.elo?.rating || pi.rating || 0 };
-      }).sort((a,b) => {
+      const sorted = raw.slice().sort((a,b) => {
         if (a.rating && b.rating) return b.rating - a.rating;
         if (a.rating) return -1; if (b.rating) return 1;
-        return (a.pi.lastName||'').localeCompare(b.pi.lastName||'','sv');
+        return (a.name||'').localeCompare(b.name||'','sv');
       });
       const sv = lang === 'sv';
       let h = '<div style="overflow-x:auto"><table class="sl-table"><thead><tr>'
@@ -914,9 +911,8 @@
         + '<th>' + (sv?'Klubb':'Club') + '</th>'
         + '<th class="td-rating">Rating</th>'
         + '</tr></thead><tbody>';
-      sorted.forEach(({pi,rating},i) => {
-        const name = [pi.firstName,pi.lastName].filter(Boolean).join(' ')||'–';
-        h += '<tr><td class="td-nr">'+(i+1)+'</td><td class="td-name">'+esc(name)+'</td><td>'+esc(String(pi.club||'–'))+'</td><td class="td-rating">'+(rating||'–')+'</td></tr>';
+      sorted.forEach(({name,club,rating},i) => {
+        h += '<tr><td class="td-nr">'+(i+1)+'</td><td class="td-name">'+esc(name||'–')+'</td><td>'+esc(String(club||'–'))+'</td><td class="td-rating">'+(rating||'–')+'</td></tr>';
       });
       h += '</tbody></table></div><p style="font-size:0.8rem;color:var(--ink-mute);margin:12px 0 0;">'
         + sorted.length + (sv?' anmälda':' registered')
