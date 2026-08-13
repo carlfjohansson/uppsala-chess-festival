@@ -12,7 +12,7 @@ const TOURNAMENTS = {
   'Ungdom':           { name: 'Ungdom — 16 augusti',                              amount: 10000 },
   // Uppsala Weekend Schack 2026
   'Sep Weekend 2026': { name: 'Uppsala September Weekend 2026 — 11–13 september', amount: 40000 },
-  'Okt Weekend 2026': { name: 'Uppsala Oktober Weekend 2026 — 23–25 oktober',     amount: 40000 },
+  'Okt Weekend 2026': { name: 'Uppsala November Weekend 2026 — 6–8 november',     amount: 40000 },
   'Dec Weekend 2026': { name: 'Uppsala December Weekend 2026 — 11–13 december',   amount: 40000 },
 };
 
