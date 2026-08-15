@@ -6,677 +6,214 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Resultat – Uppsala Schackfestival 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#f8f6f2; --panel:#ffffff; --navy:#0d3a6e; --gold:#c07010;
-  --ink:#1a1a2e; --ink-mute:#666; --line:#e0ddd8;
-  --sans:'Lato',sans-serif; --serif:'Playfair Display',serif;
-  --win-bg:#e8f5e9; --win-tx:#2e7d32;
-  --loss-bg:#fdecea; --loss-tx:#c62828;
-  --draw-bg:#fff8e1; --draw-tx:#c07010;
+  --bg:#f8f6f2; --bg-soft:#edeae4; --panel:#ffffff;
+  --navy:#0d3a6e; --gold:#c07010;
+  --ink:#12203a; --ink-mute:#7a8898; --line:rgba(18,32,58,0.10); --line-strong:rgba(18,32,58,0.22);
+  --sans:'Lato',system-ui,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
 a{color:var(--navy);text-decoration:none}
+h2,h3{font-weight:700;line-height:1.15}
 
+/* NAV */
 nav.top{position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(13,30,50,0.93);border-bottom:1px solid rgba(232,181,82,0.18)}
-nav.top .inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{font-family:var(--sans);font-size:1.1rem;color:#f5cb6b;white-space:nowrap;display:flex;align-items:center;gap:10px;text-decoration:none;letter-spacing:.04em}
-.nav-logo{height:36px;width:auto}
-nav.top ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:.95rem}
+nav.top .inner{max-width:1100px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:var(--sans);font-size:1.05rem;color:#f5cb6b;white-space:nowrap;display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{height:34px;width:auto}
+nav.top ul{display:flex;gap:20px;list-style:none;font-size:.9rem}
 nav.top ul a{color:#c9bfa8;transition:color .2s;text-decoration:none}
-nav.top ul a:hover{color:#f5cb6b}
-nav.top ul a.active{color:#f5cb6b;font-weight:700}
+nav.top ul a:hover,nav.top ul a.active{color:#f5cb6b}
 .lang-toggle{display:flex;border:1px solid rgba(232,181,82,0.4);border-radius:999px;overflow:hidden;font-size:.8rem}
 .lang-toggle button{background:transparent;border:0;color:#c9bfa8;padding:6px 12px;cursor:pointer;font-family:var(--sans);font-weight:600;letter-spacing:.05em}
 .lang-toggle button.active{background:#e8b552;color:#0f1722}
 @media(max-width:720px){nav.top ul{display:none}}
 
-.hero-small{background:var(--navy);color:#fff;padding:32px 24px 28px;text-align:center}
-.hero-small h1{font-family:var(--serif);font-size:1.8rem;color:#f5cb6b}
-.hero-small p{color:#c9bfa8;font-size:.92rem;margin-top:6px}
+/* HERO */
+.hero-small{background:var(--navy);padding:36px 24px 32px;text-align:center}
+.hero-small h1{font-size:clamp(1.6rem,3vw,2.2rem);color:#f5cb6b;font-weight:900;margin-bottom:8px}
+.hero-small p{color:#c9bfa8;font-size:.92rem}
 
-.container{max-width:1100px;margin:0 auto;padding:0 20px}
-.section{padding:32px 0}
+/* LAYOUT */
+.container{max-width:1000px;margin:0 auto;padding:0 24px}
+.section{padding:48px 0}
 
-.tourn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:24px}
-.tourn-btn{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .2s}
-.tourn-btn:hover{border-color:var(--navy);box-shadow:0 4px 12px rgba(13,58,110,.1);transform:translateY(-2px)}
-.tourn-btn.active{border-color:var(--navy);background:var(--navy);color:#fff}
-.tourn-btn .t-name{font-weight:700;font-size:.95rem;display:block}
-.tourn-btn .t-date{font-size:.76rem;opacity:.65;margin-top:3px;display:block}
-.tourn-btn.active .t-name{color:#f5cb6b}
-.tourn-btn.active .t-date{color:#c9bfa8}
+/* SECTION LABEL */
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
 
-.youth-tabs{display:none;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.youth-tabs.visible{display:flex}
-.ytab{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 14px;font-size:.82rem;cursor:pointer;font-family:var(--sans);color:var(--navy);transition:all .15s}
-.ytab:hover{border-color:var(--navy)}
-.ytab.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+/* TOURNAMENT SECTIONS */
+.tourn-section{margin-bottom:40px}
+.tourn-section h2{font-size:1.35rem;color:var(--navy);margin-bottom:6px}
+.tourn-section .tourn-date{font-size:.88rem;color:var(--ink-mute);margin-bottom:16px}
 
-#results-panel{display:none}
-.results-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.results-title{font-family:var(--serif);font-size:1.4rem;color:var(--navy);flex:1}
-.view-tabs{display:flex;gap:6px}
-.vtab{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 14px;font-size:.82rem;cursor:pointer;font-family:var(--sans);color:var(--ink-mute);transition:all .15s}
-.vtab:hover{border-color:var(--navy);color:var(--navy)}
-.vtab.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
-.ssf-link{font-size:.8rem;margin-bottom:10px}
-.ssf-link a{color:var(--ink-mute);text-decoration:underline;text-underline-offset:2px}
+/* GROUP LINKS GRID */
+.group-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.group-link{display:inline-block;padding:8px 16px;border:1px solid var(--line-strong);border-radius:8px;font-size:.88rem;font-weight:600;color:var(--navy);background:var(--panel);transition:all .15s}
+.group-link:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.group-link.single{padding:10px 22px;font-size:.95rem}
 
-.loading-msg{padding:48px;text-align:center;color:var(--ink-mute)}
-.spinner{font-size:2rem;display:block;margin-bottom:12px;animation:spin 1.5s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty-msg{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:36px;text-align:center;color:var(--ink-mute)}
-.empty-msg strong{display:block;font-size:1.05rem;color:var(--navy);margin-bottom:8px}
+/* SSF NOTE */
+.ssf-note{font-size:.82rem;color:var(--ink-mute);margin-top:6px}
+.ssf-note a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
 
-.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
-table{border-collapse:collapse;font-size:.84rem;width:1px;min-width:100%}
-thead th{background:var(--navy);color:#fff;font-weight:600;padding:8px 6px;font-size:.74rem;white-space:nowrap;position:sticky;top:0;z-index:2}
-thead th.th-name{text-align:left;background:#0a2d56;position:sticky;left:0;z-index:3}
-thead th.th-num{width:28px;min-width:28px;padding:8px 2px;text-align:center}
-thead th.th-stat{width:1px;white-space:nowrap;padding:8px 12px}
-tbody tr:nth-child(odd) td{background:var(--panel)}
-tbody tr:nth-child(even) td{background:#faf9f6}
-tbody tr:hover td{background:#f0edea!important}
-td.td-rank{text-align:center;font-weight:700;color:var(--ink-mute);padding:6px 4px;font-size:.82rem;width:28px;border-right:1px solid var(--line)}
-td.td-name{text-align:left;padding:5px 10px 5px 6px;white-space:nowrap;position:sticky;left:0;z-index:1;border-right:1px solid var(--line)}
-tbody tr:nth-child(odd) td.td-name{background:var(--panel)}
-tbody tr:nth-child(even) td.td-name{background:#faf9f6}
-.td-pname{font-weight:600;display:block;line-height:1.3}
-.td-sub{font-size:.70rem;color:var(--ink-mute);display:block;line-height:1.2}
-td.td-cell{text-align:center;padding:6px 10px;color:var(--ink-mute);font-size:.82rem;white-space:nowrap}
-td.td-w{color:var(--win-tx);font-weight:600}
-td.td-d{color:var(--draw-tx);font-weight:600}
-td.td-l{color:var(--loss-tx);font-weight:600}
-td.td-score{text-align:center;font-weight:700;color:var(--navy);padding:6px 12px;font-size:.9rem;border-left:1px solid var(--line);white-space:nowrap}
-td.td-kvp{text-align:center;padding:6px 10px;color:var(--ink-mute);font-size:.75rem}
-td.rc{width:30px;min-width:30px;max-width:30px;padding:4px 1px;text-align:center;font-weight:700;font-size:.84rem;position:relative;border:1px solid rgba(0,0,0,.07)}
-.cw{background:var(--win-bg);color:var(--win-tx)}
-.cl{background:var(--loss-bg);color:var(--loss-tx)}
-.cd{background:var(--draw-bg);color:var(--draw-tx)}
-.cs{background:repeating-linear-gradient(45deg,#f0ede8,#f0ede8 4px,#e8e5e0 4px,#e8e5e0 8px)}
-.ce{color:#bbb;font-size:.72rem}
-.opp{position:absolute;top:2px;font-size:.52rem;font-weight:500;opacity:.6;line-height:1}
-.opp-w{right:2px}.opp-b{left:2px}.opp-c{left:50%;transform:translateX(-50%)}
-.gen{margin-top:12px;color:var(--ink-mute);font-size:.74rem;text-align:right}
-.gen a{color:var(--ink-mute);text-decoration:underline;text-underline-offset:2px}
+/* DIVIDER */
+hr.divider{border:none;border-top:1px solid var(--line-strong);margin:32px 0}
 
-footer{background:var(--navy);color:#c9bfa8;text-align:center;font-size:.82rem;padding:24px;margin-top:48px}
-footer a{color:#f5cb6b}
-
-@media(max-width:600px){
-  .tourn-grid{grid-template-columns:repeat(2,1fr)}
-  .results-header{flex-direction:column;align-items:flex-start}
-}
-
-/* ── Grupper ───────────────────────────────────────────── */
-#groups-panel { margin-top: 40px; }
-.groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 24px; }
-@media (max-width: 600px) { .groups-grid { grid-template-columns: 1fr; } }
-.groups-heading { font-family: var(--serif); font-size: 1.4rem; color: var(--navy); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--gold); }
-.group-section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 28px; overflow: hidden; }
-.group-section-header { background: var(--navy); color: #fff; padding: 12px 20px; display: flex; align-items: baseline; gap: 12px; }
-.group-section-header h3 { font-family: var(--serif); font-size: 1.1rem; color: #f5cb6b; margin: 0; }
-.group-section-header .group-range { font-size: .78rem; color: #c9bfa8; }
-.group-section-body { padding: 0; }
-.groups-placeholder { background: var(--panel); border: 1px dashed var(--line); border-radius: 10px; padding: 32px; text-align: center; color: var(--ink-mute); }
-.groups-placeholder strong { display: block; font-size: 1rem; color: var(--navy); margin-bottom: 8px; }
+/* FOOTER */
+footer{background:var(--navy);color:#c9bfa8;padding:28px 24px;text-align:center;font-size:.85rem;margin-top:0}
+footer a{color:#c9bfa8;text-decoration:underline}
 </style>
 </head>
 <body>
 
 <nav class="top">
   <div class="inner">
-    <a href="/" class="brand"><img src="/logo.png" alt="UCF" class="nav-logo"><span class="sv">Uppsala Schackfestival</span><span class="en" style="display:none">6th Uppsala Chess Festival</span></a>
+    <a href="/index.html" class="brand">
+      <img src="/logo.png" class="nav-logo" alt="USSS">
+      Uppsala Chess Festival 2026
+    </a>
     <ul>
-      <li><a href="/"><span class="sv">Hem</span><span class="en" style="display:none">Home</span></a></li>
-      <li><a href="/resultat.html" class="active"><span class="sv">Resultat</span><span class="en" style="display:none">Results</span></a></li>
-      <li><a href="/live.html">⚡ Live</a></li>
+      <li><a href="/index.html"><span data-sv>Hem</span><span data-en style="display:none">Home</span></a></li>
+      <li><a href="/resultat.html" class="active">Resultat</a></li>
+      <li><a href="/weekend.html"><span data-sv>Uppsala Weekend</span><span data-en style="display:none">Uppsala Weekend</span></a></li>
     </ul>
     <div class="lang-toggle">
-      <button class="active" onclick="setLang('sv')">SV</button>
-      <button onclick="setLang('en')">EN</button>
+      <button id="btn-sv" class="active" onclick="setLang('sv')">SV</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
     </div>
   </div>
 </nav>
 
 <div class="hero-small">
-  <h1><span class="sv">Resultat & startlistor</span><span class="en" style="display:none">Results & start lists</span></h1>
-  <p><span class="sv">Välj en turnering nedan</span><span class="en" style="display:none">Select a tournament below</span></p>
+  <h1><span data-sv>Resultat</span><span data-en style="display:none">Results</span></h1>
+  <p><span data-sv>Resultat och lottning via Sveriges Schackförbunds resultatsystem</span><span data-en style="display:none">Results and pairings via the Swedish Chess Federation's result system</span></p>
 </div>
 
 <div class="container">
   <div class="section">
-    <div class="tourn-grid" id="tourn-grid"></div>
 
-    <div class="youth-tabs" id="youth-tabs">
-      <button class="ytab active" onclick="selectYouth(18502,this)">2006–2008</button>
-      <button class="ytab" onclick="selectYouth(18501,this)">2009–2011</button>
-      <button class="ytab" onclick="selectYouth(18500,this)">2012–2014</button>
-      <button class="ytab" onclick="selectYouth(18499,this)">2015–</button>
-    </div>
+    <div class="section-label" data-sv>Helgtävlingar</div>
+    <div class="section-label" data-en style="display:none">Weekend tournaments</div>
 
-    <div id="results-panel">
-      <div class="results-header">
-        <div class="results-title" id="results-title"></div>
-        <div class="view-tabs" id="view-tabs" style="display:none">
-          <button class="vtab active" onclick="switchView('cross',this)"><span class="sv">Korstabell</span><span class="en" style="display:none">Cross table</span></button>
-          <button class="vtab" onclick="switchView('round',this)"><span class="sv">Rond för rond</span><span class="en" style="display:none">Round by round</span></button>
-          <button class="vtab" onclick="switchView('compact',this)"><span class="sv">Ställning</span><span class="en" style="display:none">Standings</span></button>
-        </div>
+    <!-- WEEKEND 1 -->
+    <div class="tourn-section">
+      <h2>Weekend 1</h2>
+      <div class="tourn-date">7–9 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19022" target="_blank" rel="noopener">Grupp 1</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19023" target="_blank" rel="noopener">Grupp 2</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19024" target="_blank" rel="noopener">Grupp 3</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19025" target="_blank" rel="noopener">Grupp 4</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19026" target="_blank" rel="noopener">Grupp 5</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19027" target="_blank" rel="noopener">Grupp 6</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19028" target="_blank" rel="noopener">Grupp 7</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19029" target="_blank" rel="noopener">Grupp 8</a>
       </div>
-      <div class="ssf-link" id="ssf-link"></div>
-      <div id="tab-cross"></div>
-      <div id="tab-round" style="display:none"></div>
-      <div id="tab-compact" style="display:none"></div>
-      <div id="tab-startlist" style="display:none"></div>
-      <div class="gen" id="results-footer"></div>
     </div>
 
-    <!-- ── Berger-grupper Weekend 1 ────────────────────────────── -->
-    <div id="groups-panel" style="display:none">
-      <h2 class="groups-heading sv">Bergergrupper – Weekend 1</h2>
-      <h2 class="groups-heading en" style="display:none">Round Robin Groups – Weekend 1</h2>
-      <div id="groups-container"></div>
+    <hr class="divider">
+
+    <!-- WEEKEND 2 -->
+    <div class="tourn-section">
+      <h2>Weekend 2</h2>
+      <div class="tourn-date">14–16 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19095" target="_blank" rel="noopener">Grupp 1</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19096" target="_blank" rel="noopener">Grupp 2</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19097" target="_blank" rel="noopener">Grupp 3</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19098" target="_blank" rel="noopener">Grupp 4</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19099" target="_blank" rel="noopener">Grupp 5</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=19100" target="_blank" rel="noopener">Grupp 6</a>
+      </div>
     </div>
+
+    <hr class="divider">
+
+    <div class="section-label" data-sv>Övriga tävlingar</div>
+    <div class="section-label" data-en style="display:none">Other tournaments</div>
+
+    <!-- SNABBSCHACK -->
+    <div class="tourn-section">
+      <h2><span data-sv>Snabbschack</span><span data-en style="display:none">Rapid</span></h2>
+      <div class="tourn-date">10 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link single" href="https://member.schack.se/ShowTournamentServlet?id=18496" target="_blank" rel="noopener"><span data-sv>Resultat och lottning</span><span data-en style="display:none">Results and pairings</span></a>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- CHESS960 -->
+    <div class="tourn-section">
+      <h2>Chess960</h2>
+      <div class="tourn-date">11 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link single" href="https://member.schack.se/ShowTournamentServlet?id=18495" target="_blank" rel="noopener"><span data-sv>Resultat och lottning</span><span data-en style="display:none">Results and pairings</span></a>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- BLIXT -->
+    <div class="tourn-section">
+      <h2><span data-sv>Blixt</span><span data-en style="display:none">Blitz</span></h2>
+      <div class="tourn-date">12 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link single" href="https://member.schack.se/ShowTournamentServlet?id=18489" target="_blank" rel="noopener"><span data-sv>Resultat och lottning</span><span data-en style="display:none">Results and pairings</span></a>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- AMATÖR -->
+    <div class="tourn-section">
+      <h2><span data-sv>Amatörtävling</span><span data-en style="display:none">Amateur</span></h2>
+      <div class="tourn-date">13 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link single" href="https://member.schack.se/ShowTournamentServlet?id=18491" target="_blank" rel="noopener"><span data-sv>Resultat och lottning</span><span data-en style="display:none">Results and pairings</span></a>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- UNGDOM -->
+    <div class="tourn-section">
+      <h2><span data-sv>Ungdom</span><span data-en style="display:none">Youth</span></h2>
+      <div class="tourn-date">16 augusti 2026</div>
+      <div class="group-grid">
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=18500" target="_blank" rel="noopener">2006–2008</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=18501" target="_blank" rel="noopener">2009–2011</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=18502" target="_blank" rel="noopener">2012–2014</a>
+        <a class="group-link" href="https://member.schack.se/ShowTournamentServlet?id=18499" target="_blank" rel="noopener">2015–</a>
+      </div>
+    </div>
+
+    <p class="ssf-note" data-sv>Resultat och lottning hanteras av <a href="https://member.schack.se" target="_blank" rel="noopener">Sveriges Schackförbund</a>.</p>
+    <p class="ssf-note" data-en style="display:none">Results and pairings managed by <a href="https://member.schack.se" target="_blank" rel="noopener">the Swedish Chess Federation</a>.</p>
+
   </div>
 </div>
 
 <footer>
-  <a href="/">Uppsala Schackfestival 2026</a> &nbsp;·&nbsp;
-  <span class="sv">Data från member.schack.se</span><span class="en" style="display:none">Data from member.schack.se</span>
+  Uppsala Schackstadssällskap (USSS) &middot;
+  <a href="mailto:info@uppsalachessfestival.se">info@uppsalachessfestival.se</a>
 </footer>
 
 <script>
-const TOURNAMENTS = [
-  {id:18485, sv:'Weekend 1',         en:'Weekend 1',      date:'7–9 aug'},
-  {id:18494, sv:'Weekend 2',         en:'Weekend 2',      date:'14–16 aug'},
-  {id:18496, sv:'Snabbschack',       en:'Rapid',          date:'10 aug'},
-  {id:18495, sv:'Chess960',          en:'Chess960',       date:'11 aug'},
-  {id:18489, sv:'Blixt',             en:'Blitz',          date:'12 aug'},
-  {id:18491, sv:'Amatör',            en:'Amateur',        date:'13 aug'},
-  {id:'youth',sv:'Ungdom',           en:'Youth',          date:'16 aug', youth:true},
-];
-const YOUTH_IDS = [18502,18501,18500,18499];
-
-// ── Grupper Weekend 1 ────────────────────────────────────────────────
-// Fyll i riktiga SSF-turnerings-IDs när de är tilldelade (tätt inpå rond 1).
-// Varje element är ett objekt: {id, swiss?:true, rounds?:N}
-// Exempel nästa år: const WEEKEND1_GROUPS = [12345, 12346, 12347, 12348];
-// Lämna tomt ([]) tills IDsen är kända — då visas ett väntningsmeddelande.
-const WEEKEND1_GROUPS = [
-  {id:19022}, {id:19023}, {id:19024}, {id:19025},
-  {id:19026}, {id:19027}, {id:19028},
-  {id:19029, swiss:true, rounds:5}
-];
-const BASE = 'https://member.schack.se/public/api/v1';
-let lang = 'sv';
-let currentId = null;
-
-// Language
-function setLang(l) {
-  lang = l;
-  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.lang-toggle button:${l==='sv'?'first':'last'}-child`).classList.add('active');
-  document.querySelectorAll('.sv').forEach(e => e.style.display = l==='sv'?'':'none');
-  document.querySelectorAll('.en').forEach(e => e.style.display = l==='en'?'':'none');
-  buildGrid();
-}
-
-// Grid
-function buildGrid() {
-  document.getElementById('tourn-grid').innerHTML = TOURNAMENTS.map(t => {
-    const isActive = currentId === t.id || (t.youth && YOUTH_IDS.includes(currentId));
-    return `<button class="tourn-btn${isActive?' active':''}" onclick="selectTourn('${t.id}',this)" data-id="${t.id}">
-      <span class="t-name">${lang==='sv'?t.sv:t.en}</span>
-      <span class="t-date">${t.date}</span>
-    </button>`;
-  }).join('');
-}
-buildGrid();
-
-function selectTourn(id, btn) {
-  document.querySelectorAll('.tourn-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const youthTabs   = document.getElementById('youth-tabs');
-  const groupsPanel = document.getElementById('groups-panel');
-  if (id==='youth') {
-    youthTabs.classList.add('visible');
-    groupsPanel.style.display = 'none';
-    selectYouth(YOUTH_IDS[0], document.querySelector('.ytab'));
-  } else if (id==='18485') {
-    // Weekend 1 → visa Berger-grupperna
-    youthTabs.classList.remove('visible');
-    document.getElementById('results-panel').style.display = 'none';
-    groupsPanel.style.display = 'block';
-    loadGroups();
-  } else {
-    youthTabs.classList.remove('visible');
-    groupsPanel.style.display = 'none';
-    load(parseInt(id));
+  let lang = localStorage.getItem('ucf_lang') || 'sv';
+  function setLang(l) {
+    lang = l;
+    localStorage.setItem('ucf_lang', l);
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-sv]').forEach(el => el.style.display = l === 'sv' ? '' : 'none');
+    document.querySelectorAll('[data-en]').forEach(el => el.style.display = l === 'en' ? '' : 'none');
+    document.getElementById('btn-sv').classList.toggle('active', l === 'sv');
+    document.getElementById('btn-en').classList.toggle('active', l === 'en');
   }
-}
-
-function selectYouth(id, btn) {
-  document.querySelectorAll('.ytab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  load(id);
-}
-
-// Load
-async function load(id) {
-  currentId = id;
-  const t = TOURNAMENTS.find(x=>x.id===id||(x.youth&&YOUTH_IDS.includes(id)));
-  const name = t ? (lang==='sv'?t.sv:t.en) : `ID ${id}`;
-  document.getElementById('results-panel').style.display = 'block';
-  document.getElementById('results-title').textContent = name;
-  document.getElementById('view-tabs').style.display = 'none';
-  document.getElementById('ssf-link').innerHTML = '';
-  document.getElementById('results-footer').innerHTML = '';
-  showTab('cross');
-  document.getElementById('tab-cross').innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar data…':'Fetching data…'}</div>`;
-
-  try {
-    const [table, rounds] = await Promise.all([
-      api(`/tournamentresults/table/id/${id}`),
-      api(`/tournamentresults/roundresults/id/${id}`)
-    ]);
-
-    if (!Array.isArray(table)||table.length===0) {
-      await showStartList(id); return;
-    }
-
-    const players = standings(table);
-    const {roundInfo, matrix} = processRounds(players, rounds);
-    const nR = players.length ? Math.max(0,...Object.values(roundInfo).flatMap(r=>Object.keys(r).map(Number))) : 0;
-
-    document.getElementById('tab-cross').innerHTML = wrap(crossTable(players,matrix));
-    document.getElementById('tab-round').innerHTML = nR ? wrap(roundTable(players,roundInfo,nR)) : emptyMsg(lang==='sv'?'Rondinformation saknas':'No round data');
-    document.getElementById('tab-compact').innerHTML = wrap(standingsTable(players));
-    document.getElementById('tab-startlist').style.display = 'none';
-    document.getElementById('view-tabs').style.display = 'flex';
-
-    const now = new Date().toLocaleString('sv-SE',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',','');
-    document.getElementById('results-footer').innerHTML = `${lang==='sv'?'Uppdaterad':'Updated'} ${now} · <a href="https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=1" target="_blank">member.schack.se</a>`;
-    document.getElementById('ssf-link').innerHTML = ssfLink(id);
-  } catch(e) {
-    document.getElementById('tab-cross').innerHTML = emptyMsg(`${lang==='sv'?'Kunde inte hämta data':'Could not fetch data'}: ${esc(String(e))}`);
-  }
-}
-
-async function showStartList(id) {
-  showTab('startlist');
-  const el = document.getElementById('tab-startlist');
-  el.style.display = 'block';
-  document.getElementById('ssf-link').innerHTML = '';
-  el.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar anmälda…':'Fetching registrations…'}</div>`;
-
-  const notStarted = `<div class="empty-msg"><strong>${lang==='sv'?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong><p style="margin-top:8px;font-size:.88rem;color:var(--ink-mute)">${lang==='sv'?'Resultaten visas här när tävlingen startar.':'Results will appear here once the tournament starts.'}</p></div>`;
-
-  try {
-    const data = await api(`/tournament/group/id/${id}`);
-    const rawList = data.players||data.contenders||data.participants||[];
-    if (!rawList.length) { el.innerHTML = notStarted; return; }
-
-    // Sort by rating desc, unrated alphabetically by last name at bottom
-    const list = rawList.map(p => {
-      const pi = p.playerInfo||p;
-      const rating = pi.elo?.rating||pi.rating||0;
-      const lastName = pi.lastName||'';
-      return {p, pi, rating, lastName};
-    }).sort((a,b) => {
-      if (a.rating && b.rating) return b.rating - a.rating;
-      if (a.rating) return -1;
-      if (b.rating) return 1;
-      return a.lastName.localeCompare(b.lastName, 'sv');
-    }).map(x => x.p);
-
-    const sv = lang==='sv';
-    let h = `<div class="empty-msg" style="text-align:left;padding:16px 0 0"><strong style="display:block;margin-bottom:16px;font-size:1rem;">${sv?'Tävlingen har inte börjat än':'Tournament not yet started'}</strong></div><div class="table-wrap"><table><thead><tr>
-      <th class="th-name" style="width:32px;text-align:center">#</th>
-      <th class="th-name">${sv?'Namn':'Name'}</th>
-      <th class="th-stat">${sv?'Klubb':'Club'}</th>
-      <th class="th-stat">Rating</th>
-    </tr></thead><tbody>`;
-    list.forEach((p,i)=>{
-      const pi=p.playerInfo||p;
-      const nm=[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${i+1}`;
-      const club=pi.club||p.club||'–';
-      const rating=pi.elo?.rating||pi.rating||'–';
-      h+=`<tr><td class="td-rank">${i+1}</td><td class="td-name"><span class="td-pname">${esc(nm)}</span></td><td class="td-cell">${esc(String(club))}</td><td class="td-cell">${rating}</td></tr>`;
-    });
-    h += '</tbody></table></div>';
-    el.innerHTML = h;
-    document.getElementById('results-footer').innerHTML = `${lang==='sv'?'Anmälda spelare · Data från':'Registered players · Data from'} member.schack.se`;
-  } catch(e) {
-    el.innerHTML = notStarted;
-  }
-}
-
-function ssfLink(id) {
-  return `<a href="https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=1" target="_blank" rel="noopener">↗ ${lang==='sv'?'Öppna på member.schack.se':'Open on member.schack.se'}</a>`;
-}
-
-function showTab(name) {
-  ['cross','round','compact','startlist'].forEach(t=>{
-    const el=document.getElementById('tab-'+t);
-    el.style.display = t===name?'block':'none';
-  });
-  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('active'));
-}
-function switchView(name, btn) {
-  showTab(name);
-  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function wrap(html) { return `<div class="table-wrap">${html}</div>`; }
-function emptyMsg(msg) { return `<div class="empty-msg"><strong>${msg}</strong></div>`; }
-
-// Data
-function standings(data) {
-  return data.map(p=>{
-    const pi=p.playerInfo||{};
-    const sp=(p.wonGames||0)+(p.drawGames||0)+(p.lostGames||0);
-    const kvpRaw=p.secPoints;
-    return {
-      id:p.contenderId,
-      name:[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${p.contenderId}`,
-      club:pi.club||'', rating:pi.elo?.rating||pi.rating||0,
-      rank:p.place||0, score:p.points||0,
-      kvp:kvpRaw!=null?fmt(Math.round(kvpRaw*2)/2):'',
-      wins:String(p.wonGames||0), draws:String(p.drawGames||0),
-      losses:String(p.lostGames||0), sp:String(sp),
-    };
-  }).sort((a,b)=>{
-    const pa=a.rank||999, pb=b.rank||999;
-    if (pa!==pb) return pa-pb;
-    // Lika placering: sortera efter rating fallande
-    return b.rating-a.rating;
-  });
-}
-function parseRes(v) {
-  if (v===1||v===1.0) return {w:1,b:0};
-  if (v===0||v===0.0) return {w:0,b:1};
-  if (v===0.5||v===2) return {w:.5,b:.5};
-  if (v===3) return {w:0,b:1};
-  if (typeof v==='string') {
-    const s=v.toLowerCase().replace('½','0.5');
-    if (s.includes('1-0')||s==='1') return {w:1,b:0};
-    if (s.includes('0-1')||s==='0') return {w:0,b:1};
-    return {w:.5,b:.5};
-  }
-  return null;
-}
-function processRounds(players, rrs) {
-  const byId={},roundInfo={},matrix={};
-  players.forEach(p=>{byId[p.id]=p;roundInfo[p.id]={};matrix[p.id]={};});
-  // Kommande parningar: spel med giltiga spelar-ID men utan resultat
-  const upcomingByRound = {};
-  for (const rr of rrs) {
-    const rn=rr.roundNr, pairs=[];
-    if (rr.games?.length) {
-      for (const g of rr.games) {
-        if (!g.whiteId||!g.blackId) continue;
-        if (g.result==null||g.result===0) {
-          // Parning utan resultat → lägg i roundInfo med upcoming-markering
-          if (!upcomingByRound[rn]) upcomingByRound[rn]=[];
-          upcomingByRound[rn].push({wId:g.whiteId,bId:g.blackId});
-          const wp2=byId[g.whiteId],bp2=byId[g.blackId];
-          if (wp2&&bp2) {
-            roundInfo[g.whiteId][rn]={opp_id:g.blackId,score:null,color:'w',opp_rank:bp2.rank,upcoming:true};
-            roundInfo[g.blackId][rn]={opp_id:g.whiteId,score:null,color:'b',opp_rank:wp2.rank,upcoming:true};
-          }
-          continue;
-        }
-        const res=parseRes(g.result);
-        if (res) pairs.push({wId:g.whiteId,bId:g.blackId,res});
-      }
-    }
-    if (!pairs.length&&rr.homeId&&rr.awayId) {
-      const hr=rr.homeResult??0,ar=rr.awayResult??0;
-      if (!hr&&!ar) continue;
-      pairs.push({wId:rr.homeId,bId:rr.awayId,res:{w:hr===ar?.5:hr>ar?1:0,b:hr===ar?.5:ar>hr?1:0}});
-    }
-    for (const {wId,bId,res} of pairs) {
-      const wp=byId[wId],bp=byId[bId];
-      if (!wp||!bp) continue;
-      roundInfo[wId][rn]={opp_id:bId,score:res.w,color:'w',opp_rank:bp.rank};
-      roundInfo[bId][rn]={opp_id:wId,score:res.b,color:'b',opp_rank:wp.rank};
-      matrix[wId][bId]=res.w===1?'win':res.w===0?'loss':'draw';
-      matrix[bId][wId]=res.b===1?'win':res.b===0?'loss':'draw';
-    }
-  }
-  return {roundInfo,matrix,upcomingByRound};
-}
-
-function upcomingTable(players, upcomingByRound, byId) {
-  const sv = lang === 'sv';
-  // Ta den lägsta rondsiffran som har parningar
-  const rounds = Object.keys(upcomingByRound).map(Number).sort((a,b)=>a-b);
-  if (!rounds.length) return '';
-  const rn = rounds[0];
-  const pairs = upcomingByRound[rn];
-  if (!pairs || !pairs.length) return '';
-
-  // Bygg upp en lookup id→spelare
-  const byId2 = {};
-  players.forEach(p => { byId2[p.id] = p; });
-
-  let h = `<div style="margin-top:16px">
-    <div style="font-size:.8rem;font-weight:700;color:var(--navy);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;padding:0 2px">
-      ${sv?'Lottning rond':'Pairings round'} ${rn}
-    </div>
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th class="th-num" style="width:28px">#</th>
-        <th class="th-name" style="text-align:left">${sv?'Vit':'White'}</th>
-        <th class="th-name" style="text-align:left">${sv?'Svart':'Black'}</th>
-      </tr></thead><tbody>`;
-  pairs.forEach((pair, i) => {
-    const wp = byId2[pair.wId];
-    const bp = byId2[pair.bId];
-    const wName = wp ? esc(wp.name) : `ID ${pair.wId}`;
-    const bName = bp ? esc(bp.name) : `ID ${pair.bId}`;
-    const wSub  = wp ? `<span class="td-sub">${wp.club||''}${wp.rating?' · '+wp.rating:''}</span>` : '';
-    const bSub  = bp ? `<span class="td-sub">${bp.club||''}${bp.rating?' · '+bp.rating:''}</span>` : '';
-    h += `<tr>
-      <td class="td-rank">${i+1}</td>
-      <td class="td-name"><span class="td-pname">⬜ ${wName}</span>${wSub}</td>
-      <td class="td-name"><span class="td-pname">⬛ ${bName}</span>${bSub}</td>
-    </tr>`;
-  });
-  return h + '</tbody></table></div></div>';
-}
-
-function fmt(s) { const w=Math.floor(s),h=Math.abs(s-w-.5)<.01; return (w===0&&h)?'½':String(w)+(h?'½':''); }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function pCells(p) {
-  const sub=[p.club,p.rating?`Rating ${p.rating}`:undefined].filter(Boolean).join(' · ');
-  return `<td class="td-rank">${p.rank}</td><td class="td-name"><span class="td-pname">${esc(p.name)}</span>${sub?`<span class="td-sub">${esc(sub)}</span>`:''}</td>`;
-}
-
-function crossTable(players, matrix) {
-  const sv=lang==='sv';
-  let h=`<table><thead><tr><th class="th-name" colspan="2">${sv?'Spelare':'Player'}</th>`;
-  players.forEach((_,j)=>h+=`<th class="th-num" title="${esc(players[j].name)}">${j+1}</th>`);
-  h+=`<th class="th-stat">${sv?'Poäng':'Points'}</th><th class="th-stat">KV.P</th></tr></thead><tbody>`;
-  players.forEach((p,i)=>{
-    h+='<tr>'+pCells(p);
-    let sc=0;
-    players.forEach((opp,j)=>{
-      if (i===j){h+='<td class="rc cs"></td>';return;}
-      const v=matrix[p.id]?.[opp.id];
-      const cls={win:'cw',loss:'cl',draw:'cd'}[v]||'ce';
-      const lbl={win:'1',loss:'0',draw:'½'}[v]||'–';
-      h+=`<td class="rc ${cls}" title="${esc(p.name)} vs ${esc(opp.name)}">${lbl}</td>`;
-      sc+=v==='win'?1:v==='draw'?.5:0;
-    });
-    h+=`<td class="td-score">${fmt(sc)}</td><td class="td-kvp">${esc(p.kvp)}</td></tr>`;
-  });
-  return h+'</tbody></table>';
-}
-
-function roundTable(players, roundInfo, nR) {
-  const sv=lang==='sv';
-  let h=`<table><thead><tr><th class="th-name" colspan="2">${sv?'Spelare':'Player'}</th>`;
-  for (let r=1;r<=nR;r++) h+=`<th class="th-num">${r}</th>`;
-  h+=`<th class="th-stat">${sv?'Poäng':'Points'}</th><th class="th-stat">KV.P</th></tr></thead><tbody>`;
-  players.forEach(p=>{
-    h+='<tr>'+pCells(p);
-    for (let rn=1;rn<=nR;rn++) {
-      const info=roundInfo[p.id]?.[rn];
-      if (!info){h+='<td class="rc ce">–</td>';continue;}
-      if (info.upcoming) {
-        // Kommande parning: grå bakgrund, motståndarens plats + färgprick
-        const dot=info.color==='w'?'⬜':'⬛';
-        h+=`<td class="rc" style="background:#f0ede8;color:var(--ink-mute);font-size:.75rem" title="${dot} mot nr ${info.opp_rank}">${info.opp_rank}</td>`;
-        continue;
-      }
-      const cls=info.score===1?'cw':info.score===0?'cl':'cd';
-      const lbl=info.score===1?'1':info.score===0?'0':'½';
-      const cc=info.color==='w'?'opp-w':info.color==='b'?'opp-b':'opp-c';
-      h+=`<td class="rc ${cls}"><span class="opp ${cc}">${info.opp_rank}</span>${lbl}</td>`;
-    }
-    h+=`<td class="td-score">${fmt(p.score)}</td><td class="td-kvp">${esc(p.kvp)}</td></tr>`;
-  });
-  return h+'</tbody></table>';
-}
-
-function standingsTable(players) {
-  const sv=lang==='sv';
-  let h=`<table><thead><tr><th class="th-name" colspan="2">${sv?'Spelare':'Player'}</th>
-    <th class="th-stat">${sv?'Spelat':'Played'}</th><th class="th-stat">${sv?'Vinster':'Wins'}</th>
-    <th class="th-stat">${sv?'Remier':'Draws'}</th><th class="th-stat">${sv?'Förluster':'Losses'}</th>
-    <th class="th-stat">${sv?'Poäng':'Points'}</th><th class="th-stat">KV.P</th></tr></thead><tbody>`;
-  players.forEach(p=>{
-    h+='<tr>'+pCells(p);
-    h+=`<td class="td-cell">${p.sp}</td><td class="td-cell td-w">${p.wins}</td><td class="td-cell td-d">${p.draws}</td><td class="td-cell td-l">${p.losses}</td><td class="td-score">${fmt(p.score)}</td><td class="td-kvp">${p.kvp}</td></tr>`;
-  });
-  return h+'</tbody></table>';
-}
-
-
-// ── Berger-grupper ───────────────────────────────────────────────────
-async function loadGroups() {
-  const container = document.getElementById('groups-container');
-  if (!WEEKEND1_GROUPS.length) {
-    container.innerHTML = `<div class="groups-placeholder">
-      <strong>${lang==='sv'?'Grupperna sätts ihop tätt inpå tävlingsstart':'Groups will be formed shortly before round 1'}</strong>
-      <p>${lang==='sv'?'Ladda om sidan när tävlingen startat så visas krysstabellerna här.':'Reload the page once the tournament has started to see the cross-tables here.'}</p>
-    </div>`;
-    return;
-  }
-  container.innerHTML = `<div class="loading-msg"><span class="spinner">♟</span>${lang==='sv'?'Hämtar grupper…':'Fetching groups…'}</div>`;
-  
-  const sections = await Promise.all(WEEKEND1_GROUPS.map((grp, idx) => loadOneGroup(grp, idx)));
-  container.innerHTML = `<div class="groups-grid">${sections.join('')}</div>`;
-}
-
-async function loadOneGroup(grp, idx) {
-  const gid      = grp.id;
-  const isSwiss  = !!grp.swiss;
-  const groupNum = idx + 1;
-  const sv = lang === 'sv';
-  const typeLabel = isSwiss
-    ? `<span style="font-size:.72rem;background:rgba(255,255,255,.15);border-radius:3px;padding:1px 6px;margin-left:4px">${sv?'Schweizer':'Swiss'} · ${grp.rounds||5} ${sv?'ronder':'rounds'}</span>`
-    : `<span style="font-size:.72rem;background:rgba(255,255,255,.15);border-radius:3px;padding:1px 6px;margin-left:4px">${sv?'Berger':'Round Robin'}</span>`;
-  const header = `<div class="group-section-header">
-    <h3>${sv?'Grupp':'Group'} ${groupNum}${typeLabel}</h3>
-    <span class="group-range"><a href="https://member.schack.se/ShowTournamentServlet?id=${gid}&listingtype=1" target="_blank" style="color:#c9bfa8">member.schack.se</a></span>
-  </div>`;
-  try {
-    const [table, rounds] = await Promise.all([
-      api(`/tournamentresults/table/id/${gid}`),
-      api(`/tournamentresults/roundresults/id/${gid}`)
-    ]);
-    if (!Array.isArray(table) || !table.length) {
-      // Tävlingen har inte startat — visa startlista
-      const startData = await api(`/tournament/group/id/${gid}`);
-      const rawList = startData.players||startData.contenders||startData.participants||[];
-      const players = rawList.map(p=>{
-        const pi=p.playerInfo||{};
-        return {
-          name:[pi.firstName,pi.lastName].filter(Boolean).join(' ')||`#${p.contenderId}`,
-          club:pi.club||'',
-          rating:pi.elo?.rating||pi.rating||0
-        };
-      }).sort((a,b)=>b.rating-a.rating);
-      if (!players.length) {
-        return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${sv?'Inga spelare ännu':'No players yet'}</p></div></div></div>`;
-      }
-      const rows = players.map((p,i)=>`<tr>
-        <td class="td-rank">${i+1}</td>
-        <td class="td-name">${esc(p.name)}</td>
-        <td style="padding:5px 10px;font-size:.82rem;color:var(--ink-mute)">${esc(p.club)}</td>
-        <td style="padding:5px 10px;text-align:right;font-weight:600">${p.rating||'—'}</td>
-      </tr>`).join('');
-      const tbl = `<table><thead><tr>
-        <th class="th-num">#</th>
-        <th class="th-name" style="text-align:left">${sv?'Spelare':'Player'}</th>
-        <th class="th-stat">${sv?'Klubb':'Club'}</th>
-        <th class="th-stat">Rating</th>
-      </tr></thead><tbody>${rows}</tbody></table>`;
-      return `<div class="group-section">${header}<div class="group-section-body"><div class="table-wrap">${tbl}</div></div></div>`;
-    }
-
-    const players = standings(table);
-    const {roundInfo, matrix, upcomingByRound} = processRounds(players, rounds);
-    const nR = players.length ? Math.max(0,...Object.values(roundInfo).flatMap(r=>Object.keys(r).map(Number))) : 0;
-
-    // Bygg id-lookup för upcomingTable
-    const byId = {}; players.forEach(p => { byId[p.id] = p; });
-
-    let body;
-    if (isSwiss) {
-      // Schweizer: rond-för-rond + kommande lottning
-      body = nR ? wrap(roundTable(players,roundInfo,nR)) : wrap(standingsTable(players));
-    } else {
-      // Berger: korstabell
-      body = wrap(crossTable(players, matrix));
-    }
-    return `<div class="group-section">${header}<div class="group-section-body">${body}</div></div>`;
-  } catch(e) {
-    return `<div class="group-section">${header}<div class="group-section-body"><div class="empty-msg" style="margin:16px"><p>${esc(String(e))}</p></div></div></div>`;
-  }
-}
-
-async function api(path) {
-  try {
-    const r = await fetch(BASE+path);
-    if (r.ok) return r.json();
-  } catch(e) {}
-  // Fallback to local archive; path like /table/id/19022
-  const m = path.match(/\/([\w]+)\/id\/(\d+)/);
-  if (m) {
-    try {
-      const r2 = await fetch(`/data/archive/ssf/${m[2]}/${m[1]}.json`);
-      if (r2.ok) return r2.json();
-    } catch(e2) {}
-  }
-  throw new Error('Kunde inte hämta data (API och arkiv misslyckades)');
-}
-
-// Hash routing
-function checkHash() {
-  const h = location.hash.replace('#','');
-  if (!h) return;
-  const id = parseInt(h);
-  if (!id) return;
-  if (YOUTH_IDS.includes(id)) {
-    const btn = document.querySelector('[data-id="youth"]');
-    if (btn) selectTourn('youth', btn);
-    const idx = YOUTH_IDS.indexOf(id);
-    const ytabs = document.querySelectorAll('.ytab');
-    if (ytabs[idx]) selectYouth(id, ytabs[idx]);
-  } else {
-    const btn = document.querySelector(`[data-id="${id}"]`);
-    if (btn) selectTourn(String(id), btn);
-  }
-}
-window.addEventListener('hashchange', checkHash);
-checkHash();
+  setLang(lang);
 </script>
 </body>
 </html>
