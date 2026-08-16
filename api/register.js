@@ -1,7 +1,8 @@
 const PRICES = {
   'Weekend 1': 400, 'Weekend 2': 400, 'Snabbschack': 200,
   'Chess960': 200, 'Blixt': 200, 'Amatör': 200,
-  'Ungdom': 100
+  'Ungdom': 100,
+  'Sep Weekend 2026': 400, 'Okt Weekend 2026': 400, 'Dec Weekend 2026': 400,
 };
 
 const DATES = {
