@@ -1,5 +1,6 @@
 // Proxy för SSF:s spelaranmälningslista — undviker CORS
 // Anropas: GET /api/startlist?id=19041
+// Debug:   GET /api/startlist?id=19041&debug=1  (returnerar rå HTML)
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,10 +12,23 @@ module.exports = async (req, res) => {
   try {
     const upstream = await fetch(
       `https://member.schack.se/ShowTournamentServlet?id=${id}&listingtype=1`,
-      { headers: { 'User-Agent': 'Mozilla/5.0 Uppsala-Chess-Festival/1.0' } }
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'sv-SE,sv;q=0.9,en;q=0.8',
+          'Referer': 'https://member.schack.se/',
+        }
+      }
     );
     if (!upstream.ok) throw new Error('SSF HTTP ' + upstream.status);
     const html = await upstream.text();
+
+    // Debug mode: return raw HTML
+    if (req.query.debug === '1') {
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.status(200).send(`STATUS: ${upstream.status}\nLENGTH: ${html.length}\n\n${html.substring(0, 5000)}`);
+    }
 
     const players = [];
     const stripTags = s => s.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ').trim();
