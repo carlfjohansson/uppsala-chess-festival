@@ -49,13 +49,17 @@ module.exports = async (req, res) => {
     const total = tournaments.reduce((s, t) => s + (PRICES[t] || 0), 0);
     const payLabel = paymentMethod === 'swish' ? 'Swish: 123 138 89 09' : 'Plusgiro: 16 13 539-4';
     const isEn = lang === 'en';
+    const WEEKEND_KEYS = ['Sep Weekend 2026', 'Okt Weekend 2026', 'Dec Weekend 2026'];
+    const isWeekend = tournaments.some(t => WEEKEND_KEYS.includes(t));
+    const eventName = isWeekend ? 'Uppsala Weekend Schack 2026' : 'Uppsala Schackfestival 2026';
+    const eventNameEn = isWeekend ? 'Uppsala Weekend Chess 2026' : 'Uppsala Chess Festival 2026';
 
     if (process.env.RESEND_API_KEY) {
 
       // ── Mejl till arrangören ──────────────────────────────────────
       const organizerHtml = `
         <div style="font-family:sans-serif;max-width:560px;color:#222;">
-          <h2 style="color:#b85a2e;">Ny anmälan – Uppsala Schackfestival 2026</h2>
+          <h2 style="color:#b85a2e;">Ny anmälan – ${eventName}</h2>
           <table style="border-collapse:collapse;width:100%;">
             <tr><td style="padding:8px 12px;color:#666;border-bottom:1px solid #eee;">Namn</td><td style="padding:8px 12px;font-weight:bold;border-bottom:1px solid #eee;">${name}</td></tr>
             <tr><td style="padding:8px 12px;color:#666;border-bottom:1px solid #eee;">E-post</td><td style="padding:8px 12px;border-bottom:1px solid #eee;">${email}</td></tr>
@@ -81,8 +85,8 @@ module.exports = async (req, res) => {
         <div style="font-family:sans-serif;background:#0f1722;color:#f5ecd9;padding:40px 0;">
           <div style="max-width:560px;margin:0 auto;background:#1d2a3d;border-radius:16px;overflow:hidden;">
             <div style="background:linear-gradient(135deg,#f5cb6b,#e08a3c);padding:28px 32px;">
-              <div style="font-size:1.8rem;font-weight:bold;color:#0f1722;">Uppsala Schackfestival</div>
-              <div style="color:#0f1722;opacity:0.8;margin-top:6px;">7–16 augusti 2026</div>
+              <div style="font-size:1.8rem;font-weight:bold;color:#0f1722;">${isWeekend ? 'Uppsala Weekend Schack' : 'Uppsala Schackfestival'}</div>
+              <div style="color:#0f1722;opacity:0.8;margin-top:6px;">${isWeekend ? '' : '7–16 augusti 2026'}</div>
             </div>
             <div style="padding:32px;">
               <h2 style="color:#f5cb6b;margin:0 0 8px;">${isEn ? 'Registration confirmed!' : 'Anmälan mottagen!'}</h2>
@@ -136,7 +140,7 @@ module.exports = async (req, res) => {
           `Ny anmälan (${paymentMethod}): ${name} — ${tournaments.join(', ')}`,
           organizerHtml),
         sendEmail(process.env.RESEND_API_KEY, email,
-          isEn ? `Registration confirmed — Uppsala Chess Festival 2026` : `Anmälningsbekräftelse – Uppsala Schackfestival 2026`,
+          isEn ? `Registration confirmed — ${eventNameEn}` : `Anmälningsbekräftelse – ${eventName}`,
           playerHtml)
       ]);
     }

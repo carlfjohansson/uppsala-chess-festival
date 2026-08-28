@@ -1,0 +1,27 @@
+#!/bin/bash
+# Kör detta skript i Terminal för att automatiskt flytta de 78 nedladdade filerna
+# till rätt plats i Tidskrift_for_Schack-mappen (skriver över de felaktiga filerna).
+
+DOWNLOADS="$HOME/Downloads"
+ARKIV="/Users/Carla/Library/Mobile Documents/com~apple~CloudDocs/Desktop/Skrivbord – Carls MacBook Air (120) 2/Carlas skrivbord/USSS/Gambit play/Nya Gambit/Tidskrift_for_Schack"
+
+moved=0; missing=0
+if [ -f "$DOWNLOADS/TfS_1937_01.pdf" ]; then mv "$DOWNLOADS/TfS_1937_01.pdf" "$ARKIV/1937/TfS_1937_01.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_01.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_02.pdf" ]; then mv "$DOWNLOADS/TfS_1937_02.pdf" "$ARKIV/1937/TfS_1937_02.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_02.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_03.pdf" ]; then mv "$DOWNLOADS/TfS_1937_03.pdf" "$ARKIV/1937/TfS_1937_03.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_03.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_04.pdf" ]; then mv "$DOWNLOADS/TfS_1937_04.pdf" "$ARKIV/1937/TfS_1937_04.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_04.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_05.pdf" ]; then mv "$DOWNLOADS/TfS_1937_05.pdf" "$ARKIV/1937/TfS_1937_05.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_05.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_06.pdf" ]; then mv "$DOWNLOADS/TfS_1937_06.pdf" "$ARKIV/1937/TfS_1937_06.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_06.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_07.pdf" ]; then mv "$DOWNLOADS/TfS_1937_07.pdf" "$ARKIV/1937/TfS_1937_07.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_07.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_10.pdf" ]; then mv "$DOWNLOADS/TfS_1937_10.pdf" "$ARKIV/1937/TfS_1937_10.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_10.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_11.pdf" ]; then mv "$DOWNLOADS/TfS_1937_11.pdf" "$ARKIV/1937/TfS_1937_11.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_11.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1937_12.pdf" ]; then mv "$DOWNLOADS/TfS_1937_12.pdf" "$ARKIV/1937/TfS_1937_12.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1937_12.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_01.pdf" ]; then mv "$DOWNLOADS/TfS_1946_01.pdf" "$ARKIV/1946/TfS_1946_01.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_01.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_02.pdf" ]; then mv "$DOWNLOADS/TfS_1946_02.pdf" "$ARKIV/1946/TfS_1946_02.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_02.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_03.pdf" ]; then mv "$DOWNLOADS/TfS_1946_03.pdf" "$ARKIV/1946/TfS_1946_03.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_03.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_04.pdf" ]; then mv "$DOWNLOADS/TfS_1946_04.pdf" "$ARKIV/1946/TfS_1946_04.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_04.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_05.pdf" ]; then mv "$DOWNLOADS/TfS_1946_05.pdf" "$ARKIV/1946/TfS_1946_05.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_05.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_06.pdf" ]; then mv "$DOWNLOADS/TfS_1946_06.pdf" "$ARKIV/1946/TfS_1946_06.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_06.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_07.pdf" ]; then mv "$DOWNLOADS/TfS_1946_07.pdf" "$ARKIV/1946/TfS_1946_07.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_07.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1946_10.pdf" ]; then mv "$DOWNLOADS/TfS_1946_10.pdf" "$ARKIV/1946/TfS_1946_10.pdf"; moved=$((moved+1)); else echo "SAKNAS: TfS_1946_10.pdf"; missing=$((missing+1)); fi
+if [ -f "$DOWNLOADS/TfS_1959_01.pdf" ]; then mv "$DOWNLOADS/TfS_1959_01.pdf" "$ARKIV/1959/TfS_1959_01.pdf";
