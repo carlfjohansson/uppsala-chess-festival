@@ -51,8 +51,8 @@ module.exports = async (req, res) => {
     const isEn = lang === 'en';
     const WEEKEND_KEYS = ['Sep Weekend 2026', 'Okt Weekend 2026', 'Dec Weekend 2026'];
     const isWeekend = tournaments.some(t => WEEKEND_KEYS.includes(t));
-    const eventName = isWeekend ? 'Uppsala Weekend Schack 2026' : 'Uppsala Schackfestival 2026';
-    const eventNameEn = isWeekend ? 'Uppsala Weekend Chess 2026' : 'Uppsala Chess Festival 2026';
+    const eventName = isWeekend ? 'Uppsala Weekend 2026' : 'Uppsala Schackfestival 2026';
+    const eventNameEn = isWeekend ? 'Uppsala Weekend 2026' : 'Uppsala Chess Festival 2026';
 
     if (process.env.RESEND_API_KEY) {
 
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
         <div style="font-family:sans-serif;background:#0f1722;color:#f5ecd9;padding:40px 0;">
           <div style="max-width:560px;margin:0 auto;background:#1d2a3d;border-radius:16px;overflow:hidden;">
             <div style="background:linear-gradient(135deg,#f5cb6b,#e08a3c);padding:28px 32px;">
-              <div style="font-size:1.8rem;font-weight:bold;color:#0f1722;">${isWeekend ? 'Uppsala Weekend Schack' : 'Uppsala Schackfestival'}</div>
+              <div style="font-size:1.8rem;font-weight:bold;color:#0f1722;">${isWeekend ? 'Uppsala Weekend' : 'Uppsala Schackfestival'}</div>
               <div style="color:#0f1722;opacity:0.8;margin-top:6px;">${isWeekend ? '' : '7–16 augusti 2026'}</div>
             </div>
             <div style="padding:32px;">
