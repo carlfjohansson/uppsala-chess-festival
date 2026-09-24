@@ -261,11 +261,11 @@
         <div class="t-prizes" data-sv><strong>Priser per grupp:</strong> 1:a 999 kr &middot; 2:a 500 kr</div>
         <div class="t-prizes" data-en><strong>Prizes per group:</strong> 1st 999 SEK &middot; 2nd 500 SEK</div>
         <div class="t-actions" style="margin-top:16px;">
-          <button class="btn-register" onclick="selectAndScroll('Sep Weekend 2026', 'card-sep')" data-sv>Anmäl dig</button>
-          <button class="btn-register" onclick="selectAndScroll('Sep Weekend 2026', 'card-sep')" data-en>Register</button>
-          <div class="t-links">
-            <button class="t-link active" onclick="openStartlist(19041,'September · 11–13 sep 2026')" data-sv>Anmälda</button>
-            <button class="t-link active" onclick="openStartlist(19041,'September · 11–13 Sep 2026')" data-en>Registered players</button>
+          <div class="t-links" style="flex-wrap:wrap;">
+            <a class="t-link active" href="https://member.schack.se/ShowTournamentServlet?id=19348" target="_blank" rel="noopener">Grupp 1</a>
+            <a class="t-link active" href="https://member.schack.se/ShowTournamentServlet?id=19349" target="_blank" rel="noopener">Grupp 2</a>
+            <a class="t-link active" href="https://member.schack.se/ShowTournamentServlet?id=19350" target="_blank" rel="noopener">Grupp 3</a>
+            <a class="t-link active" href="https://member.schack.se/ShowTournamentServlet?id=19351" target="_blank" rel="noopener">Grupp 4</a>
           </div>
         </div>
       </div>
@@ -388,13 +388,7 @@
       <div class="checkout-panel">
         <h3 data-sv>Välj turneringar</h3><h3 data-en>Select tournaments</h3>
         <div class="t-check-group" id="t-check-group">
-          <label class="t-check-item" id="chk-sep" onclick="toggleCart('Sep Weekend 2026','chk-sep')">
-            <input type="checkbox" id="cb-sep" value="Sep Weekend 2026" onchange="updateCart()">
-            <div>
-              <div class="t-check-label" data-sv>September</div><div class="t-check-label" data-en>September</div>
-              <div class="t-check-sub">11–13 september 2026 &middot; 400 kr</div>
-            </div>
-          </label>
+
           <label class="t-check-item" id="chk-okt" onclick="toggleCart('Okt Weekend 2026','chk-okt')">
             <input type="checkbox" id="cb-okt" value="Okt Weekend 2026" onchange="updateCart()">
             <div>
@@ -603,28 +597,24 @@
   // ─── Cart ────────────────────────────────────────────────────
   const PRICE = 400;
   const T_LABELS_SV = {
-    'Sep Weekend 2026': 'September · 11–13 sep',
     'Okt Weekend 2026': 'November · 6–8 nov',
     'Dec Weekend 2026': 'December · 11–13 dec'
   };
   const T_LABELS_EN = {
-    'Sep Weekend 2026': 'September · 11–13 Sep',
     'Okt Weekend 2026': 'November · 6–8 Nov',
     'Dec Weekend 2026': 'December · 11–13 Dec'
   };
   const CHK_MAP = {
-    'Sep Weekend 2026': 'cb-sep',
     'Okt Weekend 2026': 'cb-okt',
     'Dec Weekend 2026': 'cb-dec'
   };
   const ITEM_MAP = {
-    'Sep Weekend 2026': 'chk-sep',
     'Okt Weekend 2026': 'chk-okt',
     'Dec Weekend 2026': 'chk-dec'
   };
 
   function getSelected() {
-    return ['Sep Weekend 2026','Okt Weekend 2026','Dec Weekend 2026']
+    return ['Okt Weekend 2026','Dec Weekend 2026']
       .filter(k => document.getElementById(CHK_MAP[k]) && document.getElementById(CHK_MAP[k]).checked);
   }
 
