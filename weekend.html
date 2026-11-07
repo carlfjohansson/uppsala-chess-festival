@@ -557,14 +557,7 @@
 
 <script>
   // ─── Language ────────────────────────────────────────────────
-  // Show Live link only when first tournament has started
-  (function() {
-    const start = new Date('2026-09-11T16:00:00+02:00').getTime();
-    if (Date.now() >= start) {
-      const el = document.getElementById('nav-live');
-      if (el) el.style.display = '';
-    }
-  })();
+
 
   let lang = localStorage.getItem('ucf_lang') || 'sv';
   function setLang(l) {
