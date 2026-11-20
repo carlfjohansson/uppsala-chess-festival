@@ -961,6 +961,7 @@
     });
 
     const years = Object.keys(byYear).map(Number).sort((a,b) => b - a);
+    const q = s => JSON.stringify(s).replace(/"/g, '&quot;');
 
     let html = '';
     years.forEach(yr => {
@@ -971,7 +972,7 @@
         html += `<div class="arc-event-date"><span data-sv>${esc(t.date_sv)}</span><span data-en>${esc(t.date_en)}</span></div>`;
         html += `<div class="arc-groups">`;
         t.groups.forEach(g => {
-          html += `<button class="arc-btn" onclick="openResults(${g.id},${JSON.stringify(t.event_sv)},${JSON.stringify(t.event_en)},${JSON.stringify(g.label_sv)},${JSON.stringify(g.label_en)})"><span data-sv>${esc(g.label_sv)}</span><span data-en>${esc(g.label_en)}</span></button>`;
+          html += `<button class="arc-btn" onclick="openResults(${g.id},${q(t.event_sv)},${q(t.event_en)},${q(g.label_sv)},${q(g.label_en)})"><span data-sv>${esc(g.label_sv)}</span><span data-en>${esc(g.label_en)}</span></button>`;
         });
         html += `</div></div>`;
       });
