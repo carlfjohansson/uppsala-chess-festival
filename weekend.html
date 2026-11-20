@@ -108,6 +108,17 @@
 
 
 
+  /* ARCHIVE */
+  .archive-year { margin-bottom: 48px; }
+  .archive-year h3 { font-size: 1.3rem; color: var(--navy); margin-bottom: 4px; }
+  .archive-event { margin-bottom: 24px; }
+  .archive-event-title { font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .archive-event-date { font-size: 0.85rem; color: var(--ink-mute); margin-bottom: 10px; }
+  .archive-groups { display: flex; flex-wrap: wrap; gap: 8px; }
+  .archive-link { display: inline-block; padding: 7px 16px; border: 1px solid var(--line-strong); border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--navy); background: var(--panel); transition: all .15s; }
+  .archive-link:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+  hr.archive-hr { border: none; border-top: 1px solid var(--line); margin: 32px 0; }
+
   /* FOOTER */
   .site-footer { background: var(--navy); color: #c9bfa8; padding: 36px 24px; margin-top: 0; }
   .footer-inner { max-width: 900px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px 48px; align-items: flex-start; }
@@ -203,6 +214,7 @@
       <li><a href="#turneringar"><span data-sv>Turneringar</span><span data-en>Tournaments</span></a></li>
       <li><a href="#anmalan"><span data-sv>Anmälan</span><span data-en>Registration</span></a></li>
       <li><a href="#regler"><span data-sv>Regler</span><span data-en>Rules</span></a></li>
+      <li><a href="#arkiv"><span data-sv>Arkiv</span><span data-en>Archive</span></a></li>
       <li id="nav-live" style="display:none;"><a href="/live.html" style="color:#f5cb6b;font-weight:700;">Live</a></li>
     </ul>
     <div class="lang-toggle">
@@ -532,6 +544,23 @@
           Questions? <a href="mailto:info@uppsalachessfestival.se" style="color:#f5cb6b;">info@uppsalachessfestival.se</a>
         </p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARKIV -->
+<section class="section" id="arkiv">
+  <div class="container">
+    <div style="margin-bottom:32px;">
+      <div class="section-label" data-sv>Historik</div>
+      <div class="section-label" data-en>History</div>
+      <h2 data-sv>Arkiv</h2>
+      <h2 data-en>Archive</h2>
+      <p style="color:var(--ink-mute);font-size:.92rem;margin-top:8px;" data-sv>Resultat från alla tidigare Uppsala Weekend-tävlingar via Sveriges Schackförbunds resultatsystem.</p>
+      <p style="color:var(--ink-mute);font-size:.92rem;margin-top:8px;" data-en>Results from all previous Uppsala Weekend tournaments via the Swedish Chess Federation's result system.</p>
+    </div>
+    <div id="archive-content">
+      <!-- Rendered by JS from /results/archive.json -->
     </div>
   </div>
 </section>
@@ -909,6 +938,52 @@
     document.body.style.overflow = '';
   }
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeStartlist(); });
+
+  // ─── Archive ─────────────────────────────────────────────────
+  (async function renderArchive() {
+    const container = document.getElementById('archive-content');
+    if (!container) return;
+    let data;
+    try {
+      const res = await fetch('/results/archive.json');
+      data = await res.json();
+    } catch(e) {
+      container.innerHTML = '<p style="color:var(--ink-mute);font-size:.88rem;">Kunde inte ladda arkivdata.</p>';
+      return;
+    }
+
+    // Group by year
+    const byYear = {};
+    data.forEach(t => {
+      if (!byYear[t.year]) byYear[t.year] = [];
+      byYear[t.year].push(t);
+    });
+
+    const years = Object.keys(byYear).map(Number).sort((a,b) => b - a);
+    const isSv = () => (localStorage.getItem('ucf_lang') || 'sv') === 'sv';
+
+    let html = '';
+    years.forEach((yr, yi) => {
+      html += `<div class="archive-year">`;
+      html += `<h3>${yr}</h3>`;
+      byYear[yr].forEach(t => {
+        const dateTxt = isSv() ? t.date_sv : t.date_en;
+        html += `<div class="archive-event">`;
+        html += `<div class="archive-event-title">${t.event}</div>`;
+        html += `<div class="archive-event-date">${dateTxt}</div>`;
+        html += `<div class="archive-groups">`;
+        t.groups.forEach(g => {
+          const lbl = isSv() ? g.label_sv : g.label_en;
+          html += `<a class="archive-link" href="https://member.schack.se/ShowTournamentServlet?id=${g.id}" target="_blank" rel="noopener">${lbl}</a>`;
+        });
+        html += `</div></div>`;
+      });
+      if (yi < years.length - 1) html += `<hr class="archive-hr">`;
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
+  })();
 
 </script>
 

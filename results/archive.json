@@ -1,0 +1,125 @@
+[
+  {
+    "year": 2026,
+    "event": "UCF Weekend 1",
+    "date_sv": "7–9 aug 2026",
+    "date_en": "7–9 Aug 2026",
+    "groups": [
+      {"id": 19022, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 19023, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 19024, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 19025, "label_sv": "Grupp 4", "label_en": "Group 4"},
+      {"id": 19026, "label_sv": "Grupp 5", "label_en": "Group 5"},
+      {"id": 19027, "label_sv": "Grupp 6", "label_en": "Group 6"},
+      {"id": 19028, "label_sv": "Grupp 7", "label_en": "Group 7"},
+      {"id": 19029, "label_sv": "Grupp 8", "label_en": "Group 8"}
+    ]
+  },
+  {
+    "year": 2026,
+    "event": "UCF Weekend 2",
+    "date_sv": "14–16 aug 2026",
+    "date_en": "14–16 Aug 2026",
+    "groups": [
+      {"id": 19095, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 19096, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 19097, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 19098, "label_sv": "Grupp 4", "label_en": "Group 4"},
+      {"id": 19099, "label_sv": "Grupp 5", "label_en": "Group 5"},
+      {"id": 19100, "label_sv": "Grupp 6", "label_en": "Group 6"}
+    ]
+  },
+  {
+    "year": 2026,
+    "event": "Uppsala Weekend September",
+    "date_sv": "11–13 sep 2026",
+    "date_en": "11–13 Sep 2026",
+    "groups": [
+      {"id": 19348, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 19349, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 19350, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 19351, "label_sv": "Grupp 4", "label_en": "Group 4"}
+    ]
+  },
+  {
+    "year": 2026,
+    "event": "Uppsala Weekend November",
+    "date_sv": "6–8 nov 2026",
+    "date_en": "6–8 Nov 2026",
+    "groups": [
+      {"id": 19699, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 19700, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 19701, "label_sv": "Grupp 3", "label_en": "Group 3"}
+    ]
+  },
+  {
+    "year": 2025,
+    "event": "UCF Weekend",
+    "date_sv": "8–10 aug 2025",
+    "date_en": "8–10 Aug 2025",
+    "groups": [
+      {"id": 16723, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 16724, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 16725, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 16726, "label_sv": "Grupp 4", "label_en": "Group 4"},
+      {"id": 16727, "label_sv": "Grupp 5", "label_en": "Group 5"},
+      {"id": 16728, "label_sv": "Grupp 6", "label_en": "Group 6"},
+      {"id": 16729, "label_sv": "Grupp 7", "label_en": "Group 7"}
+    ]
+  },
+  {
+    "year": 2024,
+    "event": "UCF Weekend",
+    "date_sv": "9–11 aug 2024",
+    "date_en": "9–11 Aug 2024",
+    "groups": [
+      {"id": 14410, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 14411, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 14412, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 14413, "label_sv": "Grupp 4", "label_en": "Group 4"},
+      {"id": 14414, "label_sv": "Grupp 5", "label_en": "Group 5"},
+      {"id": 14415, "label_sv": "Grupp 6", "label_en": "Group 6"},
+      {"id": 14416, "label_sv": "Grupp 7", "label_en": "Group 7"},
+      {"id": 14417, "label_sv": "Grupp 8", "label_en": "Group 8"}
+    ]
+  },
+  {
+    "year": 2023,
+    "event": "UCF Weekend",
+    "date_sv": "4–6 aug 2023",
+    "date_en": "4–6 Aug 2023",
+    "groups": [
+      {"id": 12126, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 12127, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 12128, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 12129, "label_sv": "Grupp 4", "label_en": "Group 4"},
+      {"id": 12130, "label_sv": "Grupp 5", "label_en": "Group 5"},
+      {"id": 12131, "label_sv": "Grupp 6", "label_en": "Group 6"}
+    ]
+  },
+  {
+    "year": 2022,
+    "event": "UCF Weekend",
+    "date_sv": "5–7 aug 2022",
+    "date_en": "5–7 Aug 2022",
+    "groups": [
+      {"id": 10472, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 10473, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 10474, "label_sv": "Grupp 3", "label_en": "Group 3"}
+    ]
+  },
+  {
+    "year": 2021,
+    "event": "UCF Weekend",
+    "date_sv": "13–15 aug 2021",
+    "date_en": "13–15 Aug 2021",
+    "groups": [
+      {"id": 9022, "label_sv": "Grupp 1", "label_en": "Group 1"},
+      {"id": 9023, "label_sv": "Grupp 2", "label_en": "Group 2"},
+      {"id": 9024, "label_sv": "Grupp 3", "label_en": "Group 3"},
+      {"id": 9025, "label_sv": "Grupp 4", "label_en": "Group 4"},
+      {"id": 9026, "label_sv": "Grupp 5", "label_en": "Group 5"},
+      {"id": 9027, "label_sv": "Grupp 6", "label_en": "Group 6"}
+    ]
+  }
+]
