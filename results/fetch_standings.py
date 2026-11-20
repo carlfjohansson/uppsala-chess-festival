@@ -72,7 +72,7 @@ def main():
     done = 0
 
     for tournament in archive:
-        print(f"\n{tournament['year']} {tournament['event']} ({tournament['date_sv']})")
+        print(f"\n{tournament['year']} {tournament.get('event_sv', tournament.get('event', ''))} ({tournament['date_sv']})")
         for group in tournament["groups"]:
             gid = group["id"]
             done += 1
